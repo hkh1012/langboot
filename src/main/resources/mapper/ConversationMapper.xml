@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.openai.mapper.ConversationMapper">
+
+    <resultMap id="BaseResultMap" type="com.hkh.ai.domain.Conversation">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="sid" column="sid" jdbcType="VARCHAR"/>
+            <result property="type" column="type" jdbcType="CHAR"/>
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="qaTime" column="qa_time" jdbcType="TIMESTAMP"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,sid,type,
+        user_id,qa_time,content,
+        create_time,create_by
+    </sql>
+</mapper>
