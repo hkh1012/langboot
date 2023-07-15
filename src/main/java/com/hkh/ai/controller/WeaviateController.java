@@ -6,10 +6,7 @@ import io.weaviate.client.base.Result;
 import io.weaviate.client.v1.misc.model.Meta;
 import io.weaviate.client.v1.schema.model.Schema;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 向量化
@@ -36,6 +33,12 @@ public class WeaviateController {
     @PutMapping("schema")
     public ResultData<Result<Boolean>> schema() {
         Result<Boolean> result = weaviateVectorStore.createSchema();
+        return ResultData.success(result,"创建成功");
+    }
+
+    @DeleteMapping("schema")
+    public ResultData<Result<Boolean>> delete() {
+        Result<Boolean> result = weaviateVectorStore.deleteSchema();
         return ResultData.success(result,"创建成功");
     }
 

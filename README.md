@@ -71,6 +71,12 @@ openai.token=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 python .\openai_api.py
 ```
 
+## Demo
+聊天
+<img src="src/main/resources/assets/stream-chat.png" alt="聊天"/>
+本地知识库
+<img src="src/main/resources/assets/use_lk.png" alt="知识库"/>
+<img src="src/main/resources/assets/use_lk2.png" alt="知识库"/>
 ## 项目交流群
 <img src="src/main/resources/assets/weixin_01.png" alt="二维码" width="300" height="300" />
 🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。

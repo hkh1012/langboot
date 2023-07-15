@@ -255,4 +255,15 @@ public class WeaviateVectorStore implements VectorStore{
         }
         return resultList;
     }
+
+    public Result<Boolean> deleteSchema() {
+        WeaviateClient client = getClient();
+        Result<Boolean> result = client.schema().classDeleter().withClassName(className).run();
+        if (result.hasErrors()) {
+            System.out.println(result.getError());
+        }else {
+            System.out.println(result.getResult());
+        }
+        return result;
+    }
 }
