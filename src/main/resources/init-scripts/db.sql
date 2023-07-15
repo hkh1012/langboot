@@ -1,17 +1,3 @@
-/*
-Navicat MySQL Data Transfer
-
-Source Server         : myaliyun
-Source Server Version : 50728
-Source Host           : 47.103.117.181:3306
-Source Database       : openai
-
-Target Server Type    : MYSQL
-Target Server Version : 50728
-File Encoding         : 65001
-
-Date: 2023-07-14 21:30:27
-*/
 
 SET FOREIGN_KEY_CHECKS=0;
 

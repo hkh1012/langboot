@@ -4,22 +4,22 @@
 🚩 本项目未涉及AI模型的微调、训练过程，仅使用相关大语言模型作为技术底座实现相关功能，模型的使用请参看相关官方文档。
 
 ## 涉及技术栈
-| 组件          | 版本                                           | 
-|-------------|----------------------------------------------|
-| java        | 17+                                          | 
-| SpringBoot  | 3.1.0                                        | 
-| swagger-ui  | knife4j-openapi3-jakarta-spring-boot-starter | 
-| 工具包         | hutool-all                                   | 
-| 缓存          | redis                                        | 
-| json        | fastjson2                                    | 
-| mysql       | mysql-connector-j                            | 
-| orm框架       | mybatis-plus                                 | 
-| openai库     | openai-java                                  | 
-| vectorstore | weaviate                                     | 
-| 页面          | freemarker、bootstrap、jquery                  | 
-| stream-chat | SSE                                          | 
-| LLMs        | openai、chatglm2                              | 
-| embeddings  | openai、text2vec-transformers                              | 
+| 组件           | 版本                                           | 
+|--------------|----------------------------------------------|
+| java         | 17+                                          | 
+| SpringBoot   | 3.1.0                                        | 
+| swagger-ui   | knife4j-openapi3-jakarta-spring-boot-starter | 
+| 工具包          | hutool-all                                   | 
+| 缓存           | redis                                        | 
+| json         | fastjson2                                    | 
+| mysql        | mysql-connector-j                            | 
+| orm框架        | mybatis-plus                                 | 
+| openai库      | openai-java                                  |
+| 前端           | freemarker、bootstrap、jquery                  | 
+| stream-chat  | SSE                                          | 
+| LLMs         | openai、chatglm2                              | 
+| embeddings   | openai、text2vec-transformers                              |
+| vector store | weaviate                                     |
 
 ## langchain 原理
 <img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>
@@ -54,10 +54,25 @@
 - [ ] 前端
     - [ ] 移动端适配
 
-## DEMO
-<img src="src/main/resources/assets/stream-chat.png" alt="聊天图"/>
-
-
+## Quick Start
+### 1. 执行数据库脚本 
+```sql
+init-script/db.sql
+```
+### 2. 安装本地向量数据库
+```dockerfile
+-- 安装启动本地向量数据库
+docker-compose up -d 
+```
+### 3. 大语言模型
+```java
+// 配置openai api token
+openai.token=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+```python
+# 或者启动本地chatglm2-6B模型
+python .\openai_api.py
+```
 
 ## 项目交流群
 <img src="src/main/resources/assets/weixin_01.png" alt="二维码" width="300" height="300" />
