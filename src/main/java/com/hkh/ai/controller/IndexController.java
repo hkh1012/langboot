@@ -21,7 +21,7 @@ public class IndexController {
         if (sysUser != null){
             return "redirect:/index";
         }else {
-            return "redirect:/auth/loginUI";
+            return "redirect:/login";
         }
     }
 

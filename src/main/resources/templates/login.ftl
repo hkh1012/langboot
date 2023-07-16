@@ -22,7 +22,7 @@
             <div class="login-title">
                 <h3>欢迎使用</h3>
             </div>
-            <form action="/auth/login" method="post">
+            <form action="/login" method="post">
                 <div class="form-group">
                     <label for="username">用户名</label>
                     <input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名">

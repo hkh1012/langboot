@@ -24,12 +24,11 @@ import java.nio.charset.Charset;
  */
 @Controller
 @AllArgsConstructor
-@RequestMapping("/auth")
 public class AuthController {
 
     private final SysUserService sysUserService;
 
-    @GetMapping("/loginUI")
+    @GetMapping("/login")
     public String login(HttpServletRequest httpServletRequest,Model model) {
         SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         if (sysUser!=null){
@@ -51,14 +50,14 @@ public class AuthController {
         }else {
             String errorMsg = "用户名或密码错误";
             errorMsg = URLEncodeUtil.encode(errorMsg);
-            return "redirect:/auth/loginUI?errorMsg=" + errorMsg;
+            return "redirect:/login?errorMsg=" + errorMsg;
         }
     }
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest httpServletRequest) {
         httpServletRequest.getSession().removeAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
-        return "redirect:/auth/loginUI";
+        return "redirect:/login";
     }
 
 

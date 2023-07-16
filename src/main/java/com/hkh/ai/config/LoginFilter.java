@@ -37,7 +37,7 @@ public class LoginFilter implements Filter {
             SysUser sysUser = (SysUser) session.getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
             HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
             if (sysUser==null){
-                httpServletResponse.sendRedirect("/auth/loginUI");
+                httpServletResponse.sendRedirect("/login");
             }else {
                 filterChain.doFilter(servletRequest,servletResponse);
             }

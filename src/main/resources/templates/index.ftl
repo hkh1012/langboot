@@ -30,7 +30,7 @@
                             <div class="form-group">
                                 <label for="name">${sysUser.nickName},您好！</label>
                             </div>
-                            <a href="/auth/logout">退出</a>
+                            <a href="/logout">退出</a>
                         </form>
                     </div>
                 </div>
