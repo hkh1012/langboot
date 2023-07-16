@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 向量化
+ * weaviate 向量化
  */
 @RestController
 @AllArgsConstructor
@@ -39,7 +39,7 @@ public class WeaviateController {
     @DeleteMapping("schema")
     public ResultData<Result<Boolean>> delete() {
         Result<Boolean> result = weaviateVectorStore.deleteSchema();
-        return ResultData.success(result,"创建成功");
+        return ResultData.success(result,"删除成功");
     }
 
 }

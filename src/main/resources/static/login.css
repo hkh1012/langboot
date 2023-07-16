@@ -1,0 +1,74 @@
+body,html{
+    color: #212930;
+    font-family: Apple System,SF Pro SC,SF Pro Display,Helvetica Neue,Arial,PingFang SC,Hiragino Sans GB,STHeiti,Microsoft YaHei,Microsoft JhengHei,Source Han Sans SC,Noto Sans CJK SC,Source Han Sans CN,sans-serif;
+    font-size: 12px;
+    margin: 0;
+    overflow: hidden;
+    height: 100%;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+}
+div, input, textarea, ul {
+    resize: none;
+    outline: none;
+    font-size: inherit;
+    outline-style: none;
+}
+#main-content {
+    width: 100%;
+    height: 100%;
+}
+
+.lunbo{
+    width: 480px;
+    height: 100%;
+    /*background-color: #5fb15f;*/
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.right-container{
+    width: calc(100% - 480px);
+    height: 100%;
+    position: relative;
+    margin-left: 480px;
+}
+.login-title{
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.login-title h3{
+    height: 34px;
+    font-size: 24px;
+    font-weight: 500;
+    color: #212930;
+    line-height: 28px;
+    margin-top: 18px;
+    text-align: left;
+}
+.login-form{
+    width: 400px;
+    min-height: 460px;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    margin-top: -230px;
+    margin-left: -200px;
+}
+
+@media screen and (max-width: 980px){
+    .lunbo {
+        left: -490px;
+    }
+    .right-container{
+        width: 100%;
+        margin-left: 0px;
+    }
+
+    .login-form{
+        width: 80%;
+        margin-left: -40%;
+    }
+}

@@ -6,11 +6,11 @@ html, body {
     height: 100%;
 }
 #chatList{
-    margin-bottom: 100px;
+    margin-bottom: 80px;
 }
 
 #conversation{
-    height: 800px;
+    height: 880px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -239,6 +239,7 @@ pre {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
 }
 
 .chat-icons a{
@@ -284,6 +285,10 @@ a:hover {
     overflow: hidden;
 }
 
+.chat-input-mid{
+    width: 100%;
+}
+
 .session-item-title-selected {
     width: 60%;
     max-width: 60%;
@@ -306,3 +311,28 @@ a:hover {
 .session-item-remove{
     margin-left: 10px;
 }
+
+@media screen and (max-width: 980px){
+    #left-content {
+        display: none;
+    }
+
+    #right-content {
+        display: none;
+    }
+
+    .bottom-fix-btn{
+        width: 100% !important;
+    }
+    .chat-input {
+        justify-content: space-between;
+    }
+    .chat-input-mid{
+        width: 100%;
+    }
+
+    .iconKnowledge,.iconHistory {
+        display: none;
+    }
+}
+

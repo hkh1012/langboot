@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="applicable-device" content="pc,mobile">
     <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/index.css" rel="stylesheet">
     <link href="/static/bootstrap-icons.css" rel="stylesheet" >
@@ -50,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="row" style="position: fixed;left: 50%;bottom: 30px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;">
+        <div class="row bottom-fix-btn" style="position: fixed;height: 50px;background-color: #fff;left: 50%;bottom: 0px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;">
             <div class="col-md-12 chat-input" >
                 <div class="col-md-1 chat-icons">
                     <a title="删除对话内容" class="iconA" href="javascript:void(0);" onclick="removeConversation(this);">
@@ -72,7 +74,7 @@
                         </svg>
                     </a>
                 </div>
-                <div class="col-md-10" style="margin-left: 0px;margin-right: 0px;">
+                <div class="col-md-10 chat-input-mid" style="margin-left: 0px;margin-right: 0px;">
                     <input type="text" id="sayContent" class="form-control" placeholder="来说点什么吧...">
                 </div>
                 <div class="col-md-1" style="text-align: center;padding-left: 0px;padding-right: 0px;">
