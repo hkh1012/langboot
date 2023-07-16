@@ -14,10 +14,10 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("PASSPORT API")
+                        .title("langchain-springboot api")
                         .version("1.0")
-                        .description( "常笑passport接口文档")
-                        .termsOfService("https://huangkh.cxjk.com")
+                        .description( "接口文档")
+                        .termsOfService("https://github.com/hkh1012/langchain-springboot")
                         .license(new License().name("Apache 2.0")
                                 .url("https://license.cxjk.com")));
     }
@@ -26,55 +26,7 @@ public class SwaggerConfig {
     public GroupedOpenApi allApi(){
         return GroupedOpenApi.builder()
                 .group("1全部")
-                .packagesToScan("com.cxjk.passport.biz")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi appApi(){
-        return GroupedOpenApi.builder()
-                .group("2应用")
-                .packagesToScan("com.cxjk.passport.biz.app")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi archApi(){
-        return GroupedOpenApi.builder()
-                .group("3权限")
-                .packagesToScan("com.cxjk.passport.biz.arch")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi authApi(){
-        return GroupedOpenApi.builder()
-                .group("4认证")
-                .packagesToScan("com.cxjk.passport.biz.auth")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi docApi(){
-        return GroupedOpenApi.builder()
-                .group("5文档")
-                .packagesToScan("com.cxjk.passport.biz.doc")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi hrApi(){
-        return GroupedOpenApi.builder()
-                .group("6人事")
-                .packagesToScan("com.cxjk.passport.biz.hr")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi logApi(){
-        return GroupedOpenApi.builder()
-                .group("7日志")
-                .packagesToScan("com.cxjk.passport.biz.log")
+                .packagesToScan("com.hkh.ai.controller")
                 .build();
     }
 

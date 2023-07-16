@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @AllArgsConstructor
 public class RegisterController {
 
-    @GetMapping("/registerUI")
+    @GetMapping("/register")
     public String registerUi(Model model) {
         return "register";
     }
