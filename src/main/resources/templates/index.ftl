@@ -17,6 +17,24 @@
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
         enabled. Please enable
         Javascript and reload this page!</h2></noscript>
+<div class="header-fix-btn">
+    <a title="显示会话列表" class="iconA showSessionList" href="javascript:void(0);"  onclick="showSessionList(this);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-justify" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+    </a>
+
+    <div class="session-title">
+        <span id="top-session-title">aaa</span>
+    </div>
+
+    <a title="使用本地知识库" class="iconA iconKnowledge2" href="javascript:void(0);" onclick="useLocalKnowledge(this);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-r-square" viewBox="0 0 16 16">
+            <path d="M5.5 4.002h3.11c1.71 0 2.741.973 2.741 2.46 0 1.138-.667 1.94-1.495 2.24L11.5 12H9.98L8.52 8.924H6.836V12H5.5V4.002Zm1.335 1.09v2.777h1.549c.995 0 1.573-.463 1.573-1.36 0-.913-.596-1.417-1.537-1.417H6.835Z"/>
+            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2Zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2Z"/>
+        </svg>
+    </a>
+</div>
 <div id="layout-content" class="shadow-md">
     <div id="left-content" class="container1">
         <div id="left-top">
@@ -25,9 +43,9 @@
         <div id="left-bottom">
             <div id="username-text">
                 <div class="row header-bar">
-                    <div class="col-md-12">
-                        <form class="form-inline text-right">
-                            <div class="form-group">
+                    <div>
+                        <form class="logout-form">
+                            <div style="margin-left: 10px;">
                                 <label for="name">${sysUser.nickName},您好！</label>
                             </div>
                             <a href="/logout">退出</a>
@@ -43,7 +61,9 @@
             </div>
         </div>
     </div>
+
     <div id="main-content" class="container">
+
         <div class="row">
             <div class="col-md-12" style="height: 100%;overflow: hidden;padding-left: 0px;padding-right: 0px;">
                 <div id="conversation" class="table table-striped">
@@ -52,7 +72,7 @@
                 </div>
             </div>
         </div>
-        <div class="row bottom-fix-btn" style="position: fixed;height: 50px;background-color: #fff;left: 50%;bottom: 0px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;">
+        <div class="row bottom-fix-btn" style="position: fixed;height: 50px;background-color: #fff;left: 50%;bottom: 10px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;display: flex;">
             <div class="col-md-12 chat-input" >
                 <div class="col-md-1 chat-icons">
                     <a title="删除对话内容" class="iconA" href="javascript:void(0);" onclick="removeConversation(this);">
@@ -135,6 +155,7 @@
         </div>
     </div>
 </div>
+<div id="full-screen-bg" class="full-screen-bg h" onclick="hideSessionList();"></div>
 </body>
 <script src="/static/index.js"></script>
 </html>

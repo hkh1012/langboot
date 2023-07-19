@@ -159,6 +159,8 @@ function selectSession(o){
     sid = $(o).attr("sid");
     localStorage.setItem("sid",sid);
     $(o).addClass('selected-session');
+    let title  = $($(o).children()[0]).html();
+    $("#top-session-title").html(title);
     loadConversation(sid);
 }
 /**
@@ -359,9 +361,11 @@ function removeKnowledge() {
 function loadLocalStatus(){
     let useLk = localStorage.getItem("useLk");
     if (useLk == "false"){
-        $(".iconKnowledge").removeClass("selected")
+        $(".iconKnowledge").removeClass("selected");
+        $(".iconKnowledge2").removeClass("selected");
     }else {
         $(".iconKnowledge").addClass("selected")
+        $(".iconKnowledge2").addClass("selected")
     }
     let useHistory = localStorage.getItem("useHistory");
     if (useHistory == "false"){
@@ -372,6 +376,16 @@ function loadLocalStatus(){
     let localSid = localStorage.getItem("sid");
     let o = $("#left-top").find("div[sid='"+localSid+"']")[0];
     selectSession(o);
+}
+
+function showSessionList(){
+    $("#full-screen-bg").removeClass("h");
+    $("#left-content").addClass("left-menu-show");
+}
+
+function hideSessionList(){
+    $("#full-screen-bg").addClass("h");
+    $("#left-content").removeClass("left-menu-show");
 }
 
 $(function () {
