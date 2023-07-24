@@ -24,12 +24,10 @@
             </div>
             <form action="/login" method="post">
                 <div class="form-group">
-                    <label for="username">用户名</label>
                     <input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名">
-                    <label for="username">密码</label>
                     <input type="password" id="password" name="password" class="form-control" placeholder="密码">
                 </div>
-                <button id="login" class="btn btn-default" type="submit">登录</button>
+                <button id="login" class="btn btn-success btn-lg btn-block" type="submit">登  录</button>
             </form>
             <div class="row">
                 <div class="col-md-12">
