@@ -23,12 +23,16 @@ public class CharacterTextSplitter implements TextSplitter{
             String[] chunks = content.split(splitterProperties.getEndspliter());
             chunkList.addAll(Arrays.asList(chunks));
         }else {
+            int indexMin = 0;
             int len = content.length();
             int i = 0;
             int right = 0;
             while (true) {
                 if (len > right ){
-                    int begin = i*splitterProperties.getSize();
+                    int begin = i*splitterProperties.getSize() - splitterProperties.getOverlay();
+                    if (begin < indexMin){
+                        begin = indexMin;
+                    }
                     int end = splitterProperties.getSize()*(i+1) + splitterProperties.getOverlay();
                     if (end > len){
                         end = len;
