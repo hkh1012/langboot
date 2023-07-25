@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>首页</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="applicable-device" content="pc,mobile">
     <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/index.css" rel="stylesheet">
@@ -64,7 +64,7 @@
 
     <div id="main-content" class="container">
 
-        <div class="row">
+        <div class="row" style="height: 100%;">
             <div class="col-md-12" style="height: 100%;overflow: hidden;padding-left: 0px;padding-right: 0px;">
                 <div id="conversation" class="table table-striped">
                     <div id="chatList">
