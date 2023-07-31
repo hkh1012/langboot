@@ -79,4 +79,5 @@ python .\openai_api.py
 <img src="src/main/resources/assets/use_lk2.png" alt="知识库"/>
 ## 项目交流群
 <img src="src/main/resources/assets/weixin_01.png" alt="二维码" width="300" height="300" />
-🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。
+<img src="src/main/resources/assets/weixin_02.png" alt="二维码" width="300" height="300" />
+🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。如群二维码已过期请扫个人我的个人二维码拉入群
