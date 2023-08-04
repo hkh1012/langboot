@@ -84,6 +84,7 @@ function fixMarkdown(message) {
     // message = message.replaceAll('&lt;','<');
     // message = message.replaceAll('&gt;','>');
     let converter = new showdown.Converter();
+    converter.setOption('tables', 'true');
     message = converter.makeHtml(message);
     return message;
 }

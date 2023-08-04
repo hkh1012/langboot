@@ -2,6 +2,14 @@ html, body {
     height: 100%;
     overflow: hidden;
 }
+.gpt-answer td {
+    padding: 2px;
+    border: 1px solid #555;
+}
+.gpt-answer th {
+    padding: 2px;
+    border: 1px solid #555;
+}
 #main-content{
     height: 100%;
 }
