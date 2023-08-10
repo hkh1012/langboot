@@ -10,6 +10,8 @@ import io.weaviate.client.v1.data.replication.model.ConsistencyLevel;
 import io.weaviate.client.v1.filters.Operator;
 import io.weaviate.client.v1.filters.WhereFilter;
 import io.weaviate.client.v1.graphql.model.GraphQLResponse;
+import io.weaviate.client.v1.graphql.query.argument.NearObjectArgument;
+import io.weaviate.client.v1.graphql.query.argument.NearTextArgument;
 import io.weaviate.client.v1.graphql.query.argument.NearVectorArgument;
 import io.weaviate.client.v1.graphql.query.fields.Field;
 import io.weaviate.client.v1.misc.model.*;
@@ -143,22 +145,35 @@ public class WeaviateVectorStore implements VectorStore{
     public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList,String kid, String docId) {
         WeaviateClient client = getClient();
         for (int i = 0; i < chunkList.size(); i++) {
-            List<Double> vector = vectorList.get(i);
-            Float[] vf = new Float[vector.size()];
-            for (int j = 0; j < vector.size(); j++) {
-                Double value = vector.get(j);
-                vf[j] = value.floatValue();
+            if (vectorList != null) {
+                List<Double> vector = vectorList.get(i);
+                Float[] vf = new Float[vector.size()];
+                for (int j = 0; j < vector.size(); j++) {
+                    Double value = vector.get(j);
+                    vf[j] = value.floatValue();
+                }
+                Map<String, Object> dataSchema = new HashMap<>();
+                dataSchema.put("content", chunkList.get(i));
+                dataSchema.put("kid", kid);
+                dataSchema.put("docId", docId);
+                Result<WeaviateObject> result = client.data().creator()
+                        .withClassName(className)
+                        .withID(UUID.randomUUID(true).toString())
+                        .withVector(vf)
+                        .withProperties(dataSchema)
+                        .run();
+            }else {
+                Map<String, Object> dataSchema = new HashMap<>();
+                dataSchema.put("content", chunkList.get(i));
+                dataSchema.put("kid", kid);
+                dataSchema.put("docId", docId);
+                Result<WeaviateObject> result = client.data().creator()
+                        .withClassName(className)
+                        .withID(UUID.randomUUID(true).toString())
+                        .withProperties(dataSchema)
+                        .run();
             }
-            Map<String, Object> dataSchema = new HashMap<>();
-            dataSchema.put("content", chunkList.get(i));
-            dataSchema.put("kid", kid);
-            dataSchema.put("docId", docId);
-            Result<WeaviateObject> result = client.data().creator()
-                    .withClassName(className)
-                    .withID(UUID.randomUUID(true).toString())
-                    .withVector(vf)
-                    .withProperties(dataSchema)
-                    .run();
+
         }
     }
 
@@ -242,6 +257,32 @@ public class WeaviateVectorStore implements VectorStore{
                 .withClassName(className)
                 .withFields(title)
                 .withNearVector(nearVector)
+                .withLimit(3)
+                .run();
+        LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
+        LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
+        ArrayList<LinkedTreeMap> m = l.get(className);
+        for (LinkedTreeMap linkedTreeMap : m){
+            String content = linkedTreeMap.get("content").toString();
+            resultList.add(content);
+        }
+        return resultList;
+    }
+
+    @Override
+    public List<String> nearest(String query) {
+        List<String> resultList = new ArrayList<>();
+        WeaviateClient client = getClient();
+        Field title = Field.builder().name("content").build();
+        NearTextArgument nearText = client.graphQL().arguments().nearTextArgBuilder()
+                .concepts(new String[]{ query })
+                .distance(0.6f) // use .certainty(0.7f) prior to v1.14
+                .build();
+
+        Result<GraphQLResponse> result = client.graphQL().get()
+                .withClassName(className)
+                .withFields(title)
+                .withNearText(nearText)
                 .withLimit(3)
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();

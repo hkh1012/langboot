@@ -15,7 +15,7 @@
         Javascript and reload this page!</h2></noscript>
 <div id="main-content">
     <div class="lunbo">
-
+<#--        <img src="/static/img/illustration3.png">-->
     </div>
     <div class="right-container">
         <div class="login-form">

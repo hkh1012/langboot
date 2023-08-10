@@ -10,5 +10,5 @@ public interface VectorStore {
     void removeByDocId(String docId);
     void removeByKid(String kid);
     List<String> nearest(List<Double> queryVector);
-
+    List<String> nearest(String query);
 }

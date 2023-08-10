@@ -1,0 +1,414 @@
+var sessionId = new Date().getTime() + "-" + Math.random();
+var resultDiv = document.getElementById('chatList');
+var conversation = document.getElementById('conversation');
+var answerContent = "";
+var source = new EventSource('/sse/subscribe?sessionId=' + sessionId);
+var lastChild = '';
+var kid = '';
+var sid = '';
+source.onmessage = function (event) {
+    if (event.data == '[END]'){
+        if (answerContent.indexOf('```') >=0 ){
+            answerContent = fixMarkdown(answerContent);
+        }
+        $("#sendBtn").prop("disabled", false);
+    }else {
+        answerContent += event.data;
+    }
+    fillLeftChatContent(answerContent);
+};
+
+source.onopen = function (event) {
+    console.log("sse opened ...");
+};
+
+
+source.onerror = function (event){
+    $("#sendBtn").prop("disabled", false);
+    console.log("sse error ...",event);
+}
+
+conversation.addEventListener('scroll', function() {
+    if (conversation.scrollTop + conversation.clientHeight >= conversation.scrollHeight) {
+        // 滚动到底部
+        conversation.scrollTop = conversation.scrollHeight;
+    }
+});
+
+function isLineBreak(str) {
+    // var regExp = /^[\r\n]+$/;
+    // return regExp.test(str);
+    var b = false;
+    if (str=='\ufeff' || str == '\u202a' || str == '\u0000'
+        || str == '\u3164' || str == '\u2800' || str == '\\n' || str == '\\r' || str == ''
+        || str.indexOf('\\n')>=0 || /^[\r\n]+$/.test(str) || /\n/.test(str) || /\r/.test(str)){
+        b = true;
+    }
+    return b;
+}
+function sendContent() {
+    answerContent = "";
+    let content = $("#sayContent").val();
+    if (content.trim() == ""){
+        return false;
+    }
+    $("#sendBtn").prop("disabled", true);
+    conversation.scrollTop = conversation.scrollHeight;
+    fillRightChatContent(content);
+    initLeftChatContent();
+    lastChild = $(resultDiv).children().last().children().last();
+    $("#sayContent").val("");
+    let useLk = localStorage.getItem("useLk");
+    let useHistory = localStorage.getItem("useHistory");
+    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"useLk":useLk,"useHistory":useHistory},function (d) {
+        console.log(d);
+    },"json");
+}
+
+function fillRightChatContent(message) {
+    $(resultDiv).append("<div class='text-right '><div class='human-question'>" + message + "</div></div>");
+}
+
+function initLeftChatContent() {
+    $(resultDiv).append("<div class='text-left'><div class='gpt-answer'></div></div>");
+}
+
+function fillLeftChatContent(message) {
+    lastChild.html(message);
+    conversation.scrollTop = conversation.scrollHeight;
+}
+
+function fixMarkdown(message) {
+    message = message.replaceAll('<br>','\n');
+    message = message.replaceAll('&nbsp;',' ');
+    // message = message.replaceAll('&lt;','<');
+    // message = message.replaceAll('&gt;','>');
+    let converter = new showdown.Converter();
+    converter.setOption('tables', 'true');
+    message = converter.makeHtml(message);
+    return message;
+}
+
+function removeConversation(o){
+    $.ajax({
+        url: '/conversation/remove',
+        type: 'POST',
+        data: JSON.stringify({"sid":sid}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            $("#chatList").html('');
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+function useLocalKnowledge(o){
+    let useLk = localStorage.getItem("useLk");
+    if (useLk == "false"){
+        localStorage.setItem("useLk","true");
+        $(o).addClass("selected")
+    }else {
+        localStorage.setItem("useLk","false");
+        $(o).removeClass("selected")
+    }
+}
+
+function useHistory(o){
+    let useHistory = localStorage.getItem("useHistory");
+    if (useHistory == "false"){
+        localStorage.setItem("useHistory","true");
+        $(o).addClass("selected")
+    }else {
+        localStorage.setItem("useHistory","false");
+        $(o).removeClass("selected")
+    }
+}
+
+/**
+ * 加载会话
+ */
+function loadSession() {
+    $("#left-top").find(".session-item").remove();
+    $.get("/chatSession/list",{},function (d) {
+        if (d.code == '200'){
+            if (d.data != null && d.data.length > 0) {
+                for (let i = 0; i < d.data.length; i++) {
+                    let item = d.data[i];
+                    $("#left-top").append('<div ondblclick="setSession(this);" onclick="selectSession(this);" class="session-item" sid="' + item.sid +'"><span class="session-item-title">' + item.title +'</span><span class="session-item-operate h"><span class="session-item-save" onclick="saveSessionTitle(this);">保存</span><span class="session-item-remove" onclick="removeSession(this);">删除</span></span></div>');
+                }
+                loadLocalStatus();
+            }else {
+                addSession();
+            }
+        }
+    },"json");
+}
+
+/**
+ * 选择会话
+ * @param o
+ */
+function selectSession(o){
+    $(".session-item").removeClass("selected-session");
+    $(".session-item-operate").addClass("h");
+    $(".session-item-save").addClass("h");
+    $(".session-item-remove").addClass("h");
+    $(".session-item-title").removeClass("session-item-title-selected").attr("contenteditable",false);
+    sid = $(o).attr("sid");
+    localStorage.setItem("sid",sid);
+    $(o).addClass('selected-session');
+    let title  = $($(o).children()[0]).html();
+    $("#top-session-title").html(title);
+    loadConversation(sid);
+}
+/**
+ * 设置会话
+ * @param o
+ */
+function setSession(o){
+    selectSession(o);
+    $(o).find(".session-item-title").addClass("session-item-title-selected").attr("contenteditable",true);
+    $(".session-item-title-selected").focus();
+    $(o).find(".session-item-operate").removeClass("h");
+    $(o).find(".session-item-save").removeClass("h");
+    $(o).find(".session-item-remove").removeClass("h");
+}
+
+/**
+ * 添加会话
+ */
+function addSession() {
+    $.ajax({
+        url: '/chatSession/save',
+        type: 'POST',
+        data: JSON.stringify({"title":"","modelId":0,"sid":""}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            loadSession();
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+function saveSessionTitle(o){
+    let title = $(o).parent().parent().find(".session-item-title").text();
+    $.ajax({
+        url: '/chatSession/save',
+        type: 'POST',
+        data: JSON.stringify({"title":title,"modelId":0,"sid":sid}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            selectSession($(o).parent().parent());
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+function removeSession(o){
+    $.ajax({
+        url: '/chatSession/remove',
+        type: 'POST',
+        data: JSON.stringify({"sid":sid}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            $(resultDiv).html('');
+            sid = '';
+            $(o).parent().parent().remove();
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+function loadConversation(sid){
+    $(resultDiv).html('');
+    $.get("/conversation/list/" + sid,{},function (d) {
+        if (d.code == '200'){
+            if (d.data != null && d.data.length > 0) {
+                for (let i = 0; i < d.data.length; i++) {
+                    let item = d.data[i];
+                    let content = item.content;
+                    if (item.type=='Q'){
+                        $(resultDiv).append("<div class='text-right '><div class='human-question'>" + content + "</div></div>");
+                    }else {
+                        if (item.content.indexOf('```') >=0 || item.content.indexOf('<br>') >=0 || item.content.indexOf('&nbsp;') >=0){
+                            content = fixMarkdown(item.content);
+                        }
+                        $(resultDiv).append("<div class='text-left'><div class='gpt-answer'>" + content +"</div></div>");
+                    }
+                }
+                conversation.scrollTop = conversation.scrollHeight;
+            }
+        }
+    },"json");
+}
+
+function saveKnowledge() {
+    let formData = new FormData();
+    let url = '';
+    if (kid){
+        formData.append("kid",kid);
+        url = '/knowledge/upload';
+    }else {
+        let knowledgeName = $("#knowledgeName").val();
+        formData.append("kname",knowledgeName);
+        url = '/knowledge/save';
+    }
+    formData.append('file', $('input[type=file]')[0].files[0]);
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (!kid){
+                $("#knowledge-none-div").addClass("h");
+            }
+            loadKnowledge();
+        },
+        error: function(xhr, status, error) {
+            // 处理错误
+        }
+    });
+}
+
+function showKnowledgeForm(){
+    $("#knowledge-none-div").removeClass("h");
+    $("#knowledgeName").addClass("h");
+}
+
+function loadKnowledge() {
+    kid = '';
+    localStorage.removeItem("knowledge");
+    $.get("/knowledge/detail",{},function (d) {
+        if (d.code=="200"){
+            let detail = d.data;
+            if (detail){
+                $("#knowledge-tbody").html("");
+                localStorage.setItem("knowledge",JSON.stringify(detail));
+                kid = detail.kid;
+                $("#knowledge-operate-div").removeClass("h");
+                $("#knowledge-name").html("<strong>" + detail.kname + "</strong>").attr("kid",detail.kid);
+                for (let i = 0; i < detail.attachList.length; i++) {
+                    let attach = detail.attachList[i];
+                    $("#knowledge-tbody").append("<tr docId='" + attach.docId + "' idx='" +i+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + i + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
+                }
+            }else {
+                $("#knowledge-none-div").removeClass("h");
+            }
+        }
+    },"json");
+}
+
+
+
+function showPreviewModal(idx) {
+    let modal = $('#previewModal');
+    let knowledge = localStorage.getItem("knowledge");
+    let parseKn = JSON.parse(knowledge);
+    let content = parseKn.attachList[idx].content;
+    $(modal).find('#previewContent').html(content);
+    $(modal).modal({
+        keyboard: false
+    })
+}
+
+function removeAttach(o) {
+    let docId = $(o).parent().parent().attr("docId");
+    $.ajax({
+        url: '/knowledge/removeAttach',
+        type: 'POST',
+        data: JSON.stringify({"docId":docId}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            console.log(data);
+            loadKnowledge();
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+function removeKnowledge() {
+    $.ajax({
+        url: '/knowledge/remove',
+        type: 'POST',
+        data: JSON.stringify({"kid":kid}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            $("#knowledge-none-div").removeClass("h");
+            $("#knowledge-operate-div").addClass("h");
+            console.log(data);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+function loadLocalStatus(){
+    let useLk = localStorage.getItem("useLk");
+    if (useLk == "false"){
+        $(".iconKnowledge").removeClass("selected");
+        $(".iconKnowledge2").removeClass("selected");
+    }else {
+        $(".iconKnowledge").addClass("selected")
+        $(".iconKnowledge2").addClass("selected")
+    }
+    let useHistory = localStorage.getItem("useHistory");
+    if (useHistory == "false"){
+        $(".iconHistory").removeClass("selected")
+    }else {
+        $(".iconHistory").addClass("selected")
+    }
+    let localSid = localStorage.getItem("sid");
+    let o = $("#left-top").find("div[sid='"+localSid+"']")[0];
+    selectSession(o);
+}
+
+function showSessionList(){
+    $("#full-screen-bg").removeClass("h");
+    $("#left-content").addClass("left-menu-show");
+}
+
+function hideSessionList(){
+    $("#full-screen-bg").addClass("h");
+    $("#left-content").removeClass("left-menu-show");
+}
+
+$(function () {
+    $("form").on('submit', function (e) {
+        e.preventDefault();
+    });
+    $("#sendBtn").click(function() {
+        sendContent();
+    });
+    $("#sayContent").keydown(function(event) {
+        if (event.which === 13) {
+            event.preventDefault(); // 阻止回车键的默认行为（表单提交）
+            // 在这里执行你想要的操作
+            sendContent();
+        }
+    });
+    $(".add-session-btn").click(function() {
+        addSession();
+    });
+    $("#saveKnowledge").click(function (){
+        saveKnowledge();
+    });
+    loadSession();
+    loadKnowledge();
+});

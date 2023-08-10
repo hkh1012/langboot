@@ -31,4 +31,60 @@ public class IndexController {
         model.addAttribute("sysUser",sysUser);
         return "index";
     }
+
+    @GetMapping(value = {"/chat"})
+    public String chat(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "chat";
+    }
+
+    @GetMapping(value = {"/summary"})
+    public String summary(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "summary";
+    }
+
+    @GetMapping(value = {"/classic"})
+    public String category(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "classic";
+    }
+
+    @GetMapping(value = {"/duplication"})
+    public String duplication(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "duplication";
+    }
+
+    @GetMapping(value = {"/sentiment"})
+    public String sentiment(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "sentiment";
+    }
+
+    @GetMapping(value = {"/keyword"})
+    public String keyword(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "keyword";
+    }
+
+    @GetMapping(value = {"/translate"})
+    public String translate(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "translate";
+    }
+
+    @GetMapping(value = {"/textToImage"})
+    public String textToImage(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "textToImage";
+    }
 }

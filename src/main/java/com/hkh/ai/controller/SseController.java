@@ -2,6 +2,9 @@ package com.hkh.ai.controller;
 
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
+import com.hkh.ai.chain.vectorizer.LocalAiVectorization;
+import com.hkh.ai.chain.vectorizer.Vectorization;
+import com.hkh.ai.chain.vectorizer.VectorizationFactory;
 import com.hkh.ai.chain.vectorstore.VectorStore;
 import com.hkh.ai.chain.vectorstore.VectorStoreFactory;
 import com.hkh.ai.common.ResultData;
@@ -37,6 +40,7 @@ public class SseController {
 
     private final ChatServiceFactory chatServiceFactory;
     private final VectorStoreFactory vectorStoreFactory;
+    private final VectorizationFactory vectorizationFactory;
 
     private final EmbeddingService embeddingService;
 
@@ -57,8 +61,15 @@ public class SseController {
             List<String> nearestList = new ArrayList<>();
             if (useLk){
                 VectorStore vectorStore = vectorStoreFactory.getVectorStore();
-                List<Double> queryVector = embeddingService.getQueryVector(content);
-                nearestList = vectorStore.nearest(queryVector);
+                Vectorization vectorization = vectorizationFactory.getEmbedding();
+                if (vectorization instanceof LocalAiVectorization){
+                    // 使用向量数据库内置的嵌入向量模型
+                    nearestList = vectorStore.nearest(content);
+                }else {
+                    // 使用外部的嵌入向量模型
+                    List<Double> queryVector = embeddingService.getQueryVector(content);
+                    nearestList = vectorStore.nearest(queryVector);
+                }
             }
             chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
         }

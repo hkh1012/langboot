@@ -18,6 +18,7 @@ import com.hkh.ai.service.KnowledgeAttachService;
 import com.hkh.ai.service.KnowledgeService;
 import com.hkh.ai.mapper.KnowledgeMapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,7 @@ import java.util.*;
 */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge> implements KnowledgeService{
 
     private final EmbeddingService embeddingService;
@@ -70,6 +72,7 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
             chunkList = resourceLoader.getChunkList(content);
         } catch (IOException e) {
             e.printStackTrace();
+            log.error("store content occur exception ",e);
         }
         knowledgeAttach.setContent(content);
         knowledgeAttach.setCreateTime(LocalDateTime.now());

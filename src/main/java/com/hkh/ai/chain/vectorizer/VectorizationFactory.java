@@ -4,6 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * 向量化工厂：提供各种向量化模型的能力
+ * @author huangkh
+ */
 @Component
 @Slf4j
 public class VectorizationFactory {

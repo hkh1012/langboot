@@ -28,6 +28,11 @@ div, input, textarea, ul {
     top: 0px;
 }
 
+.lunbo img{
+    width: 100%;
+    height: 100%;
+}
+
 .right-container{
     width: calc(100% - 480px);
     height: 100%;
