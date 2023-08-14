@@ -1,19 +1,13 @@
 html, body {
     height: 100%;
-    overflow: hidden;
 }
 
 #main-content{
-    height: calc(100% - 80px);
+    height: calc(100% - 64px);
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-content: center;
     justify-content: flex-start;
     align-items: center;
-}
-
-#main-content a{
-    font-size: 24px;
-    margin-top: 36px;
 }

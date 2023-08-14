@@ -3,9 +3,9 @@
 <head>
     <title>注册</title>
     <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/register.css" rel="stylesheet">
+    <link href="/static/css/register.css" rel="stylesheet">
     <script src="/webjars/jquery/3.1.1-1/jquery.min.js"></script>
-    <script src="/static/register.js"></script>
+    <script src="/static/js/register.js"></script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being

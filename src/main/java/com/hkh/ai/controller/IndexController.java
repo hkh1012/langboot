@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * 首页
@@ -45,6 +46,8 @@ public class IndexController {
         model.addAttribute("sysUser",sysUser);
         return "summary";
     }
+
+
 
     @GetMapping(value = {"/classic"})
     public String category(HttpServletRequest request, Model model) {

@@ -13,4 +13,6 @@ import java.util.List;
 public interface ChatService {
 
     void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser);
+
+    String blockCompletion(String content);
 }

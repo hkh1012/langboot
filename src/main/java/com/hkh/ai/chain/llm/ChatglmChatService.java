@@ -10,8 +10,10 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ChatglmChatService implements ChatService {
 
     @Value("${chain.llm.chatglm.baseurl}")
@@ -93,5 +96,29 @@ public class ChatglmChatService implements ChatService {
                 });
         ;
         service.shutdownExecutor();
+    }
+
+    @Override
+    public String blockCompletion(String content) {
+        ChatglmService service = new ChatglmService(baseUrl);
+        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
+        Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
+        List<Integer> promptTokens = enc.encode(content);
+        System.out.println("promptTokens length == " + promptTokens.size());
+
+        final List<ChatMessage> messages = new ArrayList<>();
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
+        messages.add(userMessage);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
+                .builder()
+                .model(defaultModel)
+                .messages(messages)
+                .user(content)
+                .n(1)
+                .logitBias(new HashMap<>())
+                .build();
+        ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
+        log.info("chatCompletion ==> ",chatCompletion.toString());
+        return chatCompletion.getChoices().get(0).getMessage().getContent();
     }
 }

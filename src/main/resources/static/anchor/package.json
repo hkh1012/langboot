@@ -1,0 +1,18 @@
+{
+  "name": "Anchor",
+  "description": "Bootstrap 4 UI Kit",
+  "version": "1.0.2",
+  "homepage": "https://www.wowthemes.net/anchor-free-bootstrap-ui-kit/",
+  "author": "WowThemesNet",
+  "license": "WowThemesNet License <https://www.wowthemes.net/freebies-license/>",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-install": "^1.1.0",
+    "gulp-open": "^3.0.1",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5",
+    "lodash": ">=4.17.15"
+  }
+}

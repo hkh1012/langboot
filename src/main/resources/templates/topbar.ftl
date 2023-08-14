@@ -1,26 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>首页</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="applicable-device" content="pc,mobile">
-    <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/topbar.css" rel="stylesheet">
-    <script src="/webjars/jquery/3.1.1-1/jquery.min.js"></script>
-    <script src="/static/topbar.js"></script>
-</head>
-<body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-        enabled. Please enable
-        Javascript and reload this page!</h2></noscript>
-
-<div id="topbar-content">
-    <div class="topbar-left"></div>
-    <div class="topbar-mid"></div>
-    <div class="topbar-right">
-        <span>${sysUser.nickName}</span>
-        <a href="/logout">退出</a>
+<nav class="topnav navbar navbar-expand-lg navbar-dark bg-success fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/index"><i class="fas fa-anchor mr-2"></i>
+<#--            <strong>首页</strong>-->
+        </a>
+        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbarColor02" style="">
+            <ul class="navbar-nav mr-auto d-flex align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="/chat">对话</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/summary">摘要</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/translate">翻译</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/keyword">关键词</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        更多 </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/sentiment">情感分析</a>
+                        <a class="dropdown-item" href="/duplication">查重</a>
+                        <a class="dropdown-item" href="/textToImage">文生图</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./docs.html">Docs</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto d-flex align-items-center">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        ${sysUser.nickName} </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/logout">退出系统</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
-</body>
-</html>
+</nav>

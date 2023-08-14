@@ -10,21 +10,25 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
 @Primary
+@Slf4j
 public class OpenAiChatService implements ChatService {
 
     @Value("${chain.llm.openai.token}")
@@ -94,5 +98,29 @@ public class OpenAiChatService implements ChatService {
                 });
         ;
         service.shutdownExecutor();
+    }
+
+    @Override
+    public String blockCompletion(String content) {
+        OpenAiService service = new OpenAiService(apiToken, Duration.ofSeconds(300));
+        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
+        Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
+        List<Integer> promptTokens = enc.encode(content);
+        System.out.println("promptTokens length == " + promptTokens.size());
+
+        final List<ChatMessage> messages = new ArrayList<>();
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
+        messages.add(userMessage);
+
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
+                .builder()
+                .model(defaultModel)
+                .messages(messages)
+                .n(1)
+                .logitBias(new HashMap<>())
+                .build();
+        ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
+        log.info("chatCompletion ==> {}",chatCompletion.toString());
+        return chatCompletion.getChoices().get(0).getMessage().getContent();
     }
 }

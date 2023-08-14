@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="applicable-device" content="pc,mobile">
     <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/chat.css" rel="stylesheet">
-    <link href="/static/bootstrap-icons.css" rel="stylesheet" >
+    <link href="/static/css/chat.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-icons.css" rel="stylesheet" >
     <script src="/webjars/jquery/3.1.1-1/jquery.min.js"></script>
     <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <#--    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>-->
 <#--    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>-->
-    <script src="/static/showdown.min.js"></script>
+    <script src="/static/js/showdown.min.js"></script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -157,5 +157,5 @@
 </div>
 <div id="full-screen-bg" class="full-screen-bg h" onclick="hideSessionList();"></div>
 </body>
-<script src="/static/chat.js"></script>
+<script src="/static/js/chat.js"></script>
 </html>
