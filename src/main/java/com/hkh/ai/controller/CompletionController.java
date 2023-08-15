@@ -3,6 +3,7 @@ package com.hkh.ai.controller;
 import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.request.CompletionClassicRequest;
 import com.hkh.ai.request.CompletionKeywordRequest;
 import com.hkh.ai.request.CompletionSummaryRequest;
 import com.hkh.ai.request.CompletionTranslateRequest;
@@ -38,6 +39,13 @@ public class CompletionController {
     public ResultData<String> translate(HttpServletRequest httpServletRequest, CompletionTranslateRequest request) {
         SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         String result = completionService.translate(sysUser,request);
+        return ResultData.success(result,"成功");
+    }
+
+    @PostMapping(value = {"/classic"})
+    public ResultData<String> classic(HttpServletRequest httpServletRequest, CompletionClassicRequest request) {
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        String result = completionService.classic(sysUser,request);
         return ResultData.success(result,"成功");
     }
 }

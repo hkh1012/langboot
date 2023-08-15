@@ -20,6 +20,10 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/keyword">关键词</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/classic">文本分类</a>
+                </li>
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         更多 </a>
@@ -29,9 +33,9 @@
                         <a class="dropdown-item" href="/textToImage">文生图</a>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./docs.html">Docs</a>
-                </li>
+<#--                <li class="nav-item">-->
+<#--                    <a class="nav-link" href="./docs.html">Docs</a>-->
+<#--                </li>-->
             </ul>
             <ul class="navbar-nav ml-auto d-flex align-items-center">
                 <li class="nav-item dropdown">

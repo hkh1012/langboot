@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.request.CompletionClassicRequest;
 import com.hkh.ai.request.CompletionKeywordRequest;
 import com.hkh.ai.request.CompletionSummaryRequest;
 import com.hkh.ai.request.CompletionTranslateRequest;
@@ -41,6 +42,14 @@ public class CompletionServiceImpl implements CompletionService {
     @Override
     public String translate(SysUser sysUser, CompletionTranslateRequest request) {
         String fullContent = "将下面文本翻译成" +request.getTargetLanguage() + ":" + request.getContent() ;
+        ChatService chatService = chatServiceFactory.getChatService();
+        String completionResult = chatService.blockCompletion(fullContent);
+        return completionResult;
+    }
+
+    @Override
+    public String classic(SysUser sysUser, CompletionClassicRequest request) {
+        String fullContent = "按照括号里的分类(" + request.getCategoryList() +" )，将以下文本进行分类：" +request.getContent() +  "\n\n依据相关性高低返回2~3个分类结果，并以;进行分隔";
         ChatService chatService = chatServiceFactory.getChatService();
         String completionResult = chatService.blockCompletion(fullContent);
         return completionResult;

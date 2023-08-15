@@ -67,7 +67,7 @@ CARDS
                         <div class="card-body">
                             <h3 class="card-title">人机对话</h3>
                             <p class="card-text">
-                                利用LLM大模型对话能力，实现流式，结合本地知识库，结果更精准。
+                                利用LLM大模型对话能力，实现流式输出，自定义本地知识库，结果更精准。
                             </p>
                             <a href="/chat" class="btn btn-info btn-round">Stream Chat</a>
                         </div>
@@ -110,7 +110,7 @@ CARDS
                         <p class="card-text text-muted">
                             文字经典，智能分类引领未来
                         </p>
-                        <a href="#" class="btn btn-purple btn-round">Classic</a>
+                        <a href="/classic" class="btn btn-purple btn-round">Classic</a>
                     </div>
                 </div>
             </div>
@@ -137,7 +137,7 @@ CARDS
                         <p class="card-text text-muted">
                             一句话，读懂千言情。NLP情感分析帮你轻松搞定。
                         </p>
-                        <a href="#" class="btn btn-cyan btn-round">Sentiment Analysis</a>
+                        <a href="/sentiment" class="btn btn-cyan btn-round">Sentiment Analysis</a>
                     </div>
                 </div>
             </div>
