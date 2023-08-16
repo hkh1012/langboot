@@ -20,14 +20,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/keyword">关键词</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/classic">文本分类</a>
-                </li>
-
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         更多 </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/classic">文本分类</a>
+                        <a class="dropdown-item" href="/security">内容安全</a>
                         <a class="dropdown-item" href="/sentiment">情感分析</a>
                         <a class="dropdown-item" href="/duplication">查重</a>
                         <a class="dropdown-item" href="/textToImage">文生图</a>

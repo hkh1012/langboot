@@ -26,6 +26,12 @@ public class IndexController {
         }
     }
 
+    /**
+     * 首页
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/index"})
     public String index(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -33,6 +39,12 @@ public class IndexController {
         return "index";
     }
 
+    /**
+     * 对话页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/chat"})
     public String chat(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -40,6 +52,12 @@ public class IndexController {
         return "chat";
     }
 
+    /**
+     * 摘要页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/summary"})
     public String summary(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -48,7 +66,12 @@ public class IndexController {
     }
 
 
-
+    /**
+     * 分类页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/classic"})
     public String category(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -56,6 +79,12 @@ public class IndexController {
         return "classic";
     }
 
+    /**
+     * 查重页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/duplication"})
     public String duplication(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -63,6 +92,12 @@ public class IndexController {
         return "duplication";
     }
 
+    /**
+     * 情感分析页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/sentiment"})
     public String sentiment(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -70,6 +105,12 @@ public class IndexController {
         return "sentiment";
     }
 
+    /**
+     * 关坚持提取页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/keyword"})
     public String keyword(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -77,6 +118,12 @@ public class IndexController {
         return "keyword";
     }
 
+    /**
+     * 翻译页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/translate"})
     public String translate(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -84,6 +131,25 @@ public class IndexController {
         return "translate";
     }
 
+    /**
+     * 内容安全页面
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/security"})
+    public String security(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "security";
+    }
+
+    /**
+     * 文生图页面
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping(value = {"/textToImage"})
     public String textToImage(HttpServletRequest request, Model model) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);

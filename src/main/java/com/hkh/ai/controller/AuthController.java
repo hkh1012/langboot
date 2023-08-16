@@ -8,13 +8,11 @@ import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.request.AuthLoginRequest;
 import com.hkh.ai.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -43,7 +41,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login")
-    public String login(AuthLoginRequest request, HttpServletRequest httpServletRequest,  HttpServletResponse httpServletResponse,Model model) throws IOException {
+    public String login(AuthLoginRequest request, HttpServletRequest httpServletRequest) throws IOException {
         Boolean pass = sysUserService.loginCheck(httpServletRequest,request.getUsername(),request.getPassword());
         if (pass){
             return "redirect:/index";

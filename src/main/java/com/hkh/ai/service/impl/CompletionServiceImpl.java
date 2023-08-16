@@ -4,10 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
 import com.hkh.ai.domain.SysUser;
-import com.hkh.ai.request.CompletionClassicRequest;
-import com.hkh.ai.request.CompletionKeywordRequest;
-import com.hkh.ai.request.CompletionSummaryRequest;
-import com.hkh.ai.request.CompletionTranslateRequest;
+import com.hkh.ai.request.*;
 import com.hkh.ai.service.CompletionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +47,14 @@ public class CompletionServiceImpl implements CompletionService {
     @Override
     public String classic(SysUser sysUser, CompletionClassicRequest request) {
         String fullContent = "按照括号里的分类(" + request.getCategoryList() +" )，将以下文本进行分类：" +request.getContent() +  "\n\n依据相关性高低返回2~3个分类结果，并以;进行分隔";
+        ChatService chatService = chatServiceFactory.getChatService();
+        String completionResult = chatService.blockCompletion(fullContent);
+        return completionResult;
+    }
+
+    @Override
+    public String security(SysUser sysUser, CompletionSecurityRequest request) {
+        String fullContent = "判断以下文本是否包含政治、暴力、色情、毒品、恐怖、歧视等敏感内容：" + request.getContent() +  "\n\n，你只能回答2个字：安全或者危险";
         ChatService chatService = chatServiceFactory.getChatService();
         String completionResult = chatService.blockCompletion(fullContent);
         return completionResult;
