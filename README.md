@@ -73,8 +73,14 @@ openai.token=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 python .\openai_api.py
 ```
 
-## Demo
-聊天
+## 功能展示
+| <img src="src/main/resources/assets/login_app.png" alt="登录" with="200"/> |<img src="src/main/resources/assets/functions_1.png" alt="首页"/>|<img src="src/main/resources/assets/functions_2.png" alt="功能2"/>|<img src="src/main/resources/assets/functions_3.png" alt="功能3"/>|
+|--------------------------------------------------------------------------| ------ | ------ | ------ |
+|<img src="src/main/resources/assets/functions_4.png" alt="功能4"/>|<img src="src/main/resources/assets/functions_5.png" alt="功能5"/>|<img src="src/main/resources/assets/functions_6.png" alt="功能6"/>|<img src="src/main/resources/assets/functions_7.png" alt="功能7"/>|
+|<img src="src/main/resources/assets/functions_8.png" alt="功能8"/>|<img src="src/main/resources/assets/functions_9.png" alt="功能9"/>|||
+
+## 聊天Demo
+
 <img src="src/main/resources/assets/stream-chat.png" alt="聊天"/>
 本地知识库
 <img src="src/main/resources/assets/use_lk.png" alt="知识库"/>
