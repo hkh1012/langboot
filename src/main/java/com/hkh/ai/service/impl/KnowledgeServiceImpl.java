@@ -2,21 +2,26 @@ package com.hkh.ai.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hkh.ai.config.SysConfig;
 import com.hkh.ai.domain.Knowledge;
 import com.hkh.ai.domain.KnowledgeAttach;
 import com.hkh.ai.chain.loader.ResourceLoader;
 import com.hkh.ai.chain.loader.ResourceLoaderFactory;
+import com.hkh.ai.domain.KnowledgeShare;
+import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.request.KnowledgeAttachRemoveRequest;
 import com.hkh.ai.request.KnowledgeRemoveRequest;
 import com.hkh.ai.request.KnowledgeSaveRequest;
 import com.hkh.ai.request.KnowledgeUploadRequest;
 import com.hkh.ai.response.KnowledgeDetailResponse;
+import com.hkh.ai.response.KnowledgeListResponse;
 import com.hkh.ai.service.EmbeddingService;
 import com.hkh.ai.service.KnowledgeAttachService;
 import com.hkh.ai.service.KnowledgeService;
 import com.hkh.ai.mapper.KnowledgeMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,22 +46,24 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
     private final SysConfig sysConfig;
     private final ResourceLoaderFactory resourceLoaderFactory;
     @Override
-    public void saveOne(KnowledgeSaveRequest request) {
+    public void saveOne(KnowledgeSaveRequest request, SysUser sysUser) {
         Knowledge knowledge = new Knowledge();
         knowledge.setKid(RandomUtil.randomString(10));
+        knowledge.setUid(sysUser.getId());
         knowledge.setKname(request.getKname());
         knowledge.setCreateTime(LocalDateTime.now());
         save(knowledge);
-        storeContent(request.getFile(),knowledge.getKid());
+        storeContent(request.getFile(),knowledge.getKid(),true);
     }
+
 
     @Override
     public void upload(KnowledgeUploadRequest request) {
-        storeContent(request.getFile(), request.getKid());
+        storeContent(request.getFile(), request.getKid(),false);
     }
 
     @Override
-    public void storeContent(MultipartFile file, String kid) {
+    public void storeContent(MultipartFile file, String kid,Boolean firstTime) {
         String fileName = file.getOriginalFilename();
         List<String> chunkList = new ArrayList<>();
         KnowledgeAttach knowledgeAttach = new KnowledgeAttach();
@@ -77,31 +84,33 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
         knowledgeAttach.setContent(content);
         knowledgeAttach.setCreateTime(LocalDateTime.now());
         knowledgeAttachService.save(knowledgeAttach);
-        embeddingService.storeEmbeddings(chunkList,kid,docId);
+        embeddingService.storeEmbeddings(chunkList,kid,docId,firstTime);
     }
 
     @Override
-    public KnowledgeDetailResponse detail() {
-        List<Knowledge> list = this.list();
-        if (list!=null && list.size()>0){
-            KnowledgeDetailResponse detail  = new KnowledgeDetailResponse();
-            Knowledge knowledge = list.get(0);
+    public KnowledgeDetailResponse detail(String kid) {
+        KnowledgeDetailResponse detail  = new KnowledgeDetailResponse();
+        Map<String,Object> map = new HashMap<>();
+        map.put("kid",kid);
+        List<Knowledge> knowledgeList = this.listByMap(map);
+        if (knowledgeList != null && knowledgeList.size() >0){
+            Knowledge knowledge = knowledgeList.get(0);
             BeanUtil.copyProperties(knowledge,detail);
-            Map<String,Object> map = new HashMap<>();
-            map.put("kid",knowledge.getKid());
+
             List<KnowledgeAttach> attachList = knowledgeAttachService.listByMap(map);
             detail.setAttachList(attachList);
             return detail;
         }
-        return null;
+       return null;
     }
 
     @Override
     public void removeAttach(KnowledgeAttachRemoveRequest request) {
         Map<String,Object> map = new HashMap<>();
+        map.put("kid",request.getKid());
         map.put("doc_id",request.getDocId());
         knowledgeAttachService.removeByMap(map);
-        embeddingService.removeByDocId(request.getDocId());
+        embeddingService.removeByDocId(request.getKid(),request.getDocId());
     }
 
     @Override
@@ -111,6 +120,37 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
         this.removeByMap(map);
         knowledgeAttachService.removeByMap(map);
         embeddingService.removeByKid(request.getKid());
+    }
+
+    @Override
+    public List<KnowledgeListResponse> all(List<Knowledge> mineList, List<KnowledgeShare> shareList) {
+        List<KnowledgeListResponse> list = new ArrayList<>();
+        for (Knowledge knowledge : mineList) {
+            KnowledgeListResponse item = new KnowledgeListResponse();
+            BeanUtil.copyProperties(knowledge,item);
+            item.setRole("owner");
+            Map<String,Object> map = new HashMap<>();
+            map.put("kid",knowledge.getKid());
+            List<KnowledgeAttach> attachList = knowledgeAttachService.listByMap(map);
+            item.setAttachList(attachList);
+            list.add(item);
+        }
+        for (KnowledgeShare knowledgeShare : shareList){
+            QueryWrapper<Knowledge> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("kid",knowledgeShare.getKid());
+            Knowledge knowledge = getOne(queryWrapper,false);
+            if (knowledge != null){
+                KnowledgeListResponse item = new KnowledgeListResponse();
+                BeanUtil.copyProperties(knowledge,item);
+                item.setRole("sharer");
+                Map<String,Object> map = new HashMap<>();
+                map.put("kid",knowledge.getKid());
+                List<KnowledgeAttach> attachList = knowledgeAttachService.listByMap(map);
+                item.setAttachList(attachList);
+                list.add(item);
+            }
+        }
+        return list;
     }
 
 }

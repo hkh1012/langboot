@@ -30,15 +30,15 @@ public class WeaviateController {
         return ResultData.success(schemas,"查询成功");
     }
 
-    @PutMapping("schema")
-    public ResultData<Result<Boolean>> schema() {
-        Result<Boolean> result = weaviateVectorStore.createSchema();
+    @PutMapping("schema/kid")
+    public ResultData<Result<Boolean>> schema(@PathVariable(name = "kid") String kid) {
+        Result<Boolean> result = weaviateVectorStore.createSchema(kid);
         return ResultData.success(result,"创建成功");
     }
 
-    @DeleteMapping("schema")
-    public ResultData<Result<Boolean>> delete() {
-        Result<Boolean> result = weaviateVectorStore.deleteSchema();
+    @DeleteMapping("schema/{kid}")
+    public ResultData<Result<Boolean>> delete(@PathVariable(name = "kid") String kid) {
+        Result<Boolean> result = weaviateVectorStore.deleteSchema(kid);
         return ResultData.success(result,"删除成功");
     }
 

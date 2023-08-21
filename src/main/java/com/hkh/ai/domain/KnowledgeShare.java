@@ -5,18 +5,15 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * 知识库
- * @TableName knowledge
+ * 知识库分享表
+ * @TableName knowledge_share
  */
-@TableName(value ="knowledge")
+@TableName(value ="knowledge_share")
 @Data
-public class Knowledge implements Serializable {
+public class KnowledgeShare implements Serializable {
     /**
      * 
      */
@@ -40,19 +37,6 @@ public class Knowledge implements Serializable {
      */
     @TableField(value = "kname")
     private String kname;
-
-    /**
-     * 
-     */
-    @TableField(value = "create_time")
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    /**
-     * 
-     */
-    @TableField(value = "create_by")
-    private String createBy;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

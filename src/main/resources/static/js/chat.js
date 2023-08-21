@@ -5,6 +5,7 @@ var answerContent = "";
 var source = new EventSource('/sse/subscribe?sessionId=' + sessionId);
 var lastChild = '';
 var kid = '';
+var attachList;
 var sid = '';
 source.onmessage = function (event) {
     if (event.data == '[END]'){
@@ -258,8 +259,9 @@ function saveKnowledge() {
     if (kid){
         formData.append("kid",kid);
         url = '/knowledge/upload';
-    }else {
-        let knowledgeName = $("#knowledgeName").val();
+    }
+    let knowledgeName = $("#knowledgeName").val();
+    if(knowledgeName) {
         formData.append("kname",knowledgeName);
         url = '/knowledge/save';
     }
@@ -271,9 +273,6 @@ function saveKnowledge() {
         processData: false,
         contentType: false,
         success: function(response) {
-            if (!kid){
-                $("#knowledge-none-div").addClass("h");
-            }
             loadKnowledge();
         },
         error: function(xhr, status, error) {
@@ -283,33 +282,61 @@ function saveKnowledge() {
 }
 
 function showKnowledgeForm(){
-    $("#knowledge-none-div").removeClass("h");
     $("#knowledgeName").addClass("h");
 }
 
 function loadKnowledge() {
-    kid = '';
-    localStorage.removeItem("knowledge");
-    $.get("/knowledge/detail",{},function (d) {
+    let knowledge = localStorage.getItem("knowledge");
+    localStorage.removeItem("knowledgeList");
+    $.get("/knowledge/list",{},function (d) {
         if (d.code=="200"){
-            let detail = d.data;
-            if (detail){
-                $("#knowledge-tbody").html("");
-                localStorage.setItem("knowledge",JSON.stringify(detail));
-                kid = detail.kid;
-                $("#knowledge-operate-div").removeClass("h");
-                $("#knowledge-name").html("<strong>" + detail.kname + "</strong>").attr("kid",detail.kid);
-                for (let i = 0; i < detail.attachList.length; i++) {
-                    let attach = detail.attachList[i];
-                    $("#knowledge-tbody").append("<tr docId='" + attach.docId + "' idx='" +i+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + i + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
+            let knowledgeList = d.data;
+            if (knowledgeList.length > 0){
+                $("#knowledge-list-tbody").html("");
+                localStorage.setItem("knowledgeList",JSON.stringify(knowledgeList));
+                if (!knowledge){
+                    knowledge = knowledgeList[0];
+                }else {
+                    knowledge = JSON.parse(knowledge);
                 }
-            }else {
-                $("#knowledge-none-div").removeClass("h");
+                kid = knowledge.kid;
+                localStorage.setItem("knowledge",JSON.stringify(knowledge));
+                for (let i = 0; i < knowledgeList.length; i++) {
+                    let item = knowledgeList[i];
+                    let checked = kid == item.kid ? 'checked' : '';
+                    $("#knowledge-list-tbody").append("<tr kid='" + item.kid + "' idx='" +i+"'><td><input type='radio' name='knowledge' onclick='selectThisKnowledge(this);' " + checked + " value='" +item.kid+ "'/></td><td>" + item.kname +"</td><td> " +item.role +"</td><td> <a class='removeKnowledge' kid='" + item.kid +"' onclick='removeKnowledge(this);'>删除</a></td></tr>");
+                    if (checked == 'checked') {
+                        attachList = item.attachList;
+                        $("#knowledge-attach-tbody").html("");
+                        for (let j = 0; j < attachList.length; j++) {
+                            let attach = attachList[j];
+                            $("#knowledge-attach-tbody").append("<tr kid='" + item.kid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
+                        }
+                    }
+                }
             }
         }
     },"json");
+
 }
 
+function selectThisKnowledge(o){
+    let selectKid = $(o).val();
+    kid = selectKid;
+    let knowledgeList = JSON.parse(localStorage.getItem("knowledgeList"));
+    for (let i = 0; i < knowledgeList.length; i++){
+        if (knowledgeList[i].kid == selectKid){
+            let selectedKnowledge = knowledgeList[i];
+            localStorage.setItem("knowledge",JSON.stringify(selectedKnowledge));
+            $("#knowledge-attach-tbody").html("");
+            for (let j = 0; j < selectedKnowledge.attachList.length; j++) {
+                let attach = attachList[j];
+                $("#knowledge-attach-tbody").append("<tr kid='" + selectKid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
+            }
+        }
+    }
+
+}
 
 
 function showPreviewModal(idx) {
@@ -325,10 +352,11 @@ function showPreviewModal(idx) {
 
 function removeAttach(o) {
     let docId = $(o).parent().parent().attr("docId");
+    let kid = $(o).parent().parent().attr("kid");
     $.ajax({
         url: '/knowledge/removeAttach',
         type: 'POST',
-        data: JSON.stringify({"docId":docId}),
+        data: JSON.stringify({"kid":kid,"docId":docId}),
         dataType: 'json',
         contentType: 'application/json',
         success: function(data) {
@@ -341,16 +369,16 @@ function removeAttach(o) {
     });
 }
 
-function removeKnowledge() {
+function removeKnowledge(o) {
+    let attrKid = $(o).attr("kid");
     $.ajax({
         url: '/knowledge/remove',
         type: 'POST',
-        data: JSON.stringify({"kid":kid}),
+        data: JSON.stringify({"kid":attrKid}),
         dataType: 'json',
         contentType: 'application/json',
         success: function(data) {
-            $("#knowledge-none-div").removeClass("h");
-            $("#knowledge-operate-div").addClass("h");
+            loadKnowledge();
             console.log(data);
         },
         error: function(xhr, status, error) {

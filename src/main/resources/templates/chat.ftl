@@ -105,9 +105,8 @@
     </div>
     <div id="right-content" class="container1">
         <div class="knowledge-div">
-            <div class="knowledge-none-div h" id="knowledge-none-div">
+            <div class="knowledge-save-div" id="knowledge-save-div">
                 <div class="form-group">
-                    <label for="knowledgeName">知识库名称</label>
                     <input type="hidden" class="form-control" id="kid">
                     <input type="text" class="form-control" id="knowledgeName" placeholder="知识库名称">
                 </div>
@@ -118,16 +117,32 @@
                 </div>
                 <button type="button" class="btn btn-default" id="saveKnowledge">提交</button>
             </div>
-            <div class="knowledge-operate-div h" id="knowledge-operate-div">
-                <span id="knowledge-name" id="knowledge-name"></span>&nbsp;&nbsp;<a onclick="removeKnowledge();">删除知识库</a>&nbsp;&nbsp;<a onclick="showKnowledgeForm();">添加附件</a>
-                <table id="knowledge-table" class="table">
+            <div class="knowledge-list-div" id="knowledge-list-div">
+                <table id="knowledge-list-table" class="table">
+                    <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>知识库</th>
+                        <th>角色</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="knowledge-list-tbody">
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="knowledge-attach-div" id="knowledge-attach-div">
+                <a onclick="showKnowledgeForm();">添加附件</a>
+                <table id="knowledge-attach-table" class="table">
                     <thead>
                     <tr>
                         <th>附件</th>
                         <th>操作</th>
                     </tr>
                     </thead>
-                    <tbody id="knowledge-tbody">
+                    <tbody id="knowledge-attach-tbody">
 
                     </tbody>
                 </table>

@@ -1,14 +1,22 @@
 package com.hkh.ai.controller;
 
 import com.hkh.ai.common.ResultData;
-import com.hkh.ai.request.KnowledgeAttachRemoveRequest;
-import com.hkh.ai.request.KnowledgeRemoveRequest;
-import com.hkh.ai.request.KnowledgeSaveRequest;
-import com.hkh.ai.request.KnowledgeUploadRequest;
+import com.hkh.ai.common.constant.SysConstants;
+import com.hkh.ai.domain.Knowledge;
+import com.hkh.ai.domain.KnowledgeShare;
+import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.request.*;
 import com.hkh.ai.response.KnowledgeDetailResponse;
+import com.hkh.ai.response.KnowledgeListResponse;
 import com.hkh.ai.service.KnowledgeService;
+import com.hkh.ai.service.KnowledgeShareService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 本地知识库
@@ -19,22 +27,51 @@ import org.springframework.web.bind.annotation.*;
 public class KnowledgeController {
 
     private final KnowledgeService knowledgeService;
+    private final KnowledgeShareService knowledgeShareService;
 
+    /**
+     * 新建知识库
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping(value = "save")
-    public ResultData save(KnowledgeSaveRequest request){
-        knowledgeService.saveOne(request);
+    public ResultData save(KnowledgeSaveRequest request, HttpServletRequest httpServletRequest){
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        knowledgeService.saveOne(request,sysUser);
         return ResultData.success("保存知识库成功");
     }
 
+    /**
+     * 上传知识库附件
+     * @param request
+     * @return
+     */
     @PostMapping(value = "upload")
     public ResultData upload(KnowledgeUploadRequest request){
         knowledgeService.upload(request);
         return ResultData.success("上传知识库文件成功");
     }
 
-    @GetMapping("detail")
-    public ResultData<KnowledgeDetailResponse> detail(){
-        KnowledgeDetailResponse detail = knowledgeService.detail();
+    /**
+     * 查询个人所有知识库
+     * @param httpServletRequest
+     * @return
+     */
+    @GetMapping("list")
+    public ResultData<List<KnowledgeListResponse>> list(HttpServletRequest httpServletRequest){
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        Map<String,Object> map = new HashMap<>();
+        map.put("uid",sysUser.getId());
+        List<Knowledge> mineList = knowledgeService.listByMap(map);
+        List<KnowledgeShare> shareList = knowledgeShareService.listByMap(map);
+        List<KnowledgeListResponse> result = knowledgeService.all(mineList,shareList);
+        return ResultData.success(result,"查询成功");
+    }
+
+    @GetMapping("detail/{kid}")
+    public ResultData<KnowledgeDetailResponse> detail(@PathVariable(name = "kid") String kid){
+        KnowledgeDetailResponse detail = knowledgeService.detail(kid);
         return ResultData.success(detail,"查询成功");
     }
 

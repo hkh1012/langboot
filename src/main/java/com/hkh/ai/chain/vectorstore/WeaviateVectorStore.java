@@ -20,6 +20,7 @@ import io.weaviate.client.v1.schema.model.Property;
 import io.weaviate.client.v1.schema.model.Schema;
 import io.weaviate.client.v1.schema.model.WeaviateClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +70,7 @@ public class WeaviateVectorStore implements VectorStore{
     }
 
 
-    public Result<Boolean> createSchema(){
+    public Result<Boolean> createSchema(String kid){
         WeaviateClient client = getClient();
 //        StopwordConfig stopwordConfig = StopwordConfig.builder()
 //            .preset("en")
@@ -111,7 +112,7 @@ public class WeaviateVectorStore implements VectorStore{
 
 
         WeaviateClass clazz = WeaviateClass.builder()
-            .className(className)
+            .className(className + kid)
             .description("local knowledge")
             .vectorIndexType("hnsw")
             .vectorizer("text2vec-transformers")
@@ -142,7 +143,10 @@ public class WeaviateVectorStore implements VectorStore{
     }
 
     @Override
-    public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList,String kid, String docId) {
+    public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList,String kid, String docId,Boolean firstTime) {
+        if (firstTime) {
+            createSchema(kid);
+        }
         WeaviateClient client = getClient();
         for (int i = 0; i < chunkList.size(); i++) {
             if (vectorList != null) {
@@ -157,7 +161,7 @@ public class WeaviateVectorStore implements VectorStore{
                 dataSchema.put("kid", kid);
                 dataSchema.put("docId", docId);
                 Result<WeaviateObject> result = client.data().creator()
-                        .withClassName(className)
+                        .withClassName(className + kid)
                         .withID(UUID.randomUUID(true).toString())
                         .withVector(vf)
                         .withProperties(dataSchema)
@@ -168,7 +172,7 @@ public class WeaviateVectorStore implements VectorStore{
                 dataSchema.put("kid", kid);
                 dataSchema.put("docId", docId);
                 Result<WeaviateObject> result = client.data().creator()
-                        .withClassName(className)
+                        .withClassName(className + kid)
                         .withID(UUID.randomUUID(true).toString())
                         .withProperties(dataSchema)
                         .run();
@@ -178,7 +182,7 @@ public class WeaviateVectorStore implements VectorStore{
     }
 
     @Override
-    public void removeByDocId(String docId) {
+    public void removeByDocId(String kid,String docId) {
         List<String> resultList = new ArrayList<>();
         WeaviateClient client = getClient();
         Field fieldId = Field.builder().name("id").build();
@@ -186,15 +190,19 @@ public class WeaviateVectorStore implements VectorStore{
             .path(new String[]{ "docId" })
             .operator(Operator.Equal)
             .valueString(docId)
+            .operator(Operator.And)
+            .path(new String[]{ "kid" })
+            .operator(Operator.Equal)
+            .valueString(kid)
             .build();
         Result<GraphQLResponse> result = client.graphQL().get()
-            .withClassName(className)
+            .withClassName(className + kid)
             .withFields(fieldId)
             .withWhere(where)
             .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
-        ArrayList<LinkedTreeMap> m = l.get(className);
+        ArrayList<LinkedTreeMap> m = l.get(className + kid);
         for (LinkedTreeMap linkedTreeMap : m){
             String uuid = linkedTreeMap.get("id").toString();
             resultList.add(uuid);
@@ -219,13 +227,13 @@ public class WeaviateVectorStore implements VectorStore{
                 .valueString(kid)
                 .build();
         Result<GraphQLResponse> result = client.graphQL().get()
-                .withClassName(className)
+                .withClassName(className + kid)
                 .withFields(fieldId)
                 .withWhere(where)
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
-        ArrayList<LinkedTreeMap> m = l.get(className);
+        ArrayList<LinkedTreeMap> m = l.get(className + kid);
         for (LinkedTreeMap linkedTreeMap : m){
             String uuid = linkedTreeMap.get("id").toString();
             resultList.add(uuid);
@@ -233,14 +241,17 @@ public class WeaviateVectorStore implements VectorStore{
         for (String uuid : resultList) {
             Result<Boolean> deleteResult = client.data().deleter()
                     .withID(uuid)
-                    .withClassName(className)
+                    .withClassName(className + kid)
                     .withConsistencyLevel(ConsistencyLevel.ONE)  // default QUORUM
                     .run();
         }
     }
 
     @Override
-    public List<String> nearest(List<Double> queryVector) {
+    public List<String> nearest(List<Double> queryVector,String kid) {
+        if (StringUtils.isBlank(kid)){
+            return new ArrayList<String>();
+        }
         List<String> resultList = new ArrayList<>();
         Float[] vf = new Float[queryVector.size()];
         for (int j = 0; j < queryVector.size(); j++) {
@@ -254,14 +265,14 @@ public class WeaviateVectorStore implements VectorStore{
 //                .distance(0.1F)
                 .build();
         Result<GraphQLResponse> result = client.graphQL().get()
-                .withClassName(className)
+                .withClassName(className + kid)
                 .withFields(title)
                 .withNearVector(nearVector)
                 .withLimit(3)
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
-        ArrayList<LinkedTreeMap> m = l.get(className);
+        ArrayList<LinkedTreeMap> m = l.get(className + kid);
         for (LinkedTreeMap linkedTreeMap : m){
             String content = linkedTreeMap.get("content").toString();
             resultList.add(content);
@@ -270,7 +281,10 @@ public class WeaviateVectorStore implements VectorStore{
     }
 
     @Override
-    public List<String> nearest(String query) {
+    public List<String> nearest(String query,String kid) {
+        if (StringUtils.isBlank(kid)){
+            return new ArrayList<String>();
+        }
         List<String> resultList = new ArrayList<>();
         WeaviateClient client = getClient();
         Field title = Field.builder().name("content").build();
@@ -280,14 +294,14 @@ public class WeaviateVectorStore implements VectorStore{
                 .build();
 
         Result<GraphQLResponse> result = client.graphQL().get()
-                .withClassName(className)
+                .withClassName(className + kid)
                 .withFields(title)
                 .withNearText(nearText)
                 .withLimit(3)
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
-        ArrayList<LinkedTreeMap> m = l.get(className);
+        ArrayList<LinkedTreeMap> m = l.get(className + kid);
         for (LinkedTreeMap linkedTreeMap : m){
             String content = linkedTreeMap.get("content").toString();
             resultList.add(content);
@@ -295,9 +309,9 @@ public class WeaviateVectorStore implements VectorStore{
         return resultList;
     }
 
-    public Result<Boolean> deleteSchema() {
+    public Result<Boolean> deleteSchema(String kid) {
         WeaviateClient client = getClient();
-        Result<Boolean> result = client.schema().classDeleter().withClassName(className).run();
+        Result<Boolean> result = client.schema().classDeleter().withClassName(className+ kid).run();
         if (result.hasErrors()) {
             System.out.println(result.getError());
         }else {

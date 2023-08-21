@@ -280,12 +280,12 @@ a:hover {
     cursor: pointer;
 }
 
-.knowledge-none-div{
+.knowledge-save-div{
     margin: 10px;
     border-bottom: 1px solid #e5e7eb;
 }
 
-.knowledge-operate-div{
+.knowledge-attach-div{
     margin: 10px;
 }
 

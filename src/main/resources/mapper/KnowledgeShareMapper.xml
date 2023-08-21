@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.ai.mapper.KnowledgeShareMapper">
+
+    <resultMap id="BaseResultMap" type="com.hkh.ai.domain.KnowledgeShare">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="kid" column="kid" jdbcType="VARCHAR"/>
+            <result property="uid" column="uid" jdbcType="INTEGER"/>
+            <result property="kname" column="kname" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,kid,uid,
+        kname
+    </sql>
+</mapper>

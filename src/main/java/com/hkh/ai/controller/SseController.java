@@ -48,7 +48,7 @@ public class SseController {
 
     @PostMapping(path = "send")
     @ResponseBody
-    public ResultData send(HttpServletRequest httpServletRequest, String sessionId, String content,String sid,Boolean useLk,Boolean useHistory) {
+    public ResultData send(HttpServletRequest httpServletRequest, String sessionId, String content,String kid,String sid,Boolean useLk,Boolean useHistory) {
         SseEmitter sseEmitter = sseCache.get(sessionId);
         if (sseEmitter != null) {
             SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
@@ -64,11 +64,11 @@ public class SseController {
                 Vectorization vectorization = vectorizationFactory.getEmbedding();
                 if (vectorization instanceof LocalAiVectorization){
                     // 使用向量数据库内置的嵌入向量模型
-                    nearestList = vectorStore.nearest(content);
+                    nearestList = vectorStore.nearest(content,kid);
                 }else {
                     // 使用外部的嵌入向量模型
                     List<Double> queryVector = embeddingService.getQueryVector(content);
-                    nearestList = vectorStore.nearest(queryVector);
+                    nearestList = vectorStore.nearest(queryVector,kid);
                 }
             }
             chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);

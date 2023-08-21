@@ -6,9 +6,9 @@ import java.util.List;
  * 向量存储
  */
 public interface VectorStore {
-    void storeEmbeddings(List<String> chunkList,List<List<Double>> vectorList, String kid, String docId);
-    void removeByDocId(String docId);
+    void storeEmbeddings(List<String> chunkList,List<List<Double>> vectorList, String kid, String docId,Boolean firstTime);
+    void removeByDocId(String kid,String docId);
     void removeByKid(String kid);
-    List<String> nearest(List<Double> queryVector);
-    List<String> nearest(String query);
+    List<String> nearest(List<Double> queryVector,String kid);
+    List<String> nearest(String query,String kid);
 }

@@ -24,17 +24,17 @@ public class EmbeddingServiceImpl implements EmbeddingService {
      * @param docId             文档ID
      */
     @Override
-    public void storeEmbeddings(List<String> chunkList, String kid, String docId) {
+    public void storeEmbeddings(List<String> chunkList, String kid, String docId,Boolean firstTime) {
         VectorStore vectorStore = vectorStoreFactory.getVectorStore();
         Vectorization vectorization = vectorizationFactory.getEmbedding();
         List<List<Double>> vectorList = vectorization.batchVectorization(chunkList);
-        vectorStore.storeEmbeddings(chunkList,vectorList,kid,docId);
+        vectorStore.storeEmbeddings(chunkList,vectorList,kid,docId,firstTime);
     }
 
     @Override
-    public void removeByDocId(String docId) {
+    public void removeByDocId(String kid,String docId) {
         VectorStore vectorStore = vectorStoreFactory.getVectorStore();
-        vectorStore.removeByDocId(docId);
+        vectorStore.removeByDocId(kid,docId);
     }
 
     @Override

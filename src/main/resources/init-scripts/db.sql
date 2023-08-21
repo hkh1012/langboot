@@ -37,14 +37,15 @@ CREATE TABLE `conversation` (
 -- ----------------------------
 DROP TABLE IF EXISTS `knowledge`;
 CREATE TABLE `knowledge` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `kid` varchar(10) NOT NULL COMMENT '知识库ID',
-  `kname` varchar(50) NOT NULL COMMENT '知识库名称',
-  `create_time` datetime DEFAULT NULL,
-  `create_by` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_kname` (`kname`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COMMENT='知识库';
+     `id` int(11) NOT NULL AUTO_INCREMENT,
+     `kid` varchar(10) NOT NULL COMMENT '知识库ID',
+     `uid` bigint(20) NOT NULL DEFAULT '0' COMMENT '用户ID',
+     `kname` varchar(50) NOT NULL COMMENT '知识库名称',
+     `create_time` datetime DEFAULT NULL,
+     `create_by` varchar(50) DEFAULT NULL,
+     PRIMARY KEY (`id`),
+     UNIQUE KEY `idx_kname` (`kname`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COMMENT='知识库';
 
 -- ----------------------------
 -- Table structure for knowledge_attach
@@ -63,6 +64,17 @@ CREATE TABLE `knowledge_attach` (
   UNIQUE KEY `idx_kname` (`kid`,`doc_name`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COMMENT='知识库附件';
 
+-- ----------------------------
+-- Table structure for knowledge_share
+-- ----------------------------
+DROP TABLE IF EXISTS `knowledge_share`;
+CREATE TABLE `knowledge_share` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `kid` varchar(10) NOT NULL COMMENT '知识库ID',
+    `uid` int(11) NOT NULL DEFAULT '0' COMMENT '用户ID',
+    `kname` varchar(50) DEFAULT NULL COMMENT '知识库名称',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COMMENT='知识库分享表';
 -- ----------------------------
 -- Table structure for sys_model
 -- ----------------------------
