@@ -44,7 +44,7 @@ CREATE TABLE `knowledge` (
      `create_time` datetime DEFAULT NULL,
      `create_by` varchar(50) DEFAULT NULL,
      PRIMARY KEY (`id`),
-     UNIQUE KEY `idx_kname` (`kname`) USING BTREE
+     UNIQUE KEY `idx_kid` (`kid`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COMMENT='知识库';
 
 -- ----------------------------

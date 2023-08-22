@@ -5,7 +5,6 @@ var answerContent = "";
 var source = new EventSource('/sse/subscribe?sessionId=' + sessionId);
 var lastChild = '';
 var kid = '';
-var attachList;
 var sid = '';
 source.onmessage = function (event) {
     if (event.data == '[END]'){
@@ -306,7 +305,7 @@ function loadKnowledge() {
                     let checked = kid == item.kid ? 'checked' : '';
                     $("#knowledge-list-tbody").append("<tr kid='" + item.kid + "' idx='" +i+"'><td><input type='radio' name='knowledge' onchange='selectThisKnowledge(this);' " + checked + " value='" +item.kid+ "'/></td><td>" + item.kname +"</td><td> " +item.role +"</td><td> <a class='removeKnowledge' kid='" + item.kid +"' onclick='removeKnowledge(this);'>删除</a></td></tr>");
                     if (checked == 'checked') {
-                        attachList = item.attachList;
+                        let attachList = item.attachList;
                         $("#knowledge-attach-tbody").html("");
                         for (let j = 0; j < attachList.length; j++) {
                             let attach = attachList[j];
