@@ -72,16 +72,6 @@ public class WeaviateVectorStore implements VectorStore{
 
     public Result<Boolean> createSchema(String kid){
         WeaviateClient client = getClient();
-//        StopwordConfig stopwordConfig = StopwordConfig.builder()
-//            .preset("en")
-//            .additions(new String[]{ "star", "nebula" })
-//            .removals(new String[]{ "a", "the" })
-//            .build();
-//
-//        InvertedIndexConfig invertedIndexConfig = InvertedIndexConfig.builder()
-//            .stopwords(stopwordConfig)
-//            .indexTimestamps(true)
-//            .build();
 
         VectorIndexConfig vectorIndexConfig = VectorIndexConfig.builder()
             .distance("cosine")
@@ -116,20 +106,24 @@ public class WeaviateVectorStore implements VectorStore{
             .description("local knowledge")
             .vectorIndexType("hnsw")
             .vectorizer("text2vec-transformers")
-//            .invertedIndexConfig(invertedIndexConfig)
             .shardingConfig(shardingConfig)
             .vectorIndexConfig(vectorIndexConfig)
             .replicationConfig(replicationConfig)
             .properties(new ArrayList() {{
-//                add(Property.builder()
-//                        .dataType(new ArrayList(){ { add(DataType.TEXT); } })
-//                        .description("Title of the article")
-//                        .name("title")
-//                        .build());
                 add(Property.builder()
                         .dataType(new ArrayList(){ { add(DataType.TEXT); } })
                         .name("content")
                         .description("The content of the local knowledge,for search")
+                        .build());
+                add(Property.builder()
+                        .dataType(new ArrayList(){ { add(DataType.TEXT); } })
+                        .name("kid")
+                        .description("The knowledge id of the local knowledge,for search")
+                        .build());
+                add(Property.builder()
+                        .dataType(new ArrayList(){ { add(DataType.TEXT); } })
+                        .name("docId")
+                        .description("The doc id of the local knowledge,for search")
                         .build());
             } })
             .build();
@@ -190,10 +184,10 @@ public class WeaviateVectorStore implements VectorStore{
             .path(new String[]{ "docId" })
             .operator(Operator.Equal)
             .valueString(docId)
-            .operator(Operator.And)
-            .path(new String[]{ "kid" })
-            .operator(Operator.Equal)
-            .valueString(kid)
+//            .operator(Operator.And)
+//            .path(new String[]{ "kid" })
+//            .operator(Operator.Equal)
+//            .valueString(kid)
             .build();
         Result<GraphQLResponse> result = client.graphQL().get()
             .withClassName(className + kid)

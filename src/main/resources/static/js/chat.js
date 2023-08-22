@@ -61,7 +61,7 @@ function sendContent() {
     $("#sayContent").val("");
     let useLk = localStorage.getItem("useLk");
     let useHistory = localStorage.getItem("useHistory");
-    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"useLk":useLk,"useHistory":useHistory},function (d) {
+    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory},function (d) {
         console.log(d);
     },"json");
 }
@@ -304,7 +304,7 @@ function loadKnowledge() {
                 for (let i = 0; i < knowledgeList.length; i++) {
                     let item = knowledgeList[i];
                     let checked = kid == item.kid ? 'checked' : '';
-                    $("#knowledge-list-tbody").append("<tr kid='" + item.kid + "' idx='" +i+"'><td><input type='radio' name='knowledge' onclick='selectThisKnowledge(this);' " + checked + " value='" +item.kid+ "'/></td><td>" + item.kname +"</td><td> " +item.role +"</td><td> <a class='removeKnowledge' kid='" + item.kid +"' onclick='removeKnowledge(this);'>删除</a></td></tr>");
+                    $("#knowledge-list-tbody").append("<tr kid='" + item.kid + "' idx='" +i+"'><td><input type='radio' name='knowledge' onchange='selectThisKnowledge(this);' " + checked + " value='" +item.kid+ "'/></td><td>" + item.kname +"</td><td> " +item.role +"</td><td> <a class='removeKnowledge' kid='" + item.kid +"' onclick='removeKnowledge(this);'>删除</a></td></tr>");
                     if (checked == 'checked') {
                         attachList = item.attachList;
                         $("#knowledge-attach-tbody").html("");
@@ -321,6 +321,8 @@ function loadKnowledge() {
 }
 
 function selectThisKnowledge(o){
+    $("input[type=radio][name=knowledge]").removeAttr("checked");
+    $(o).attr("checked","checked");
     let selectKid = $(o).val();
     kid = selectKid;
     let knowledgeList = JSON.parse(localStorage.getItem("knowledgeList"));
@@ -330,7 +332,7 @@ function selectThisKnowledge(o){
             localStorage.setItem("knowledge",JSON.stringify(selectedKnowledge));
             $("#knowledge-attach-tbody").html("");
             for (let j = 0; j < selectedKnowledge.attachList.length; j++) {
-                let attach = attachList[j];
+                let attach = selectedKnowledge.attachList[j];
                 $("#knowledge-attach-tbody").append("<tr kid='" + selectKid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
             }
         }
