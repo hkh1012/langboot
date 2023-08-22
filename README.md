@@ -33,8 +33,8 @@
     - [ ] 知识图谱/图数据库接入
 - [ ] 增加更多 LLM 模型支持
     - [x] [OPENAI/completions](https://platform.openai.com/docs/api-reference)
-    - [x] [THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b)
-    - [ ] [baichuan-inc/Baichuan-7B](https://huggingface.co/baichuan-inc/Baichuan-7B)
+    - [x] [THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b)
+    - [ ] [THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b)
 - [ ] 增加更多 Embedding 模型支持
     - [x] [OPENAI/embedding](https://platform.openai.com/docs/api-reference/embeddings)
     - [x] [weaviate/text2vec-transformers](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers)
@@ -48,10 +48,18 @@
     - [x] 会话管理
     - [x] 知识库管理
     - [ ] 支持搜索引擎问答
-    - [ ] prompts相关功能
+- [ ] prompts相关功能
+    - [x] 摘要
+    - [x] 翻译
+    - [x] 关键词
+    - [x] 文本分类
+    - [x] 内容安全
+    - [x] 偏好分析
+    - [ ] 查重
+    - [ ] 文生图
 - [ ] 前端
     - [x] 移动端适配
-    - [ ] 代码等内容流式输出优化
+    - [x] 代码等内容流式输出优化
 
 ## Quick Start
 ### 1. 执行数据库脚本 
