@@ -32,7 +32,7 @@
     - [ ] 结构化数据接入（如Excel、SQL 等）
     - [ ] 知识图谱/图数据库接入
 - [ ] 增加更多 LLM 模型支持
-    - [x] [OPENAI/completions](https://platform.openai.com/docs/api-reference)
+    - [x] [OPENAI](https://platform.openai.com/docs/api-reference)
     - [x] [THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b)
     - [ ] [THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b)
 - [ ] 增加更多 Embedding 模型支持
