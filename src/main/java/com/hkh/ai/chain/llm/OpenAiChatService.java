@@ -1,6 +1,7 @@
 package com.hkh.ai.chain.llm;
 
 import cn.hutool.core.util.StrUtil;
+import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;

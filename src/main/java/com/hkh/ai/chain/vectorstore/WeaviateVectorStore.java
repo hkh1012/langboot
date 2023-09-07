@@ -4,6 +4,7 @@ import cn.hutool.core.lang.UUID;
 import com.google.gson.internal.LinkedTreeMap;
 import com.hkh.ai.chain.retrieve.PromptRetriever;
 import com.hkh.ai.chain.retrieve.PromptRetrieverFactory;
+import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import io.weaviate.client.Config;
 import io.weaviate.client.WeaviateClient;
 import io.weaviate.client.base.Result;
@@ -12,7 +13,6 @@ import io.weaviate.client.v1.data.replication.model.ConsistencyLevel;
 import io.weaviate.client.v1.filters.Operator;
 import io.weaviate.client.v1.filters.WhereFilter;
 import io.weaviate.client.v1.graphql.model.GraphQLResponse;
-import io.weaviate.client.v1.graphql.query.argument.NearObjectArgument;
 import io.weaviate.client.v1.graphql.query.argument.NearTextArgument;
 import io.weaviate.client.v1.graphql.query.argument.NearVectorArgument;
 import io.weaviate.client.v1.graphql.query.fields.Field;
@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -42,9 +41,11 @@ public class WeaviateVectorStore implements VectorStore{
     private String className;
 
     private final PromptRetrieverFactory promptRetrieverFactory;
+    private final PromptRetrieverProperties promptRetrieverProperties;
 
-    public WeaviateVectorStore(PromptRetrieverFactory promptRetrieverFactory) {
+    public WeaviateVectorStore(PromptRetrieverFactory promptRetrieverFactory, PromptRetrieverProperties promptRetrieverProperties) {
         this.promptRetrieverFactory = promptRetrieverFactory;
+        this.promptRetrieverProperties = promptRetrieverProperties;
     }
 
     public WeaviateClient getClient(){
@@ -275,7 +276,7 @@ public class WeaviateVectorStore implements VectorStore{
                 .withClassName(className + kid)
                 .withFields(contentField,_additional)
                 .withNearVector(nearVector)
-                .withLimit(5)
+                .withLimit(promptRetrieverProperties.getLimits())
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
@@ -311,7 +312,7 @@ public class WeaviateVectorStore implements VectorStore{
                 .withClassName(className + kid)
                 .withFields(contentField,_additional)
                 .withNearText(nearText)
-                .withLimit(5)
+                .withLimit(promptRetrieverProperties.getLimits())
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");

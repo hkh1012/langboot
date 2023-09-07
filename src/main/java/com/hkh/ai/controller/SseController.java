@@ -2,6 +2,7 @@ package com.hkh.ai.controller;
 
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
+import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import com.hkh.ai.chain.vectorizer.LocalAiVectorization;
 import com.hkh.ai.chain.vectorizer.Vectorization;
 import com.hkh.ai.chain.vectorizer.VectorizationFactory;
@@ -16,6 +17,8 @@ import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Controller
 @RequestMapping(path = "sse")
 @AllArgsConstructor
+@Slf4j
 public class SseController {
     private static Map<String, SseEmitter> sseCache = new ConcurrentHashMap<>();
 
@@ -43,8 +48,8 @@ public class SseController {
     private final VectorizationFactory vectorizationFactory;
 
     private final EmbeddingService embeddingService;
-
     private final ConversationService conversationService;
+    private final PromptRetrieverProperties promptRetrieverProperties;
 
     @PostMapping(path = "send")
     @ResponseBody
@@ -71,7 +76,17 @@ public class SseController {
                     nearestList = vectorStore.nearest(queryVector,kid);
                 }
             }
-            chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
+            if (useLk && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
+                try {
+                    sseEmitter.send("Sorry，本地知识库未找到相关内容，请您尝试其他方式。");
+                    sseEmitter.send("[END]");
+                } catch (IOException e) {
+                    log.error("sseEmitter send occur error",e);
+                    throw new RuntimeException(e);
+                }
+            }else {
+                chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
+            }
         }
         return ResultData.success("发送成功");
     }
