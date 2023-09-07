@@ -1,4 +1,6 @@
 package com.hkh.ai.chain.retrieve;
 
-public class PromptRetriever {
+public interface PromptRetriever<T> {
+
+    T retrieve(T source);
 }

@@ -2,6 +2,8 @@ package com.hkh.ai.chain.vectorstore;
 
 import cn.hutool.core.lang.UUID;
 import com.google.gson.internal.LinkedTreeMap;
+import com.hkh.ai.chain.retrieve.PromptRetriever;
+import com.hkh.ai.chain.retrieve.PromptRetrieverFactory;
 import io.weaviate.client.Config;
 import io.weaviate.client.WeaviateClient;
 import io.weaviate.client.base.Result;
@@ -38,6 +40,12 @@ public class WeaviateVectorStore implements VectorStore{
 
     @Value("${chain.vector.store.weaviate.classname}")
     private String className;
+
+    private final PromptRetrieverFactory promptRetrieverFactory;
+
+    public WeaviateVectorStore(PromptRetrieverFactory promptRetrieverFactory) {
+        this.promptRetrieverFactory = promptRetrieverFactory;
+    }
 
     public WeaviateClient getClient(){
         Config config = new Config(protocol, host);
@@ -253,21 +261,28 @@ public class WeaviateVectorStore implements VectorStore{
             vf[j] = value.floatValue();
         }
         WeaviateClient client = getClient();
-        Field title = Field.builder().name("content").build();
+        Field contentField = Field.builder().name("content").build();
+        Field _additional = Field.builder()
+                .name("_additional")
+                .fields(new Field[]{
+                        Field.builder().name("distance").build()
+                }).build();
         NearVectorArgument nearVector = NearVectorArgument.builder()
                 .vector(vf)
-//                .distance(0.1F)
+                .distance(1.6f) // certainty = 1f - distance /2f
                 .build();
         Result<GraphQLResponse> result = client.graphQL().get()
                 .withClassName(className + kid)
-                .withFields(title)
+                .withFields(contentField,_additional)
                 .withNearVector(nearVector)
-                .withLimit(3)
+                .withLimit(5)
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
         ArrayList<LinkedTreeMap> m = l.get(className + kid);
-        for (LinkedTreeMap linkedTreeMap : m){
+        PromptRetriever<ArrayList<LinkedTreeMap>> promptRetriever = promptRetrieverFactory.getPromptRetriever();
+        ArrayList<LinkedTreeMap> retrieved = promptRetriever.retrieve(m);
+        for (LinkedTreeMap linkedTreeMap : retrieved){
             String content = linkedTreeMap.get("content").toString();
             resultList.add(content);
         }
@@ -281,22 +296,29 @@ public class WeaviateVectorStore implements VectorStore{
         }
         List<String> resultList = new ArrayList<>();
         WeaviateClient client = getClient();
-        Field title = Field.builder().name("content").build();
+        Field contentField = Field.builder().name("content").build();
+        Field _additional = Field.builder()
+                .name("_additional")
+                .fields(new Field[]{
+                        Field.builder().name("distance").build()
+                }).build();
         NearTextArgument nearText = client.graphQL().arguments().nearTextArgBuilder()
                 .concepts(new String[]{ query })
-                .distance(0.6f) // use .certainty(0.7f) prior to v1.14
+                .distance(1.6f) // certainty = 1f - distance /2f
                 .build();
 
         Result<GraphQLResponse> result = client.graphQL().get()
                 .withClassName(className + kid)
-                .withFields(title)
+                .withFields(contentField,_additional)
                 .withNearText(nearText)
-                .withLimit(3)
+                .withLimit(5)
                 .run();
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
         ArrayList<LinkedTreeMap> m = l.get(className + kid);
-        for (LinkedTreeMap linkedTreeMap : m){
+        PromptRetriever<ArrayList<LinkedTreeMap>> promptRetriever = promptRetrieverFactory.getPromptRetriever();
+        ArrayList<LinkedTreeMap> retrieved = promptRetriever.retrieve(m);
+        for (LinkedTreeMap linkedTreeMap : retrieved){
             String content = linkedTreeMap.get("content").toString();
             resultList.add(content);
         }
