@@ -78,7 +78,10 @@ public class SseController {
             }
             if (useLk && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
                 try {
-                    sseEmitter.send("Sorry，本地知识库未找到相关内容，请您尝试其他方式。");
+                    String goalKeeperWords = "Sorry，本地知识库未找到相关内容，请您尝试其他方式。";
+                    conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), customChatMessage.getContent(), "Q");
+                    conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), goalKeeperWords, "A");
+                    sseEmitter.send(goalKeeperWords);
                     sseEmitter.send("[END]");
                 } catch (IOException e) {
                     log.error("sseEmitter send occur error",e);
