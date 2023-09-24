@@ -156,4 +156,17 @@ public class IndexController {
         model.addAttribute("sysUser",sysUser);
         return "textToImage";
     }
+
+    /**
+     * 函数调用
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/function"})
+    public String function(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "function";
+    }
 }

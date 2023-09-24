@@ -13,4 +13,8 @@ public interface CompletionService {
     String classic(SysUser sysUser, CompletionClassicRequest request);
 
     String security(SysUser sysUser, CompletionSecurityRequest request);
+
+    String function(SysUser sysUser, CompletionFunctionRequest request);
+
+    String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request);
 }

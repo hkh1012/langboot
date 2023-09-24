@@ -1,9 +1,12 @@
 package com.hkh.ai.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.domain.function.LocationWeather;
 import com.hkh.ai.request.*;
 import com.hkh.ai.service.CompletionService;
 import lombok.AllArgsConstructor;
@@ -59,4 +62,19 @@ public class CompletionServiceImpl implements CompletionService {
         String completionResult = chatService.blockCompletion(fullContent);
         return completionResult;
     }
+
+    @Override
+    public String function(SysUser sysUser, CompletionFunctionRequest request) {
+        ChatService chatService = chatServiceFactory.getChatService();
+        String completionResult = chatService.functionCompletion(request.getContent(), request.getFunctionName(), request.getDescription(),request.getClazz());
+        return completionResult;
+    }
+
+    @Override
+    public String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request) {
+        ChatService chatService = chatServiceFactory.getChatService();
+        String completionResult = chatService.functionCompletion(request.getContent(), "get_location_weather", "the current weather of a location ", LocationWeather.class);
+        return completionResult;
+    }
+
 }

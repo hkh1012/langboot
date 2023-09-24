@@ -82,4 +82,17 @@ public class CompletionController {
         String result = completionService.security(sysUser,request);
         return ResultData.success(result,"成功");
     }
+
+    /**
+     * 函数调用（天气）
+     * @param httpServletRequest
+     * @param request
+     * @return
+     */
+    @PostMapping(value = {"/function/weather"})
+    public ResultData<String> function(HttpServletRequest httpServletRequest, CompletionFunctionWeatherRequest request) {
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        String result = completionService.functionWeather(sysUser,request);
+        return ResultData.success(result,"成功");
+    }
 }

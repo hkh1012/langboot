@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -120,5 +121,10 @@ public class ChatglmChatService implements ChatService {
         ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
         log.info("chatCompletion ==> ",chatCompletion.toString());
         return chatCompletion.getChoices().get(0).getMessage().getContent();
+    }
+
+    @Override
+    public String functionCompletion(String content,String functionName,String description ,Class clazz) {
+        return blockCompletion(content);
     }
 }

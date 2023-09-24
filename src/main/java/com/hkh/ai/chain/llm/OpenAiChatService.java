@@ -1,6 +1,11 @@
 package com.hkh.ai.chain.llm;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
@@ -10,10 +15,8 @@ import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.completion.chat.*;
+import com.theokanning.openai.service.FunctionExecutor;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Primary
@@ -124,4 +125,45 @@ public class OpenAiChatService implements ChatService {
         log.info("chatCompletion ==> {}",chatCompletion.toString());
         return chatCompletion.getChoices().get(0).getMessage().getContent();
     }
+
+    @Override
+    public String functionCompletion(String content,String functionName,String description ,Class clazz) {
+        OpenAiService service = new OpenAiService(apiToken, Duration.ofSeconds(300));
+        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
+        Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
+        List<Integer> promptTokens = enc.encode(content);
+        System.out.println("promptTokens length == " + promptTokens.size());
+
+        final List<ChatMessage> messages = new ArrayList<>();
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
+        messages.add(userMessage);
+
+        FunctionExecutor functionExecutor = getFunctionExecutor(functionName,description,clazz);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
+                .builder()
+                .model(defaultModel)
+                .messages(messages)
+                .functions(functionExecutor.getFunctions())
+                .functionCall(ChatCompletionRequest.ChatCompletionRequestFunctionCall.of("auto"))
+                .n(1)
+                .logitBias(new HashMap<>())
+                .build();
+        ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
+        log.info("functionCompletion ==> {}",chatCompletion.toString());
+        JsonNode arguments = chatCompletion.getChoices().get(0).getMessage().getFunctionCall().getArguments();
+        log.info("arguments ==> {}",arguments);
+        return JSONObject.toJSONString(arguments);
+    }
+
+    private FunctionExecutor getFunctionExecutor(String functionName,String description ,Class clazz){
+        FunctionExecutor functionExecutor = new FunctionExecutor(Collections.singletonList(ChatFunction.builder()
+                .name(functionName)
+                .description(description)
+                .executor(clazz, w -> w)
+                .build()));
+        return functionExecutor;
+    }
+
+
+
 }
