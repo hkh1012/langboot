@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;
 
 @Data
-public class DemandStep {
+public class DemandStepFunObj {
 
     @JsonPropertyDescription("The name of the step")
     @JsonProperty(required = true)

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;
 
 @Data
-public class DemandRole {
+public class DemandRoleFuncObj {
 
     @JsonPropertyDescription("The name of the role")
     @JsonProperty(required = true)

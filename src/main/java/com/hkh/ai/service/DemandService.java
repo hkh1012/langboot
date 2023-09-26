@@ -1,9 +1,14 @@
 package com.hkh.ai.service;
 
+import com.hkh.ai.agent.prompt.demand.function.DemandRoleFuncObj;
+import com.hkh.ai.agent.prompt.demand.function.DemandStepFunObj;
+import com.hkh.ai.domain.AgentField;
 import com.hkh.ai.domain.Demand;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.request.AgentDemandProposeRequest;
+
+import java.util.List;
 
 /**
 * @author huangkh
@@ -13,4 +18,9 @@ import com.hkh.ai.request.AgentDemandProposeRequest;
 public interface DemandService extends IService<Demand> {
 
     void propose(SysUser sysUser, AgentDemandProposeRequest request);
+
+    Demand saveDemand(SysUser sysUser, String did, String fid, String content);
+
+    void stepRole(SysUser sysUser, AgentField agentField, Demand demand, List<DemandRoleFuncObj> roles, List<DemandStepFunObj> steps);
+
 }

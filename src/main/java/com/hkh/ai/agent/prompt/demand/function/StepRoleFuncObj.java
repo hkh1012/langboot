@@ -7,13 +7,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DemandFuncObj {
+public class StepRoleFuncObj {
 
-    @JsonPropertyDescription("The roles ")
+    @JsonPropertyDescription("role name")
     @JsonProperty(required = true)
-    private List<DemandRoleFuncObj> roles;
+    private String roleName;
 
-    @JsonPropertyDescription("The name of the step")
-    @JsonProperty(required = true)
-    private List<DemandStepFunObj> steps;
 }

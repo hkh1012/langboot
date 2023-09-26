@@ -96,6 +96,54 @@ CREATE TABLE `sys_model` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统模型';
 
 -- ----------------------------
+-- Table structure for demand
+-- ----------------------------
+DROP TABLE IF EXISTS `demand`;
+CREATE TABLE `demand` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `did` varchar(50) NOT NULL COMMENT '需求ID',
+  `fid` varchar(50) NOT NULL COMMENT '所属领域ID',
+  `content` text COMMENT '需求内容',
+  `user_id` int(11) DEFAULT NULL COMMENT '用户ID',
+  `unambiguous` bit(1) DEFAULT b'0' COMMENT '明确的',
+  `create_time` datetime DEFAULT NULL,
+  `create_by` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='需求';
+
+-- ----------------------------
+-- Table structure for demand_step
+-- ----------------------------
+DROP TABLE IF EXISTS `demand_step`;
+CREATE TABLE `demand_step` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `did` varchar(50) NOT NULL COMMENT '需求ID',
+   `fid` varchar(50) NOT NULL COMMENT '所属领域ID',
+   `step_name` varchar(100) DEFAULT NULL COMMENT '步骤名称',
+   `description` text COMMENT '步骤描述',
+   `role` varchar(100) DEFAULT NULL COMMENT '负责人角色',
+   `user_id` int(11) DEFAULT NULL COMMENT '用户ID',
+   `create_time` datetime DEFAULT NULL,
+   `create_by` varchar(50) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='需求步骤';
+
+-- ----------------------------
+-- Table structure for agent_field
+-- ----------------------------
+DROP TABLE IF EXISTS `agent_field`;
+CREATE TABLE `agent_field` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `fid` varchar(50) NOT NULL COMMENT '领域ID',
+   `field_name` varchar(50) NOT NULL COMMENT '领域名称',
+   `description` text COMMENT '领域描述',
+   `status` bit(1) DEFAULT b'0' COMMENT '是否生效：0无效1有效',
+   `create_time` datetime DEFAULT NULL,
+   `create_by` varchar(50) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='代理领域';
+
+-- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
