@@ -1,6 +1,7 @@
 package com.hkh.ai.chain.llm;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;
@@ -125,6 +126,6 @@ public class ChatglmChatService implements ChatService {
 
     @Override
     public String functionCompletion(String content,String functionName,String description ,Class clazz) {
-        return blockCompletion(content);
+        return JSONObject.toJSONString(blockCompletion(content));
     }
 }

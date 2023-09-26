@@ -10,4 +10,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface AgentFieldService extends IService<AgentField> {
 
+    AgentField getByFid(String fid);
 }

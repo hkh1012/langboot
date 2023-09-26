@@ -10,6 +10,7 @@ import com.hkh.ai.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +35,10 @@ public class AgentController {
      * @param request
      * @return
      */
-    @PostMapping("/demand/propose")
-    public ResultData demandPropose(HttpServletRequest httpServletRequest, @RequestBody @Valid AgentDemandProposeRequest request) {
+    @PostMapping(value = "/demand/propose")
+    public ResultData demandPropose(HttpServletRequest httpServletRequest, AgentDemandProposeRequest request) {
         SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
-//        demandService.propose(sysUser,request);
+        demandService.propose(sysUser,request);
         return ResultData.success("保存成功");
     }
 

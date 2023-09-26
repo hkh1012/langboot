@@ -64,16 +64,15 @@ public class CompletionServiceImpl implements CompletionService {
     }
 
     @Override
-    public String function(SysUser sysUser, CompletionFunctionRequest request) {
+    public String function(SysUser sysUser, String content, String functionName, String description, Class clazz) {
         ChatService chatService = chatServiceFactory.getChatService();
-        String completionResult = chatService.functionCompletion(request.getContent(), request.getFunctionName(), request.getDescription(),request.getClazz());
+        String completionResult = chatService.functionCompletion(content, functionName, description,clazz);
         return completionResult;
     }
 
     @Override
     public String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request) {
-        ChatService chatService = chatServiceFactory.getChatService();
-        String completionResult = chatService.functionCompletion(request.getContent(), "get_location_weather", "the current weather of a location ", LocationWeather.class);
+        String completionResult = function(sysUser,request.getContent(), "get_location_weather", "the current weather of a location ", LocationWeather.class);
         return completionResult;
     }
 

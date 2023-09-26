@@ -1,5 +1,6 @@
 package com.hkh.ai.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hkh.ai.domain.AgentField;
 import com.hkh.ai.service.AgentFieldService;
@@ -15,6 +16,13 @@ import org.springframework.stereotype.Service;
 public class AgentFieldServiceImpl extends ServiceImpl<AgentFieldMapper, AgentField>
     implements AgentFieldService{
 
+    @Override
+    public AgentField getByFid(String fid) {
+        QueryWrapper<AgentField> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("fid",fid);
+        AgentField agentField = this.getOne(queryWrapper,false);
+        return agentField;
+    }
 }
 
 

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>函数调用</title>
+    <title>agent代理</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="applicable-device" content="pc,mobile">
-    <link href="/static/css/function.css" rel="stylesheet"/>
+    <link href="/static/css/agent.css" rel="stylesheet"/>
     <script src="/webjars/jquery/3.1.1-1/jquery.min.js"></script>
-    <script src="/static/js/function.js"></script>
+    <script src="/static/js/agent.js"></script>
 
     <!-- Fonts -->
     <#--    <link href="https://fonts.googleapis.com/css?family=Nunito:300,300i,400,600,700" rel="stylesheet">-->
@@ -27,11 +27,11 @@
 <main class="container" style="margin-top: 100px;">
     <form>
         <div class="form-group">
-            <textarea class="form-control" onchange="contentChange();" maxlength="3000" id="functionContent" rows="9" aria-describedby="functionHelp" placeholder="请输入查询天气文本（限3000字）" required></textarea>
-            <small id="functionHelp" class="form-text text-danger"></small>
+            <textarea class="form-control" onchange="contentChange();" maxlength="3000" id="agentContent" rows="9" aria-describedby="agentHelp" placeholder="请输入任务目标文本" required></textarea>
+            <small id="agentHelp" class="form-text text-danger"></small>
         </div>
-        <button type="button" class="btn btn-success btn-round" id="functionBtn" onclick="functionCheck();">函数调用</button>
-        <div class="functionResult" id="functionResult"></div>
+        <button type="button" class="btn btn-success btn-round" id="agentBtn" onclick="agentCheck();">提交任务</button>
+        <div class="agentResult" id="agentResult"></div>
     </form>
 </main>
 

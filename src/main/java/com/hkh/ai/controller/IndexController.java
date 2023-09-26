@@ -169,4 +169,17 @@ public class IndexController {
         model.addAttribute("sysUser",sysUser);
         return "function";
     }
+
+    /**
+     * 代理agent
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/agent"})
+    public String agent(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "agent";
+    }
 }

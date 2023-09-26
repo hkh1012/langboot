@@ -2,6 +2,8 @@ package com.hkh.ai.service;
 
 import com.hkh.ai.domain.Demand;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.request.AgentDemandProposeRequest;
 
 /**
 * @author huangkh
@@ -10,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface DemandService extends IService<Demand> {
 
+    void propose(SysUser sysUser, AgentDemandProposeRequest request);
 }

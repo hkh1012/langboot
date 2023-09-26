@@ -27,6 +27,7 @@
                         <a class="dropdown-item" href="/classic">文本分类</a>
                         <a class="dropdown-item" href="/security">内容安全</a>
                         <a class="dropdown-item" href="/function">函数调用</a>
+                        <a class="dropdown-item" href="/agent">agent代理</a>
                         <a class="dropdown-item" href="/sentiment">情感分析</a>
                         <a class="dropdown-item" href="/duplication">查重</a>
                         <a class="dropdown-item" href="/textToImage">文生图</a>
