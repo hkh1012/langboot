@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.ai.mapper.DemandStepMapper">
+
+    <resultMap id="BaseResultMap" type="com.hkh.ai.domain.DemandStep">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="did" column="did" jdbcType="VARCHAR"/>
+            <result property="fid" column="fid" jdbcType="VARCHAR"/>
+            <result property="stepName" column="step_name" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="role" column="role" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="unambiguous" column="unambiguous" jdbcType="BIT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,did,fid,
+        step_name,description,role,
+        user_id,unambiguous,create_time,
+        create_by
+    </sql>
+</mapper>
