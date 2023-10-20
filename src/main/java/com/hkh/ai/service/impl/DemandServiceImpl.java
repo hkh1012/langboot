@@ -6,10 +6,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hkh.ai.agent.prompt.demand.DemandProposePrompt;
 import com.hkh.ai.agent.prompt.demand.DemandStepRolePrompt;
-import com.hkh.ai.agent.prompt.demand.function.DemandFuncObj;
-import com.hkh.ai.agent.prompt.demand.function.DemandRoleFuncObj;
-import com.hkh.ai.agent.prompt.demand.function.DemandStepFunObj;
-import com.hkh.ai.agent.prompt.demand.function.StepRoleFuncObj;
+import com.hkh.ai.agent.prompt.demand.functionObj.DemandFuncObj;
+import com.hkh.ai.agent.prompt.demand.functionObj.DemandRoleFuncObj;
+import com.hkh.ai.agent.prompt.demand.functionObj.DemandStepFunObj;
+import com.hkh.ai.agent.prompt.demand.functionObj.StepRoleFuncObj;
 import com.hkh.ai.domain.AgentField;
 import com.hkh.ai.domain.Demand;
 import com.hkh.ai.domain.SysUser;
@@ -43,12 +43,13 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
     public void propose(SysUser sysUser, AgentDemandProposeRequest request) {
         AgentField agentField = agentFieldService.getByFid(request.getFid());
         String content = DemandProposePrompt.prompt(agentField.getFieldName(),request.getContent());
-        String resultJsonStr = completionService.function(sysUser, content,"demain_propose","get the roles and the steps of the demand", DemandFuncObj.class);
+        String resultJsonStr = completionService.function(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
         System.out.println(resultJsonStr);
-        log.info("[BOSS]完成目标需要的角色与步骤: %s",resultJsonStr);
-        Demand demand = saveDemand(sysUser, RandomUtil.randomString(32), request.getFid(), request.getContent());
         DemandFuncObj demandFuncObj = JSONObject.parseObject(resultJsonStr, DemandFuncObj.class);
+        log.info("[AGENT]完成目标需要的角色与步骤: {}",resultJsonStr);
+        Demand demand = saveDemand(sysUser, RandomUtil.randomString(32), request.getFid(), request.getContent());
         stepRole(sysUser,agentField,demand,demandFuncObj.getRoles(),demandFuncObj.getSteps());
+
     }
 
     @Override
@@ -71,8 +72,8 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
             String resultJsonStr = completionService.function(sysUser, content,"choose_the_step_role","get the role who finish the demand step", StepRoleFuncObj.class);
             System.out.println(resultJsonStr);
             StepRoleFuncObj stepRoleFuncObj = JSONObject.parseObject(resultJsonStr,StepRoleFuncObj.class);
+            log.info("[AGENT]完成步骤{}对应的负责角色为{}",steps.get(i).getStepName(),stepRoleFuncObj.getRoleName());
             demandStepService.saveDemandStep(demand.getDid(),agentField.getFid(),steps.get(i).getStepName(),steps.get(i).getDescription(),stepRoleFuncObj.getRoleName(),sysUser.getId());
-            log.info("[BOSS]完成步骤[%s]对应的负责角色为[%s]",steps.get(i).getStepName(),stepRoleFuncObj.getRoleName());
         }
     }
 }

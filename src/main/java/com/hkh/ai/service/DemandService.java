@@ -1,7 +1,7 @@
 package com.hkh.ai.service;
 
-import com.hkh.ai.agent.prompt.demand.function.DemandRoleFuncObj;
-import com.hkh.ai.agent.prompt.demand.function.DemandStepFunObj;
+import com.hkh.ai.agent.prompt.demand.functionObj.DemandRoleFuncObj;
+import com.hkh.ai.agent.prompt.demand.functionObj.DemandStepFunObj;
 import com.hkh.ai.domain.AgentField;
 import com.hkh.ai.domain.Demand;
 import com.baomidou.mybatisplus.extension.service.IService;

@@ -1,4 +1,4 @@
-package com.hkh.ai.agent.prompt.demand.function;
+package com.hkh.ai.agent.prompt.demand.functionObj;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
