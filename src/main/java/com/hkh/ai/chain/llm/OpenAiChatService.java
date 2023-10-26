@@ -39,11 +39,21 @@ public class OpenAiChatService implements ChatService {
     @Value("${chain.llm.openai.model}")
     private String defaultModel;
 
+    @Value("${proxy.enable}")
+    private boolean proxyEnable;
+
+    @Value("${proxy.host}")
+    private String proxyHost;
+
+    @Value("${proxy.port}")
+    private String proxyPort;
+
     @Autowired
     private ConversationService conversationService;
 
     @Override
     public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser){
+
         OpenAiService service = new OpenAiService(apiToken);
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
@@ -74,6 +84,7 @@ public class OpenAiChatService implements ChatService {
                 .logitBias(new HashMap<>())
                 .build();
         StringBuilder sb = new StringBuilder();
+        enableProxy();
         service.streamChatCompletion(chatCompletionRequest)
                 .doOnError(Throwable::printStackTrace)
                 .blockingForEach(item -> {
@@ -104,6 +115,7 @@ public class OpenAiChatService implements ChatService {
 
     @Override
     public String blockCompletion(String content) {
+        enableProxy();
         OpenAiService service = new OpenAiService(apiToken, Duration.ofSeconds(300));
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
@@ -128,6 +140,7 @@ public class OpenAiChatService implements ChatService {
 
     @Override
     public String functionCompletion(String content,String functionName,String description ,Class clazz) {
+        enableProxy();
         OpenAiService service = new OpenAiService(apiToken, Duration.ofSeconds(300));
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
@@ -164,6 +177,11 @@ public class OpenAiChatService implements ChatService {
         return functionExecutor;
     }
 
-
+    private void enableProxy(){
+        if (proxyEnable){
+            System.getProperties().setProperty("https.proxyHost",proxyHost);
+            System.getProperties().setProperty("https.proxyPort",proxyPort);
+        }
+    }
 
 }
