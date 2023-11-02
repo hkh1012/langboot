@@ -1,6 +1,7 @@
 package com.hkh.ai.chain.vectorstore;
 
 import cn.hutool.core.lang.UUID;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.internal.LinkedTreeMap;
 import com.hkh.ai.chain.retrieve.PromptRetriever;
 import com.hkh.ai.chain.retrieve.PromptRetrieverFactory;
@@ -109,6 +110,22 @@ public class WeaviateVectorStore implements VectorStore{
             .factor(1)
             .build();
 
+        JSONObject classModuleConfigValue = new JSONObject();
+        classModuleConfigValue.put("vectorizeClassName",false);
+        JSONObject classModuleConfig = new JSONObject();
+        classModuleConfig.put("text2vec-transformers",classModuleConfigValue);
+
+        JSONObject propertyModuleConfigValueSkipTrue = new JSONObject();
+        propertyModuleConfigValueSkipTrue.put("vectorizePropertyName",false);
+        propertyModuleConfigValueSkipTrue.put("skip",true);
+        JSONObject propertyModuleConfigSkipTrue = new JSONObject();
+        propertyModuleConfigSkipTrue.put("text2vec-transformers",propertyModuleConfigValueSkipTrue);
+
+        JSONObject propertyModuleConfigValueSkipFalse = new JSONObject();
+        propertyModuleConfigValueSkipFalse.put("vectorizePropertyName",false);
+        propertyModuleConfigValueSkipFalse.put("skip",false);
+        JSONObject propertyModuleConfigSkipFalse = new JSONObject();
+        propertyModuleConfigSkipFalse.put("text2vec-transformers",propertyModuleConfigValueSkipFalse);
 
         WeaviateClass clazz = WeaviateClass.builder()
             .className(className + kid)
@@ -118,26 +135,31 @@ public class WeaviateVectorStore implements VectorStore{
             .shardingConfig(shardingConfig)
             .vectorIndexConfig(vectorIndexConfig)
             .replicationConfig(replicationConfig)
+            .moduleConfig(classModuleConfig)
             .properties(new ArrayList() {{
                 add(Property.builder()
                         .dataType(new ArrayList(){ { add(DataType.TEXT); } })
                         .name("content")
                         .description("The content of the local knowledge,for search")
+                        .moduleConfig(propertyModuleConfigSkipFalse)
                         .build());
                 add(Property.builder()
                         .dataType(new ArrayList(){ { add(DataType.TEXT); } })
                         .name("kid")
                         .description("The knowledge id of the local knowledge,for search")
+                        .moduleConfig(propertyModuleConfigSkipTrue)
                         .build());
                 add(Property.builder()
                         .dataType(new ArrayList(){ { add(DataType.TEXT); } })
                         .name("docId")
                         .description("The doc id of the local knowledge,for search")
+                        .moduleConfig(propertyModuleConfigSkipTrue)
                         .build());
                 add(Property.builder()
                         .dataType(new ArrayList(){ { add(DataType.TEXT); } })
                         .name("uuid")
                         .description("The uuid id of the local knowledge fragment(same with id properties),for search")
+                        .moduleConfig(propertyModuleConfigSkipTrue)
                         .build());
             } })
             .build();

@@ -22,6 +22,7 @@ public class BestFirstPromptRetriever implements PromptRetriever<ArrayList<Linke
     private final PromptRetrieverProperties promptRetrieverProperties;
     @Override
     public ArrayList<LinkedTreeMap> retrieve(ArrayList<LinkedTreeMap> sourceArray) {
+        log.info("检索前数据为：{}",sourceArray);
         ArrayList<LinkedTreeMap> resultList = new ArrayList<>();
         for (LinkedTreeMap linkedTreeMap : sourceArray){
             String additionalJsonStr = JSON.toJSONString(linkedTreeMap.get("_additional"));
@@ -39,6 +40,7 @@ public class BestFirstPromptRetriever implements PromptRetriever<ArrayList<Linke
                 }
             }
         }
+        log.info("检索后数据为：{}",sourceArray);
         return resultList;
     }
 }
