@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
@@ -19,11 +20,13 @@ import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.service.FunctionExecutor;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import retrofit2.Retrofit;
 
 import java.time.Duration;
 import java.util.*;
@@ -33,28 +36,19 @@ import java.util.*;
 @Slf4j
 public class OpenAiChatService implements ChatService {
 
-    @Value("${chain.llm.openai.token}")
-    private String apiToken;
 
     @Value("${chain.llm.openai.model}")
     private String defaultModel;
 
-    @Value("${proxy.enable}")
-    private boolean proxyEnable;
-
-    @Value("${proxy.host}")
-    private String proxyHost;
-
-    @Value("${proxy.port}")
-    private String proxyPort;
-
     @Autowired
     private ConversationService conversationService;
 
+    @Autowired
+    private OpenAiServiceProxy openAiServiceProxy;
+
     @Override
     public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser){
-
-        OpenAiService service = new OpenAiService(apiToken);
+        OpenAiService service = openAiServiceProxy.service();
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
         List<Integer> promptTokens = enc.encode(request.getContent());
@@ -84,7 +78,6 @@ public class OpenAiChatService implements ChatService {
                 .logitBias(new HashMap<>())
                 .build();
         StringBuilder sb = new StringBuilder();
-        enableProxy();
         service.streamChatCompletion(chatCompletionRequest)
                 .doOnError(Throwable::printStackTrace)
                 .blockingForEach(item -> {
@@ -115,8 +108,7 @@ public class OpenAiChatService implements ChatService {
 
     @Override
     public String blockCompletion(String content) {
-        enableProxy();
-        OpenAiService service = new OpenAiService(apiToken, Duration.ofSeconds(300));
+        OpenAiService service = openAiServiceProxy.service();
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
         List<Integer> promptTokens = enc.encode(content);
@@ -140,8 +132,7 @@ public class OpenAiChatService implements ChatService {
 
     @Override
     public String functionCompletion(String content,String functionName,String description ,Class clazz) {
-        enableProxy();
-        OpenAiService service = new OpenAiService(apiToken, Duration.ofSeconds(300));
+        OpenAiService service = openAiServiceProxy.service();
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
         List<Integer> promptTokens = enc.encode(content);
@@ -175,13 +166,6 @@ public class OpenAiChatService implements ChatService {
                 .executor(clazz, w -> w)
                 .build()));
         return functionExecutor;
-    }
-
-    private void enableProxy(){
-        if (proxyEnable){
-            System.getProperties().setProperty("https.proxyHost",proxyHost);
-            System.getProperties().setProperty("https.proxyPort",proxyPort);
-        }
     }
 
 }

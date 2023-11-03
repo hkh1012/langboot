@@ -1,10 +1,12 @@
 package com.hkh.ai.chain.vectorizer;
 
+import com.hkh.ai.chain.llm.OpenAiServiceProxy;
 import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -17,15 +19,15 @@ import java.util.List;
 @Primary
 public class OpenAiVectorization implements Vectorization {
 
-    @Value("${chain.vectorization.openai.token}")
-    private String apiToken;
-
     @Value("${chain.vectorization.openai.model}")
     private String embeddingModel;
 
+    @Autowired
+    private OpenAiServiceProxy openAiServiceProxy;
+
     @Override
     public List<List<Double>> batchVectorization(List<String> chunkList) {
-        OpenAiService service = new OpenAiService(apiToken);
+        OpenAiService service = openAiServiceProxy.service();
         EmbeddingRequest embeddingRequest = EmbeddingRequest
                 .builder()
                 .model(embeddingModel)
