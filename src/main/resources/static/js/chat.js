@@ -58,8 +58,8 @@ function sendContent() {
     initLeftChatContent();
     lastChild = $(resultDiv).children().last().children().last();
     $("#sayContent").val("");
-    let useLk = localStorage.getItem("useLk");
-    let useHistory = localStorage.getItem("useHistory");
+    let useLk = !localStorage.getItem("useLk") ? false : localStorage.getItem("useLk");
+    let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
     $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory},function (d) {
         console.log(d);
     },"json");
@@ -107,6 +107,9 @@ function removeConversation(o){
 
 function useLocalKnowledge(o){
     let useLk = localStorage.getItem("useLk");
+    if (useLk == null){
+        useLk = 'false';
+    }
     if (useLk == "false"){
         localStorage.setItem("useLk","true");
         $(o).addClass("selected")
@@ -118,6 +121,9 @@ function useLocalKnowledge(o){
 
 function useHistory(o){
     let useHistory = localStorage.getItem("useHistory");
+    if (useHistory == null){
+        useHistory = 'false';
+    }
     if (useHistory == "false"){
         localStorage.setItem("useHistory","true");
         $(o).addClass("selected")
@@ -390,6 +396,9 @@ function removeKnowledge(o) {
 
 function loadLocalStatus(){
     let useLk = localStorage.getItem("useLk");
+    if (useLk == null){
+        useLk = 'false';
+    }
     if (useLk == "false"){
         $(".iconKnowledge").removeClass("selected");
         $(".iconKnowledge2").removeClass("selected");
@@ -398,13 +407,22 @@ function loadLocalStatus(){
         $(".iconKnowledge2").addClass("selected")
     }
     let useHistory = localStorage.getItem("useHistory");
+    if (useHistory == null){
+        useHistory = 'false';
+    }
     if (useHistory == "false"){
         $(".iconHistory").removeClass("selected")
     }else {
         $(".iconHistory").addClass("selected")
     }
     let localSid = localStorage.getItem("sid");
-    let o = $("#left-top").find("div[sid='"+localSid+"']")[0];
+    let o = null;
+    if (localSid == null || localSid == undefined || localSid == 'undefined'){
+        o = $("#left-top").find(".session-item")[0];
+    }else {
+        o = $("#left-top").find("div[sid='"+localSid+"']")[0];
+    }
+
     selectSession(o);
 }
 
