@@ -1,0 +1,63 @@
+package com.hkh.ai.chain.llm.baiduqianfan;
+
+import cn.hutool.http.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hkh.ai.domain.AccessToken;
+import com.hkh.ai.service.AccessTokenService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+
+@Component
+@Slf4j
+public class BaiduQianFanUtil {
+
+    @Value("${chain.llm.baidu.model}")
+    private String defautModel;
+
+    @Value("${chain.llm.baidu.appKey}")
+    private String appKey;
+
+    @Value("${chain.llm.baidu.secretKey}")
+    private String secretKey;
+
+    @Autowired
+    private AccessTokenService accessTokenService;
+
+
+    public String getUrl(){
+        if ("ernie_bot".equals(defautModel)){
+            return ChatApis.ERNIE_BOT;
+        } else if ("ernie_bot4".equals(defautModel)) {
+            return ChatApis.ERNIE_BOT4;
+        }else if ("ernie_bot_turbo".equals(defautModel)) {
+            return ChatApis.ERNIE_BOT_TURBO;
+        }else {
+            return ChatApis.ERNIE_BOT;
+        }
+    }
+
+    public String getAccessToken(){
+        QueryWrapper<AccessToken> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app","baidu");
+        // 提前 1分钟 失效
+        queryWrapper.ge("expired_time",LocalDateTime.now().plusSeconds(60L));
+        AccessToken accessToken = accessTokenService.getOne(queryWrapper,false);
+        if (accessToken == null){
+            String token = HttpUtil.get(ChatApis.GET_TOKEN + "?grant_type=client_credentials&client_id=" + appKey + "&client_secret=" + secretKey);
+            AccessToken newAccessToken = new AccessToken();
+            newAccessToken.setApp("baidu");
+            newAccessToken.setToken(token);
+            newAccessToken.setExpiredTime(LocalDateTime.now().plusDays(30L));
+            newAccessToken.setCreateTime(LocalDateTime.now());
+            accessTokenService.save(newAccessToken);
+            return token;
+        }
+        return accessToken.getToken();
+    }
+}
