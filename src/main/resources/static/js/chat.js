@@ -1,3 +1,28 @@
+$.ajaxSetup({
+    error: function (jqXHR, textStatus, errorThrown) {
+        switch (jqXHR.status) {
+            case (500):
+                if (jqXHR.responseJSON.message == '会话过期'){
+                    window.location.href = '/login';
+                }
+                break;
+            case (401):
+                //TODO 未登录
+                window.location.href = '/login';
+                break;
+            case (403):
+                //TODO 无权限执行此操作
+                break;
+            case (408):
+                //TODO 请求超时
+                break;
+            default:
+                //TODO 未知错误
+        }
+
+    }
+});
+
 var sessionId = new Date().getTime() + "-" + Math.random();
 var resultDiv = document.getElementById('chatList');
 var conversation = document.getElementById('conversation');
@@ -60,9 +85,13 @@ function sendContent() {
     $("#sayContent").val("");
     let useLk = !localStorage.getItem("useLk") ? false : localStorage.getItem("useLk");
     let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
-    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory},function (d) {
+    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory})
+        .done(function (d) {
         console.log(d);
-    },"json");
+    }).always(function() {
+        // 无论请求成功或失败都会被执行的操作
+        $("#sendBtn").prop("disabled", false);
+    });
 }
 
 function fillRightChatContent(message) {
