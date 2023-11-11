@@ -24,6 +24,13 @@ public class BaiduQianFanUtil {
     @Value("${chain.llm.baidu.model}")
     private String defautModel;
 
+    /**
+     * 百度千帆开饭的embedding api model（默认：bge-large-zh）
+     * 可选模型：Embedding-V1、bge-large-zh、bge-large-en
+     */
+    @Value("${chain.vectorization.baidu.model}")
+    private String embeddingModel;
+
     @Value("${chain.llm.baidu.appKey}")
     private String appKey;
 
@@ -43,6 +50,18 @@ public class BaiduQianFanUtil {
             return ChatApis.ERNIE_BOT_TURBO;
         }else {
             return ChatApis.ERNIE_BOT;
+        }
+    }
+
+    public String getEmbeddingUrl(){
+        if ("Embedding-V1".equals(embeddingModel)){
+            return ChatApis.EMBEDDING_EMBEDDING_V1;
+        } else if ("bge-large-zh".equals(embeddingModel)) {
+            return ChatApis.EMBEDDING_BGE_LARGE_ZH;
+        } else if ("bge-large-zh".equals(embeddingModel)) {
+            return ChatApis.EMBEDDING_BGE_LARGE_EN;
+        }else {
+            return ChatApis.EMBEDDING_BGE_LARGE_ZH;
         }
     }
 

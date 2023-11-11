@@ -11,7 +11,12 @@ public interface ChatApis {
 
     String ERNIE_BOT_TURBO = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant";
 
-
     String GET_TOKEN = "https://aip.baidubce.com/oauth/2.0/token";
+
+    String EMBEDDING_EMBEDDING_V1 = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/embeddings/embedding-v1";
+
+    String EMBEDDING_BGE_LARGE_ZH = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/embeddings/bge_large_zh";
+
+    String EMBEDDING_BGE_LARGE_EN = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/embeddings/bge_large_en";
 
 }

@@ -17,11 +17,16 @@ public class VectorizationFactory {
     private final OpenAiVectorization openAiVectorization;
     private final LocalAiVectorization localAiVectorization;
     private final HuggingFaceInferenceVectorization huggingFaceInferenceVectorization;
+    private final BaiduQianFanVectorization baiduQianFanVectorization;
 
-    public VectorizationFactory(OpenAiVectorization openAiVectorization, LocalAiVectorization localAiVectorization, HuggingFaceInferenceVectorization huggingFaceInferenceVectorization) {
+    public VectorizationFactory(OpenAiVectorization openAiVectorization,
+                                LocalAiVectorization localAiVectorization,
+                                HuggingFaceInferenceVectorization huggingFaceInferenceVectorization,
+                                BaiduQianFanVectorization baiduQianFanVectorization) {
         this.openAiVectorization = openAiVectorization;
         this.localAiVectorization = localAiVectorization;
         this.huggingFaceInferenceVectorization = huggingFaceInferenceVectorization;
+        this.baiduQianFanVectorization = baiduQianFanVectorization;
     }
 
     public Vectorization getEmbedding(){
@@ -31,6 +36,8 @@ public class VectorizationFactory {
             return localAiVectorization;
         }else if ("huggingFace".equals(type)){
             return huggingFaceInferenceVectorization;
+        }else if ("baidu".equals(type)){
+            return baiduQianFanVectorization;
         }else {
             return null;
         }
