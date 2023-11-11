@@ -34,10 +34,13 @@
 - [ ] 增加更多 LLM 模型支持
     - [x] [OPENAI](https://platform.openai.com/docs/api-reference)
     - [x] [THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b)
+    - [x] [百度/文心一言](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t)
     - [ ] [THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b)
+    - 
 - [ ] 增加更多 Embedding 模型支持
     - [x] [OPENAI/embedding](https://platform.openai.com/docs/api-reference/embeddings)
     - [x] [weaviate/text2vec-transformers](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers)
+    - [x] [百度/文心一言](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/dllz04sro)
     - [ ] [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)
 - [ ] 系统功能
     - [ ] 用户
@@ -94,6 +97,6 @@ python .\openai_api.py
 <img src="src/main/resources/assets/use_lk.png" alt="知识库"/>
 <img src="src/main/resources/assets/use_lk2.png" alt="知识库"/>
 ## 项目交流群
-<img src="src/main/resources/assets/weixin_01.png" alt="二维码" width="300" height="467" />
+<img src="src/main/resources/assets/weixin_qun.png" alt="二维码" width="300" height="467" />
 <img src="src/main/resources/assets/weixin_02.png" alt="二维码" width="300" height="406" />
 🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。如群二维码已过期请扫个人我的个人二维码拉入群
