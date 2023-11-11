@@ -96,7 +96,6 @@ public class ChatglmChatService implements ChatService {
                         conversationService.saveConversation(sysUser.getId(),request.getSessionId(), sb.toString(), "A");
                     }
                 });
-        ;
         service.shutdownExecutor();
     }
 

@@ -1,18 +1,22 @@
 package com.hkh.ai.chain.llm.baiduqianfan;
 
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hkh.ai.domain.AccessToken;
 import com.hkh.ai.service.AccessTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
+/**
+ * 百度千帆 工具类
+ * @author huangkh
+ */
 @Component
 @Slf4j
 public class BaiduQianFanUtil {
@@ -49,11 +53,14 @@ public class BaiduQianFanUtil {
         queryWrapper.ge("expired_time",LocalDateTime.now().plusSeconds(60L));
         AccessToken accessToken = accessTokenService.getOne(queryWrapper,false);
         if (accessToken == null){
-            String token = HttpUtil.get(ChatApis.GET_TOKEN + "?grant_type=client_credentials&client_id=" + appKey + "&client_secret=" + secretKey);
+            String result = HttpUtil.get(ChatApis.GET_TOKEN + "?grant_type=client_credentials&client_id=" + appKey + "&client_secret=" + secretKey);
+            JSONObject jsonObject = JSON.parseObject(result);
+            String token = jsonObject.getString("access_token");
+            int expires_in_seconds = jsonObject.getIntValue("expires_in");
             AccessToken newAccessToken = new AccessToken();
             newAccessToken.setApp("baidu");
             newAccessToken.setToken(token);
-            newAccessToken.setExpiredTime(LocalDateTime.now().plusDays(30L));
+            newAccessToken.setExpiredTime(LocalDateTime.now().plusSeconds(expires_in_seconds));
             newAccessToken.setCreateTime(LocalDateTime.now());
             accessTokenService.save(newAccessToken);
             return token;

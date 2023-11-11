@@ -5,6 +5,7 @@ import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ public interface ChatService {
      * @param sseEmitter
      * @param sysUser
      */
-    void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser);
+    void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException;
 
     /**
      * 阻塞推理
