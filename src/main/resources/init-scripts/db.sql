@@ -144,6 +144,19 @@ CREATE TABLE `agent_field` (
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='代理领域';
 
 -- ----------------------------
+-- Table structure for access_token
+-- ----------------------------
+DROP TABLE IF EXISTS `access_token`;
+CREATE TABLE `access_token` (
+                                `id` int(11) NOT NULL AUTO_INCREMENT,
+                                `app` varchar(20) CHARACTER SET utf8 NOT NULL COMMENT '应用',
+                                `token` varchar(255) NOT NULL COMMENT 'token值',
+                                `expired_time` datetime NOT NULL COMMENT '过期时间',
+                                `create_time` datetime DEFAULT NULL,
+                                `create_by` varchar(50) DEFAULT NULL,
+                                PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COMMENT='第三方接口访问token';
+-- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;

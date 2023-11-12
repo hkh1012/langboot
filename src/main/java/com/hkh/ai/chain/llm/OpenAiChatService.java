@@ -102,7 +102,6 @@ public class OpenAiChatService implements ChatService {
                         conversationService.saveConversation(sysUser.getId(),request.getSessionId(), sb.toString(), "A");
                     }
                 });
-        ;
         service.shutdownExecutor();
     }
 

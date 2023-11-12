@@ -17,6 +17,7 @@ import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -51,6 +52,7 @@ public class SseController {
     private final ConversationService conversationService;
     private final PromptRetrieverProperties promptRetrieverProperties;
 
+    @SneakyThrows
     @PostMapping(path = "send")
     @ResponseBody
     public ResultData send(HttpServletRequest httpServletRequest, String sessionId, String content,String kid,String sid,Boolean useLk,Boolean useHistory) {
