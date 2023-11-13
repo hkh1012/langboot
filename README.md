@@ -17,8 +17,8 @@
 | openai库      | openai-java                                  |
 | 前端           | freemarker、bootstrap、jquery                  | 
 | stream-chat  | SSE                                          | 
-| LLMs         | openai、chatglm2                              | 
-| embeddings   | openai、text2vec-transformers                              |
+| LLMs         | openai、chatglm2、文心一言                         | 
+| embeddings   | openai、text2vec-transformers、文心一言                |
 | vector store | weaviate                                     |
 
 ## langchain 原理
@@ -99,4 +99,4 @@ python .\openai_api.py
 ## 项目交流群
 <img src="src/main/resources/assets/weixin_qun.png" alt="二维码" width="300" height="467" />
 <img src="src/main/resources/assets/weixin_02.png" alt="二维码" width="300" height="406" />
-🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。如群二维码已过期请扫个人我的个人二维码拉入群
+🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。如群二维码已过期请扫我的个人二维码拉入群
