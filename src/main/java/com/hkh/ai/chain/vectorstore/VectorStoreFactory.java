@@ -13,13 +13,18 @@ public class VectorStoreFactory {
 
     private final WeaviateVectorStore weaviateVectorStore;
 
-    public VectorStoreFactory(WeaviateVectorStore weaviateVectorStore) {
+    private final MilvusVectorStore milvusVectorStore;
+
+    public VectorStoreFactory(WeaviateVectorStore weaviateVectorStore, MilvusVectorStore milvusVectorStore) {
         this.weaviateVectorStore = weaviateVectorStore;
+        this.milvusVectorStore = milvusVectorStore;
     }
 
     public VectorStore getVectorStore(){
         if ("weaviate".equals(type)){
             return weaviateVectorStore;
+        }else if ("milvus".equals(type)){
+            return milvusVectorStore;
         }
         return null;
     }
