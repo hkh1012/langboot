@@ -70,7 +70,7 @@ public class SseController {
                 VectorStore vectorStore = vectorStoreFactory.getVectorStore();
                 Vectorization vectorization = vectorizationFactory.getEmbedding();
                 if (vectorization instanceof LocalAiVectorization){
-                    // 使用向量数据库内置的嵌入向量模型
+                    // 使用 weaviate向量数据库内置的嵌入向量模型
                     nearestList = vectorStore.nearest(content,kid);
                 }else {
                     // 使用外部的嵌入向量模型
