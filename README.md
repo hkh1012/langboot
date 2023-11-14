@@ -18,8 +18,8 @@
 | 前端           | freemarker、bootstrap、jquery                  | 
 | stream-chat  | SSE                                          | 
 | LLMs         | openai、chatglm2、文心一言                         | 
-| embeddings   | openai、text2vec-transformers、文心一言                |
-| vector store | weaviate                                     |
+| embeddings   | openai、text2vec-transformers、文心一言            |
+| vector store | weaviate、milvus                                    |
 
 ## langchain 原理
 <img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>
