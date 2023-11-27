@@ -67,12 +67,13 @@ public class OpenAiChatService implements ChatService {
             temp = temp + conversation.getContent();
         }
         ask = temp + ask;
-        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), ask);
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), (nearestList.size() > 0 ? "严格根据我给你的系统上下文内容原文回答问题，请不要自己发挥" : "" )+ ask);
         messages.add(userMessage);
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
                 .builder()
                 .model(defaultModel)
                 .messages(messages)
+                .temperature(0.8)
                 .user(request.getSessionId())
                 .n(1)
                 .logitBias(new HashMap<>())
@@ -154,9 +155,9 @@ public class OpenAiChatService implements ChatService {
         log.info("functionCompletion chatCompletionRequest ===> {}",chatCompletionRequest);
         ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
         log.info("functionCompletion ==> {}",chatCompletion.toString());
-        JsonNode arguments = chatCompletion.getChoices().get(0).getMessage().getFunctionCall().getArguments();
-        log.info("functionCompletion result arguments ==> {}",arguments);
-        return JSONObject.toJSONString(arguments);
+        ChatCompletionChoice chatCompletionChoice = chatCompletion.getChoices().get(0);
+        ChatMessage message = chatCompletionChoice.getMessage();
+        return JSONObject.toJSONString(message);
     }
 
     private FunctionExecutor getFunctionExecutor(String functionName,String description ,Class clazz){

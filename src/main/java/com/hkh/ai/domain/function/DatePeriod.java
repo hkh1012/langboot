@@ -24,4 +24,13 @@ public enum DatePeriod {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public static String getValueByName(String name) {
+        for (DatePeriod datePeriod : DatePeriod.values()) {
+            if (datePeriod.name().equals(name)) {
+                return datePeriod.getMessage();
+            }
+        }
+        return null;
+    }
 }
