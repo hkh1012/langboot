@@ -1,5 +1,6 @@
 package com.hkh.ai.domain.function;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;
@@ -8,20 +9,14 @@ import lombok.Data;
  * 地区天气
  */
 @Data
+@JsonClassDescription("weather of a location")
 public class LocationWeather {
 
-    @JsonPropertyDescription("The temperature of the weather")
+    @JsonPropertyDescription("city, for example: 常州,苏州,上海")
     @JsonProperty(required = true)
-    public int temperature;
-
-    @JsonPropertyDescription("description of the weather")
-    @JsonProperty(required = true)
-    public String description;
-
-    @JsonPropertyDescription("City and state, for example: León, Guanajuato")
     public String location;
 
-    @JsonPropertyDescription("The temperature unit, can be 'celsius' or 'fahrenheit'")
+    @JsonPropertyDescription("date period of weather")
     @JsonProperty(required = true)
-    public WeatherUnit unit;
+    public DatePeriod datePeriod;
 }

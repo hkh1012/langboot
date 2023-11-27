@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.domain.function.DatePeriod;
 import com.hkh.ai.domain.function.LocationWeather;
 import com.hkh.ai.request.*;
 import com.hkh.ai.service.CompletionService;
@@ -72,7 +73,8 @@ public class CompletionServiceImpl implements CompletionService {
 
     @Override
     public String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request) {
-        String completionResult = function(sysUser,request.getContent(), "get_location_weather", "the current weather of a location ", LocationWeather.class);
+        String completionResult = function(sysUser,request.getContent(), "get_location_weather", "the weather of a location ", LocationWeather.class);
+        log.info("functionWeather completionResult = {}",completionResult);
         return completionResult;
     }
 

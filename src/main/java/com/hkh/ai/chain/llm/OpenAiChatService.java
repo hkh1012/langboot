@@ -151,10 +151,11 @@ public class OpenAiChatService implements ChatService {
                 .n(1)
                 .logitBias(new HashMap<>())
                 .build();
+        log.info("functionCompletion chatCompletionRequest ===> {}",chatCompletionRequest);
         ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
         log.info("functionCompletion ==> {}",chatCompletion.toString());
         JsonNode arguments = chatCompletion.getChoices().get(0).getMessage().getFunctionCall().getArguments();
-        log.info("arguments ==> {}",arguments);
+        log.info("functionCompletion result arguments ==> {}",arguments);
         return JSONObject.toJSONString(arguments);
     }
 

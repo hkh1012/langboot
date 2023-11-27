@@ -176,4 +176,4 @@ CREATE TABLE `sys_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
-INSERT INTO `sys_user` (`id`, `user_name`, `email`, `password`, `nick_name`, `mobile`, `avatar_url`, `register_time`, `last_login_time`, `std_tokens`, `create_time`, `create_by`) VALUES (1, 'hkh', 'xxx@qq.com', 'e10adc3949ba59abbe56e057f20f883e', '心远', '18000000000', NULL, '2023-6-15 13:53:42', '2023-6-15 13:53:45', 10000, '2023-6-15 13:53:53', '18000000000');
+INSERT INTO `sys_user` (`id`, `user_name`, `email`, `password`, `nick_name`, `mobile`, `avatar_url`, `register_time`, `last_login_time`, `std_tokens`, `create_time`, `create_by`) VALUES (1, 'demo', 'xxx@qq.com', 'e10adc3949ba59abbe56e057f20f883e', '心远', '18000000000', NULL, '2023-6-15 13:53:42', '2023-6-15 13:53:45', 10000, '2023-6-15 13:53:53', '18000000000');

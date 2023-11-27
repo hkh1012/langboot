@@ -182,4 +182,43 @@ public class IndexController {
         model.addAttribute("sysUser",sysUser);
         return "agent";
     }
+
+    /**
+     * 代理agent(客服)
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/agent/cs"})
+    public String agentCs(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "agent_cs";
+    }
+
+    /**
+     * 代理agent(业绩)
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/agent/sales"})
+    public String agentSales(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "agent_sales";
+    }
+
+    /**
+     * 代理agent(复杂任务)
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/agent/complex"})
+    public String agentComplex(HttpServletRequest request, Model model) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        return "agent_complex";
+    }
 }
