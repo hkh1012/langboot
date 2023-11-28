@@ -6,7 +6,7 @@ package com.hkh.ai.domain.function;
 public enum DatePeriod {
     THE_DAY_BEFORE_YESTERDAY("前天"),
     YESTERDAY("昨天"),
-    TODAY("昨天"),
+    TODAY("今天"),
     TOMORROW("明天"),
     THE_DAY_AFTER_TOMORROW("后天"),
     WITHIN_THE_NEXT_WEEK("未来一周");

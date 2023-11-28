@@ -92,4 +92,14 @@ public class CompletionServiceImpl implements CompletionService {
         return completionResult;
     }
 
+    @Override
+    public <T> T completeObj(SysUser sysUser, String content, String functionName, String description, Class<T> clazz) {
+        ChatService chatService = chatServiceFactory.getChatService();
+        String completionResult = chatService.functionCompletion(content, functionName, description,clazz);
+        JSONObject chatMessage = JSONObject.parseObject(completionResult);
+        JSONObject functionCall = chatMessage.getJSONObject("function_call");
+        JSONObject arguments = functionCall.getJSONObject("arguments");
+        return arguments.to(clazz);
+    }
+
 }
