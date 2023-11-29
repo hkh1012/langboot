@@ -1,14 +1,19 @@
 package com.hkh.ai.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.domain.function.DatePeriod;
 import com.hkh.ai.domain.function.LocationWeather;
 import com.hkh.ai.request.*;
 import com.hkh.ai.service.CompletionService;
+import com.hkh.ai.util.FunctionReflect;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,13 +72,34 @@ public class CompletionServiceImpl implements CompletionService {
     public String function(SysUser sysUser, String content, String functionName, String description, Class clazz) {
         ChatService chatService = chatServiceFactory.getChatService();
         String completionResult = chatService.functionCompletion(content, functionName, description,clazz);
-        return completionResult;
+        JSONObject chatMessage = JSONObject.parseObject(completionResult);
+        String returnContent = chatMessage.getString("content");
+        if (StrUtil.isBlank(returnContent)){
+            JSONObject functionCall = chatMessage.getJSONObject("function_call");
+            String function = functionCall.getString("name");
+            JSONObject arguments = functionCall.getJSONObject("arguments");
+            String reflect = (String) FunctionReflect.reflect(function, arguments);
+            return reflect;
+        }else {
+            return returnContent;
+        }
     }
 
     @Override
     public String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request) {
-        String completionResult = function(sysUser,request.getContent(), "get_location_weather", "the current weather of a location ", LocationWeather.class);
+        String completionResult = function(sysUser,request.getContent(), "get_location_weather", "the weather of a location ", LocationWeather.class);
+        log.info("functionWeather completionResult = {}",completionResult);
         return completionResult;
+    }
+
+    @Override
+    public <T> T completeObj(SysUser sysUser, String content, String functionName, String description, Class<T> clazz) {
+        ChatService chatService = chatServiceFactory.getChatService();
+        String completionResult = chatService.functionCompletion(content, functionName, description,clazz);
+        JSONObject chatMessage = JSONObject.parseObject(completionResult);
+        JSONObject functionCall = chatMessage.getJSONObject("function_call");
+        JSONObject arguments = functionCall.getJSONObject("arguments");
+        return arguments.to(clazz);
     }
 
 }

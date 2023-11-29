@@ -27,3 +27,4 @@ target/
 .idea/
 langchain-springboot.iml
 application-prod.properties
+application-cxai.properties

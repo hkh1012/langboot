@@ -43,13 +43,10 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
     public void propose(SysUser sysUser, AgentDemandProposeRequest request) {
         AgentField agentField = agentFieldService.getByFid(request.getFid());
         String content = DemandProposePrompt.prompt(agentField.getFieldName(),request.getContent());
-        String resultJsonStr = completionService.function(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
-        System.out.println(resultJsonStr);
-        DemandFuncObj demandFuncObj = JSONObject.parseObject(resultJsonStr, DemandFuncObj.class);
-        log.info("[AGENT]完成目标需要的角色与步骤: {}",resultJsonStr);
+        DemandFuncObj demandFuncObj = completionService.completeObj(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
+        log.info("[AGENT]完成目标需要的角色与步骤: {}",demandFuncObj);
         Demand demand = saveDemand(sysUser, RandomUtil.randomString(32), request.getFid(), request.getContent());
         stepRole(sysUser,agentField,demand,demandFuncObj.getRoles(),demandFuncObj.getSteps());
-
     }
 
     @Override
@@ -70,10 +67,8 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
         for (int i = 0; i < steps.size(); i++) {
             String content = DemandStepRolePrompt.prompt(agentField.getFieldName(),demand.getContent(), StrUtil.join(",",roles),steps.get(i).getDescription());
             String resultJsonStr = completionService.function(sysUser, content,"choose_the_step_role","get the role who finish the demand step", StepRoleFuncObj.class);
-            System.out.println(resultJsonStr);
-            StepRoleFuncObj stepRoleFuncObj = JSONObject.parseObject(resultJsonStr,StepRoleFuncObj.class);
-            log.info("[AGENT]完成步骤{}对应的负责角色为{}",steps.get(i).getStepName(),stepRoleFuncObj.getRoleName());
-            demandStepService.saveDemandStep(demand.getDid(),agentField.getFid(),steps.get(i).getStepName(),steps.get(i).getDescription(),stepRoleFuncObj.getRoleName(),sysUser.getId());
+            log.info("[AGENT]完成步骤{}对应的负责角色为{}",steps.get(i).getStepName(),resultJsonStr);
+            demandStepService.saveDemandStep(demand.getDid(),agentField.getFid(),steps.get(i).getStepName(),steps.get(i).getDescription(),resultJsonStr,sysUser.getId());
         }
     }
 }

@@ -77,6 +77,7 @@ public class SseController {
                     List<Double> queryVector = embeddingService.getQueryVector(content);
                     nearestList = vectorStore.nearest(queryVector,kid);
                 }
+                log.info("向量检索结果为{}",nearestList);
             }
             if (useLk && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
                 try {

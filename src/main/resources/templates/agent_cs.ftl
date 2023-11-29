@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>agent代理</title>
+    <title>agent代理-智能客服</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="applicable-device" content="pc,mobile">
@@ -25,11 +25,14 @@
         Javascript and reload this page!</h2></noscript>
 <#include "topbar.ftl">
 <main class="container" style="margin-top: 100px;">
-    <ul>
-        <li><a href="/agent/cs">智能客服(电商)</a></li>
-        <li><a href="/agent/sales">业绩查询助手</a></li>
-        <li><a href="/agent/complex">复杂任务</a></li>
-    </ul>
+    <form>
+        <div class="form-group">
+            <textarea class="form-control" onchange="contentChange();" maxlength="3000" id="agentContent" rows="9" aria-describedby="agentHelp" placeholder="请输入任务目标文本" required></textarea>
+            <small id="agentHelp" class="form-text text-danger"></small>
+        </div>
+        <button type="button" class="btn btn-success btn-round" id="agentBtn" onclick="agentCheck();">提交任务</button>
+        <div class="agentResult" id="agentResult"></div>
+    </form>
 </main>
 
 <script src="/static/anchor/assets/js/vendor/jquery.min.js" type="text/javascript"></script>

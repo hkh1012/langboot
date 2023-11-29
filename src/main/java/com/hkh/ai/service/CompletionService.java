@@ -1,5 +1,6 @@
 package com.hkh.ai.service;
 
+import com.hkh.ai.agent.prompt.demand.functionObj.DemandFuncObj;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.request.*;
 
@@ -17,4 +18,6 @@ public interface CompletionService {
     String function(SysUser sysUser, String content,String functionName,String description,Class clazz);
 
     String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request);
+
+    <T> T completeObj(SysUser sysUser, String content, String demand_propose, String s, Class<T> clazz);
 }
