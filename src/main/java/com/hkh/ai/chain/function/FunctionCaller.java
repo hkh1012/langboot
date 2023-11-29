@@ -18,7 +18,7 @@ public class FunctionCaller {
         String location = jsonNode.getString("location");
         String datePeriod = jsonNode.getString("datePeriod");
         String valueByName = DatePeriod.getValueByName(datePeriod);
-        String result = "通过查询(模拟)天气API得到:" +location + valueByName + "天气为晴天";
+        String result = "(模拟)通过查询天气API得到:" +location + valueByName + "天气为晴天";
         log.info(result);
         return result;
     }

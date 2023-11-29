@@ -43,11 +43,10 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
     public void propose(SysUser sysUser, AgentDemandProposeRequest request) {
         AgentField agentField = agentFieldService.getByFid(request.getFid());
         String content = DemandProposePrompt.prompt(agentField.getFieldName(),request.getContent());
-        DemandFuncObj demandFuncObj = (DemandFuncObj) completionService.completeObj(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
+        DemandFuncObj demandFuncObj = completionService.completeObj(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
         log.info("[AGENT]完成目标需要的角色与步骤: {}",demandFuncObj);
         Demand demand = saveDemand(sysUser, RandomUtil.randomString(32), request.getFid(), request.getContent());
         stepRole(sysUser,agentField,demand,demandFuncObj.getRoles(),demandFuncObj.getSteps());
-
     }
 
     @Override
