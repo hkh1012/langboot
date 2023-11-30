@@ -148,6 +148,25 @@
                 </table>
             </div>
 
+            <div class="example-attach-div" id="example-attach-div">
+                <div class="form-group">
+                    <label for="exampleFile">示例库附件</label>
+                    <input type="file" id="exampleFile">
+                    <p class="help-block">支持 txt | doc | docx | pdf 等文本文件</p>
+                </div>
+                <button type="button" class="btn btn-default" id="saveExample">提交</button>
+                <table id="example-attach-table" class="table">
+                    <thead>
+                    <tr>
+                        <th>附件</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="example-attach-tbody">
+
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

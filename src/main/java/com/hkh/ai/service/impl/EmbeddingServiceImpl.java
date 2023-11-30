@@ -49,4 +49,18 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         List<Double> queryVector = vectorization.singleVectorization(query);
         return queryVector;
     }
+
+    @Override
+    public void storeExampleEmbeddings(List<String> chunkList, String kid, String docId, Boolean firstTime) {
+        Vectorization vectorization = vectorizationFactory.getEmbedding();
+        List<List<Double>> vectorList = vectorization.batchVectorization(chunkList);
+        VectorStore vectorStore = vectorStoreFactory.getVectorStore();
+        vectorStore.storeExampleEmbeddings(chunkList,vectorList,kid,docId,firstTime);
+    }
+
+    @Override
+    public void removeExampleByKid(String kid) {
+        VectorStore vectorStore = vectorStoreFactory.getVectorStore();
+        vectorStore.removeExampleByKid(kid);
+    }
 }

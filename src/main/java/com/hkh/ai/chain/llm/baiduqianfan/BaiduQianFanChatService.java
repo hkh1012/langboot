@@ -39,7 +39,7 @@ public class BaiduQianFanChatService implements ChatService {
     @Autowired
     private BaiduQianFanCompletionWebClient baiduQianFanCompletionWebClient;
     @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> historyList, SseEmitter sseEmitter, SysUser sysUser) {
+    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> historyList, SseEmitter sseEmitter, SysUser sysUser,List<String> nearestExampleList) {
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
         List<Integer> promptTokens = enc.encode(request.getContent());

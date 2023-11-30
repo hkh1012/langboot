@@ -5,19 +5,14 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hkh.ai.config.SysConfig;
-import com.hkh.ai.domain.Knowledge;
-import com.hkh.ai.domain.KnowledgeAttach;
+import com.hkh.ai.domain.*;
 import com.hkh.ai.chain.loader.ResourceLoader;
 import com.hkh.ai.chain.loader.ResourceLoaderFactory;
-import com.hkh.ai.domain.KnowledgeShare;
-import com.hkh.ai.domain.SysUser;
-import com.hkh.ai.request.KnowledgeAttachRemoveRequest;
-import com.hkh.ai.request.KnowledgeRemoveRequest;
-import com.hkh.ai.request.KnowledgeSaveRequest;
-import com.hkh.ai.request.KnowledgeUploadRequest;
+import com.hkh.ai.request.*;
 import com.hkh.ai.response.KnowledgeDetailResponse;
 import com.hkh.ai.response.KnowledgeListResponse;
 import com.hkh.ai.service.EmbeddingService;
+import com.hkh.ai.service.ExampleAttachService;
 import com.hkh.ai.service.KnowledgeAttachService;
 import com.hkh.ai.service.KnowledgeService;
 import com.hkh.ai.mapper.KnowledgeMapper;
@@ -43,6 +38,7 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
 
     private final EmbeddingService embeddingService;
     private final KnowledgeAttachService knowledgeAttachService;
+    private final ExampleAttachService exampleAttachService;
     private final SysConfig sysConfig;
     private final ResourceLoaderFactory resourceLoaderFactory;
     @Override
@@ -151,6 +147,44 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
             }
         }
         return list;
+    }
+
+    @Override
+    public void uploadExample(KnowledgeUploadExampleRequest request) {
+        String fileName = request.getFile().getOriginalFilename();
+        List<String> chunkList = new ArrayList<>();
+        ExampleAttach exampleAttach = new ExampleAttach();
+        exampleAttach.setKid(request.getKid());
+        String docId = RandomUtil.randomString(10);
+        exampleAttach.setDocId(docId);
+        exampleAttach.setDocName(fileName);
+        exampleAttach.setDocType(fileName.substring(fileName.lastIndexOf(".")+1));
+        String content = "";
+        ResourceLoader resourceLoader = resourceLoaderFactory.getLoaderByFileType(exampleAttach.getDocType());
+        try {
+            content = resourceLoader.getContent(request.getFile().getInputStream());
+            chunkList = resourceLoader.getChunkList(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("store content occur exception ",e);
+        }
+        exampleAttach.setContent(content);
+        exampleAttach.setCreateTime(LocalDateTime.now());
+        exampleAttachService.save(exampleAttach);
+        embeddingService.storeExampleEmbeddings(chunkList, request.getKid(), docId,true);
+    }
+
+    @Override
+    public void removeExample(ExampleRemoveRequest request) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("kid",request.getKid());
+        exampleAttachService.removeByMap(map);
+        embeddingService.removeExampleByKid(request.getKid());
+    }
+
+    @Override
+    public List<ExampleAttach> listExampleByMap(Map<String, Object> map) {
+        return exampleAttachService.listByMap(map);
     }
 
 }

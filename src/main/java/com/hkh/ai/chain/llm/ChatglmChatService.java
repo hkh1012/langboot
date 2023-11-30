@@ -39,7 +39,7 @@ public class ChatglmChatService implements ChatService {
     private ConversationService conversationService;
 
     @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser){
+    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser,List<String> nearestExampleList){
         // 参考 OpenAi 库实现 Chatglm 流式对话
         ChatglmService service = new ChatglmService(baseUrl);
 

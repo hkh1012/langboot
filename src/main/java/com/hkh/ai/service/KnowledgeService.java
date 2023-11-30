@@ -1,13 +1,11 @@
 package com.hkh.ai.service;
 
+import com.hkh.ai.domain.ExampleAttach;
 import com.hkh.ai.domain.Knowledge;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hkh.ai.domain.KnowledgeShare;
 import com.hkh.ai.domain.SysUser;
-import com.hkh.ai.request.KnowledgeAttachRemoveRequest;
-import com.hkh.ai.request.KnowledgeRemoveRequest;
-import com.hkh.ai.request.KnowledgeSaveRequest;
-import com.hkh.ai.request.KnowledgeUploadRequest;
+import com.hkh.ai.request.*;
 import com.hkh.ai.response.KnowledgeDetailResponse;
 import com.hkh.ai.response.KnowledgeListResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author huangkh
@@ -36,4 +35,10 @@ public interface KnowledgeService extends IService<Knowledge> {
     void removeKnowledge(KnowledgeRemoveRequest request);
 
     List<KnowledgeListResponse> all(List<Knowledge> mineList, List<KnowledgeShare> shareList);
+
+    void uploadExample(KnowledgeUploadExampleRequest request);
+
+    void removeExample(ExampleRemoveRequest request);
+
+    List<ExampleAttach> listExampleByMap(Map<String, Object> map);
 }
