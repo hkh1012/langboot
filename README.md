@@ -84,8 +84,10 @@ openai.token=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 python .\openai_api.py
 ```
 
-更多配置请查看
+## 更多配置请查看
+
 [Wiki](https://github.com/hkh1012/langchain-springboot/wiki)
+
 [如何构建高质量知识库文档](https://github.com/hkh1012/langchain-springboot/wiki/How-to-build-a-high%E2%80%90quality-knowledge-base)
 
 ## 功能展示
