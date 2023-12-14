@@ -31,13 +31,13 @@ public class KnowledgeController {
     private final KnowledgeShareService knowledgeShareService;
 
     /**
-     * 新建知识库
+     * 保存知识库
      * @param request
      * @param httpServletRequest
      * @return
      */
     @PostMapping(value = "save")
-    public ResultData save(KnowledgeSaveRequest request, HttpServletRequest httpServletRequest){
+    public ResultData save(@RequestBody KnowledgeSaveRequest request, HttpServletRequest httpServletRequest){
         SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         knowledgeService.saveOne(request,sysUser);
         return ResultData.success("保存知识库成功");

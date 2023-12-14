@@ -1,14 +1,14 @@
-function openKnowledgeDiv(){
-    $(".knowledge-container").removeClass("h");
-    $("#knowledge-warning-msg").html('');
+function openKnowledgeAttachDiv(){
+    $(".attach-container").removeClass("h");
+    $("#attach-warning-msg").html('');
 }
 
 function closeFormDiv(){
-    $(".knowledge-container").addClass("h");
+    $(".attach-container").addClass("h");
 }
 
-function addKnowledge(){
-    openKnowledgeDiv();
+function addKnowledgeAttach(){
+    openKnowledgeAttachDiv();
     $("#knowledge-id").val('');
     $("#knowledge-kid").val('');
     $("#knowledge-uid").val('');
@@ -16,16 +16,8 @@ function addKnowledge(){
     $("#knowledge-description").val('');
 }
 
-function editKnowledge(knowledge){
-    openKnowledgeDiv();
-    $("#knowledge-id").val(knowledge.id);
-    $("#knowledge-kid").val(knowledge.kid);
-    $("#knowledge-uid").val(knowledge.uid);
-    $("#knowledge-name").val(knowledge.kname);
-    $("#knowledge-description").val(knowledge.description);
-}
 
-function saveKnowledge(){
+function uploadAttach(){
     let id = $("#knowledge-id").val();
     let kid = $("#knowledge-kid").val();
     let uid = $("#knowledge-uid").val();
@@ -58,8 +50,8 @@ function saveKnowledge(){
 
 }
 
-function searchKnowledge(){
-    let searchContent = $("#knowledge-search-content").val();
-    window.location.href = "/knowledge/index?pageNum=" + knowledgeListPageNum + "&searchContent=" + searchContent;
+function searchKnowledgeAttach(kid){
+    let searchContent = $("#knowledge-attach-search-content").val();
+    window.location.href = "/knowledge/attach?kid=" + kid +"&pageNum=" + attachListPageNum + "&searchContent=" + searchContent;
 }
 

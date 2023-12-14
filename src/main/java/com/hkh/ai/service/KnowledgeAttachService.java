@@ -1,7 +1,9 @@
 package com.hkh.ai.service;
 
+import com.github.pagehelper.PageInfo;
 import com.hkh.ai.domain.KnowledgeAttach;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hkh.ai.request.KnowledgeAttachPageRequest;
 
 /**
 * @author huangkh
@@ -10,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface KnowledgeAttachService extends IService<KnowledgeAttach> {
 
+    PageInfo<KnowledgeAttach> pageInfo(KnowledgeAttachPageRequest knowledgeAttachPageRequest);
 }

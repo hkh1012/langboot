@@ -13,7 +13,7 @@ public class PageRequest {
 
     @Schema(title = "当前第几页，默认1",description = "当前第几页，默认1",defaultValue = "1",requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer pageNum = 1;
-    @Schema(title = "每页条数，默认10",description = "每页条数，默认10",defaultValue = "10",requiredMode = Schema.RequiredMode.REQUIRED)
-    private Integer pageSize = 3;
+    @Schema(title = "每页条数，默认8",description = "每页条数，默认8",defaultValue = "8",requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer pageSize = 8;
 
 }

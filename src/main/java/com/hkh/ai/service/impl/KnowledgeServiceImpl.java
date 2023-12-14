@@ -46,13 +46,23 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
     private final ResourceLoaderFactory resourceLoaderFactory;
     @Override
     public void saveOne(KnowledgeSaveRequest request, SysUser sysUser) {
-        Knowledge knowledge = new Knowledge();
-        knowledge.setKid(RandomUtil.randomString(10));
-        knowledge.setUid(sysUser.getId());
-        knowledge.setKname(request.getKname());
-        knowledge.setCreateTime(LocalDateTime.now());
-        save(knowledge);
-        storeContent(request.getFile(),knowledge.getKid(),true);
+        if (StringUtils.isBlank(request.getKid())){
+            Knowledge knowledge = new Knowledge();
+            knowledge.setKid(RandomUtil.randomString(10));
+            knowledge.setUid(sysUser.getId());
+            knowledge.setKname(request.getKname());
+            knowledge.setDescription(request.getDescription());
+            knowledge.setCreateTime(LocalDateTime.now());
+            save(knowledge);
+        }else {
+            Knowledge knowledge = this.getById(request.getId());
+            knowledge.setKid(request.getKid());
+            knowledge.setUid(request.getUid());
+            knowledge.setKname(request.getKname());
+            knowledge.setDescription(request.getDescription());
+            saveOrUpdate(knowledge);
+        }
+//        storeContent(request.getFile(),knowledge.getKid(),true);
     }
 
 
