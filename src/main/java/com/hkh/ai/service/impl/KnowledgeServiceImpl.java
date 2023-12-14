@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hkh.ai.config.SysConfig;
 import com.hkh.ai.domain.*;
 import com.hkh.ai.chain.loader.ResourceLoader;
@@ -19,6 +21,7 @@ import com.hkh.ai.mapper.KnowledgeMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -185,6 +188,23 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
     @Override
     public List<ExampleAttach> listExampleByMap(Map<String, Object> map) {
         return exampleAttachService.listByMap(map);
+    }
+
+    @Override
+    public PageInfo<Knowledge> pageInfo(KnowledgePageRequest knowledgePageRequest) {
+        QueryWrapper<Knowledge> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("kname",knowledgePageRequest.getSearchContent())
+                .or().like("description",knowledgePageRequest.getSearchContent())
+        ;
+        queryWrapper.orderByDesc("create_time");
+        PageHelper.startPage(knowledgePageRequest.getPageNum(), knowledgePageRequest.getPageSize());
+        PageInfo<Knowledge> pageInfo = new PageInfo<>(list(queryWrapper));
+        pageInfo.getList().stream().forEach(item -> {
+            if (StringUtils.isBlank(item.getDescription())) {
+                item.setDescription("");
+            }
+        });
+        return pageInfo;
     }
 
 }

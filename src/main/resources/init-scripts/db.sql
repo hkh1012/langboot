@@ -41,6 +41,7 @@ CREATE TABLE `knowledge` (
      `kid` varchar(10) NOT NULL COMMENT '知识库ID',
      `uid` bigint(20) NOT NULL DEFAULT '0' COMMENT '用户ID',
      `kname` varchar(50) NOT NULL COMMENT '知识库名称',
+     `description` varchar(1000) NULL COMMENT '描述',
      `create_time` datetime DEFAULT NULL,
      `create_by` varchar(50) DEFAULT NULL,
      PRIMARY KEY (`id`),

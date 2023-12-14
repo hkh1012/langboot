@@ -29,7 +29,7 @@ public class BaiduQianFanVectorization implements Vectorization{
             if (chunkList.size() - (batchSize * i) >= batchSize){
                 subList = chunkList.subList(i*batchSize,i*batchSize + batchSize);
             }else {
-                subList = chunkList.subList(i*batchSize,chunkList.size()-1);
+                subList = chunkList.subList(i*batchSize,chunkList.size());
             }
 
             JSONObject body = new JSONObject();

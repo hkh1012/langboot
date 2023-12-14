@@ -1,7 +1,11 @@
 package com.hkh.ai.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.hkh.ai.common.constant.SysConstants;
+import com.hkh.ai.domain.Knowledge;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.request.KnowledgePageRequest;
+import com.hkh.ai.service.KnowledgeService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @AllArgsConstructor
 public class IndexController {
+
+    private final KnowledgeService knowledgeService;
 
     @GetMapping(value = {"/"})
     public String root(HttpServletRequest request, Model model) {
@@ -220,5 +226,20 @@ public class IndexController {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         model.addAttribute("sysUser",sysUser);
         return "agent_complex";
+    }
+
+    /**
+     * 知识库管理页面
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/knowledge/index"})
+    public String knowledgeIndex(HttpServletRequest request, Model model, KnowledgePageRequest knowledgePageRequest) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        PageInfo<Knowledge> pageInfo = knowledgeService.pageInfo(knowledgePageRequest);
+        model.addAttribute("pageInfo",pageInfo);
+        return "knowledge/index";
     }
 }

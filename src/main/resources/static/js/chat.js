@@ -558,9 +558,9 @@ $(function () {
     $("#saveKnowledge").click(function (){
         saveKnowledge();
     });
-    $("#saveExample").click(function (){
-        saveExample();
-    });
+    // $("#saveExample").click(function (){
+    //     saveExample();
+    // });
     loadSession();
     loadKnowledge();
 });

@@ -105,6 +105,10 @@
     </div>
     <div id="right-content" class="container1">
         <div class="knowledge-div">
+            <div class="knowledge-selected-div">
+                <label for="knowledgeFile">当前知识库为:</label>
+                <p>无</p><a href="/knowledge/index" target="_self">切换</a>
+            </div>
             <div class="knowledge-save-div" id="knowledge-save-div">
                 <div class="form-group">
                     <input type="hidden" class="form-control" id="kid">

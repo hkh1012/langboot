@@ -1,5 +1,6 @@
 package com.hkh.ai.service;
 
+import com.github.pagehelper.PageInfo;
 import com.hkh.ai.domain.ExampleAttach;
 import com.hkh.ai.domain.Knowledge;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -41,4 +42,6 @@ public interface KnowledgeService extends IService<Knowledge> {
     void removeExample(ExampleRemoveRequest request);
 
     List<ExampleAttach> listExampleByMap(Map<String, Object> map);
+
+    PageInfo<Knowledge> pageInfo(KnowledgePageRequest knowledgePageRequest);
 }

@@ -42,6 +42,12 @@ public class Knowledge implements Serializable {
     private String kname;
 
     /**
+     * 描述
+     */
+    @TableField(value = "description")
+    private String description;
+
+    /**
      * 
      */
     @TableField(value = "create_time")
