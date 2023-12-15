@@ -9,8 +9,10 @@
     <script>
         let attachListPageNum = ${pageInfo.pageNum};
         let searchContent = '${formData.searchContent}';
+        let formKname = '${formData.kname}';
     </script>
     <script src="/webjars/jquery/3.1.1-1/jquery.min.js"></script>
+    <script src="/static/js/common/confirm.js"></script>
     <script src="/static/js/knowledge/attach.js"></script>
 
     <!-- Fonts -->
@@ -29,6 +31,11 @@
         Javascript and reload this page!</h2></noscript>
 <#include "../topbar.ftl">
 <main class="container" style="margin-top: 100px;">
+    <div class="row">
+        <div class="col">
+            <h4 style="text-align: center;">知识库附件管理【${formData.kname}】</h4>
+        </div>
+    </div>
     <div class="row" style="margin-top: -20px;margin-bottom: 10px;">
         <div class="col">
             <a href="/knowledge/index">&lt&lt返回知识库列表</a>
@@ -43,7 +50,7 @@
         </div>
     </div>
     <div class="row" style="margin-top: 12px;margin-bottom: 12px;padding-left: 14px;">
-        <a href="#" class="btn btn-success btn-round shadow-lg" onclick="addKnowledgeAttach();">新增</a>
+        <a href="#" class="btn btn-success btn-round shadow-lg" onclick="addKnowledgeAttach();">上传附件</a>
     </div>
 
     <!-- table -->
@@ -64,14 +71,14 @@
                     <td> ${item.docType} </td>
                     <td>
                         <span class="btn btn-sm btn-outline-danger btn-round" onclick="removeKnowledgeAttach('${item.kid}','${item.docId}')">删除</span>
-                        <span class="btn btn-sm btn-outline-warning btn-round">知识片段</span>
+                        <a class="btn btn-sm btn-outline-orange btn-round" href="/knowledge/fragment?kid=${item.kid}&kname=${knowledge.kname}&docId=${item.docId}&docName=${item.docName}&pageNum=1&searchContent=">知识片段</a>
                     </td>
                 </tr>
             </#list>
         </tbody>
     </table>
     <#import "../common/pagination.ftl" as fpage />
-    <@fpage.fpage page=pageInfo.pageNum pagesize=pageInfo.pageSize totalpages=pageInfo.pages totalrecords=pageInfo.total url="/knowledge/attach?searchContent=" + formData.searchContent/>
+    <@fpage.fpage page=pageInfo.pageNum pagesize=pageInfo.pageSize totalpages=pageInfo.pages totalrecords=pageInfo.total url="/knowledge/attach?kid=" +formData.kid+"&searchContent=" + formData.searchContent/>
 
 </main>
 <div class="attach-container h">
@@ -104,7 +111,7 @@
             <div class="form-group">
                 <div class="col col-flex-right">
                     <button type="button" class="btn btn-outline-danger btn-round" onclick="closeFormDiv();">取消</button>
-                    <button type="button" class="btn btn-success btn-round" style="margin-left: 10px;" onclick="uploadAttach();">上传附件</button>
+                    <button type="button" class="btn btn-success btn-round" style="margin-left: 10px;" onclick="uploadAttach('${knowledge.kid}');">上传附件</button>
                 </div>
             </div>
         </div>

@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>知识库列表</title>
+    <title>知识片段列表</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="applicable-device" content="pc,mobile">
-    <link href="/static/css/knowledge/index.css" rel="stylesheet"/>
+    <link href="/static/css/knowledge/fragment.css" rel="stylesheet"/>
     <script>
-        let knowledgeListPageNum = ${pageInfo.pageNum};
+        let fragmentListPageNum = ${pageInfo.pageNum};
         let searchContent = '${formData.searchContent}';
+        let formKid = '${formData.kid}';
+        let formKname = '${formData.kname}';
+        let formDocId = '${formData.docId}';
+        let formDocName = '${formData.docName}';
     </script>
     <script src="/webjars/jquery/3.1.1-1/jquery.min.js"></script>
     <script src="/static/js/common/confirm.js"></script>
-    <script src="/static/js/knowledge/index.js"></script>
+    <script src="/static/js/knowledge/fragment.js"></script>
 
     <!-- Fonts -->
     <#--    <link href="https://fonts.googleapis.com/css?family=Nunito:300,300i,400,600,700" rel="stylesheet">-->
@@ -30,65 +34,62 @@
         Javascript and reload this page!</h2></noscript>
 <#include "../topbar.ftl">
 <main class="container" style="margin-top: 100px;">
-    <div class="row" style="margin-bottom: 10px;">
+    <div class="row">
         <div class="col">
-            <h4 style="text-align: center;">知识库管理</h4>
+            <h4 style="text-align: center;">知识片段管理【${knowledge.kname}】</h4>
+        </div>
+    </div>
+    <div class="row" style="margin-top: -20px;margin-bottom: 10px;">
+        <div class="col">
+            <a href="/knowledge/index">&lt&lt返回知识库列表</a>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <input type="text" class="form-control input-round" id="knowledge-search-content" value="${formData.searchContent}" placeholder="知识库名称/描述">
+            <input type="text" class="form-control input-round" id="knowledge-fragment-search-content" value="${formData.searchContent}" placeholder="片段内容">
         </div>
         <div class="col">
-            <button type="submit" class="btn btn-outline-success btn-round" onclick="searchKnowledge();">搜索</button>
+            <button type="submit" class="btn btn-outline-success btn-round" onclick="searchKnowledgeFragment('${formData.kid}','${formData.docId}');">搜索</button>
         </div>
     </div>
     <div class="row" style="margin-top: 12px;margin-bottom: 12px;padding-left: 14px;">
-        <a href="#" class="btn btn-success btn-round shadow-lg" onclick="addKnowledge();">新增</a>
-        <a href="#" class="btn btn-outline-success btn-round" style="margin-left: 10px">选择</a>
+        <a href="#" class="btn btn-success btn-round shadow-lg" onclick="addKnowledgeFragment();">新增</a>
     </div>
 
     <!-- table -->
     <table class="table">
         <thead class="thead-light">
         <tr>
-            <th scope="col"> #      </th>
-            <th scope="col"> kid	</th>
-            <th scope="col"> 知识库名称	</th>
-            <th scope="col"> 描述	</th>
-            <th scope="col"> 作者	</th>
-            <th scope="col"> 操作	</th>
+            <th scope="col" style="width: 120px;"> 知识库KID	</th>
+            <th scope="col" style="width: 120px;"> 文档ID	</th>
+            <th scope="col" style="width: 120px;"> 片段ID	</th>
+            <th scope="col" style="width: 80px;"> 排序	</th>
+            <th scope="col"> 知识片段	</th>
+            <th scope="col" style="width: 100px;"> 操作	</th>
         </tr>
         </thead>
         <tbody>
             <#list pageInfo.list as item>
                 <tr>
-                    <th scope="row">
-                        <label>
-                            <input type="radio" name="knowledge" class="form-radio-input">
-                        </label>
-                    </th>
                     <td> ${item.kid} </td>
-                    <td> ${item.kname} </td>
-                    <td> ${item.description} </td>
-                    <td> ${item.uid} </td>
+                    <td> ${item.docId} </td>
+                    <td> ${item.fid} </td>
+                    <td> ${item.idx} </td>
+                    <td> ${item.content} </td>
                     <td>
-                        <span class="btn btn-sm btn-outline-primary btn-round" onclick="editKnowledge({id:'${item.id}',kid:'${item.kid}',kname:'${item.kname}',uid:'${item.uid}',description:'${item.description}'});">编辑</span>
-                        <span class="btn btn-sm btn-outline-danger btn-round" onclick="removeKnowledge('${item.kid}')">删除</span>
-                        <a class="btn btn-sm btn-outline-orange btn-round" href="/knowledge/fragment?kid=${item.kid}&kname=${item.kname}&docId=&docName=&pageNum=1&searchContent=">知识片段</a>
-                        <a class="btn btn-sm btn-outline-success btn-round" href="/knowledge/attach?kid=${item.kid}&kname=${item.kname}&pageNum=1&searchContent=">附件</a>
+                        <span class="btn btn-sm btn-outline-danger btn-round" onclick="removeKnowledgeFragment('${item.kid}','${item.fid}')">删除</span>
                     </td>
                 </tr>
             </#list>
         </tbody>
     </table>
     <#import "../common/pagination.ftl" as fpage />
-    <@fpage.fpage page=pageInfo.pageNum pagesize=pageInfo.pageSize totalpages=pageInfo.pages totalrecords=pageInfo.total url="/knowledge/index?searchContent=" + formData.searchContent/>
+    <@fpage.fpage page=pageInfo.pageNum pagesize=pageInfo.pageSize totalpages=pageInfo.pages totalrecords=pageInfo.total url="/knowledge/fragment?kid=" + formData.kid + "&kname="+formData.kname+"&docId="+ formData.docId+"&docName=" +formData.docName + "&searchContent=" + formData.searchContent/>
 
 </main>
-<div class="knowledge-container h">
-    <div class="knowledge-edit-form">
-        <div class="knowledge-edit-form-content">
+<div class="fragment-container h">
+    <div class="fragment-edit-form">
+        <div class="fragment-edit-form-content">
             <div class="form-group">
                 <div class="col col-flex-right">
                     <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" style="cursor: pointer;" viewBox="0 0 384 512" onclick="closeFormDiv();">
@@ -99,32 +100,24 @@
             </div>
             <div class="form-group">
                 <div class="col">
-                    <h4>知识库编辑</h4>
+                    <h4>新增知识片段</h4>
                 </div>
             </div>
 
         <div class="form-group">
             <div class="col">
-                <input type="text" class="form-control" id="knowledge-name" placeholder="知识库名称">
-                <input type="hidden" class="form-control" id="knowledge-id">
-                <input type="hidden" class="form-control" id="knowledge-kid">
-                <input type="hidden" class="form-control" id="knowledge-uid">
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col">
-                <textarea class="form-control" id="knowledge-description" rows="6" placeholder="知识库描述"></textarea>
+                <textarea class="form-control" id="knowledge-fragment" rows="6" placeholder="知识片段"></textarea>
             </div>
         </div>
             <div class="form-group">
                 <div class="col">
-                    <h6 id="knowledge-warning-msg" style="color: red;"></h6>
+                    <h6 id="fragment-warning-msg" style="color: red;"></h6>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col col-flex-right">
                     <button type="button" class="btn btn-outline-danger btn-round" onclick="closeFormDiv();">取消</button>
-                    <button type="button" class="btn btn-success btn-round" style="margin-left: 10px;" onclick="saveKnowledge();">保存</button>
+                    <button type="button" class="btn btn-success btn-round" style="margin-left: 10px;" onclick="saveKnowledgeFragment();">保存</button>
                 </div>
             </div>
         </div>

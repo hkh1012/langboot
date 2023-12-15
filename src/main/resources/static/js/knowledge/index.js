@@ -58,6 +58,25 @@ function saveKnowledge(){
 
 }
 
+function removeKnowledge(kid) {
+    showConfirm("确定要删除该知识库吗？",function (){
+        $.ajax({
+            url: '/knowledge/remove',
+            type: 'POST',
+            data: JSON.stringify({"kid":kid}),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(data) {
+                console.log(data);
+                window.location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    },null);
+}
+
 function searchKnowledge(){
     let searchContent = $("#knowledge-search-content").val();
     window.location.href = "/knowledge/index?pageNum=" + knowledgeListPageNum + "&searchContent=" + searchContent;

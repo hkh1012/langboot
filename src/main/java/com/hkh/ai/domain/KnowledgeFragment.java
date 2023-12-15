@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -36,6 +37,12 @@ public class KnowledgeFragment implements Serializable {
     private String docId;
 
     /**
+     * 知识片段ID
+     */
+    @TableField(value = "fid")
+    private String fid;
+
+    /**
      * 片段索引下标
      */
     @TableField(value = "idx")
@@ -52,7 +59,7 @@ public class KnowledgeFragment implements Serializable {
      */
     @TableField(value = "create_time")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 

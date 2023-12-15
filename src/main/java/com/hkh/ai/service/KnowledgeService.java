@@ -27,7 +27,7 @@ public interface KnowledgeService extends IService<Knowledge> {
 
     void upload(KnowledgeUploadRequest request);
 
-    void storeContent(MultipartFile file, String kid,Boolean firstTime) throws IOException;
+    void storeContent(MultipartFile file, String kid) throws IOException;
 
     KnowledgeDetailResponse detail(String kid);
 
@@ -44,4 +44,6 @@ public interface KnowledgeService extends IService<Knowledge> {
     List<ExampleAttach> listExampleByMap(Map<String, Object> map);
 
     PageInfo<Knowledge> pageInfo(KnowledgePageRequest knowledgePageRequest);
+
+    Knowledge getOneByKid(String kid);
 }

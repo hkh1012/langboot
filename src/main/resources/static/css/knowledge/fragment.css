@@ -1,0 +1,29 @@
+.fragment-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    background-color: #3338;
+    z-index: 9999;
+}
+
+.h{
+    display: none;
+}
+
+.fragment-edit-form{
+    width: 50%;
+    height: 50%;
+    margin: 10% auto;
+    background-color: white;
+    padding: 2%;
+}
+
+.col-flex-right{
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+

@@ -159,6 +159,12 @@ public class WeaviateVectorStore implements VectorStore{
                         .build());
                 add(Property.builder()
                         .dataType(new ArrayList(){ { add(DataType.TEXT); } })
+                        .name("fid")
+                        .description("The fragment id of the local knowledge,for search")
+                        .moduleConfig(propertyModuleConfigSkipTrue)
+                        .build());
+                add(Property.builder()
+                        .dataType(new ArrayList(){ { add(DataType.TEXT); } })
                         .name("uuid")
                         .description("The uuid id of the local knowledge fragment(same with id properties),for search")
                         .moduleConfig(propertyModuleConfigSkipTrue)
@@ -172,6 +178,42 @@ public class WeaviateVectorStore implements VectorStore{
         }
         System.out.println(result.getResult());
             return result;
+    }
+
+    @Override
+    public void newSchema(String kid) {
+        createSchema(kid);
+    }
+
+    @Override
+    public void removeByKidAndFid(String kid, String fid) {
+        List<String> resultList = new ArrayList<>();
+        WeaviateClient client = getClient();
+        Field fieldId = Field.builder().name("uuid").build();
+        WhereFilter where = WhereFilter.builder()
+                .path(new String[]{ "fid" })
+                .operator(Operator.Equal)
+                .valueString(fid)
+                .build();
+        Result<GraphQLResponse> result = client.graphQL().get()
+                .withClassName(className + kid)
+                .withFields(fieldId)
+                .withWhere(where)
+                .run();
+        LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
+        LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
+        ArrayList<LinkedTreeMap> m = l.get(className + kid);
+        for (LinkedTreeMap linkedTreeMap : m){
+            String uuid = linkedTreeMap.get("uuid").toString();
+            resultList.add(uuid);
+        }
+        for (String uuid : resultList) {
+            Result<Boolean> deleteResult = client.data().deleter()
+                    .withID(uuid)
+                    .withClassName(className + kid)
+                    .withConsistencyLevel(ConsistencyLevel.ALL)  // default QUORUM
+                    .run();
+        }
     }
 
     public Result<Boolean> createExampleSchema(String kid){
@@ -267,10 +309,7 @@ public class WeaviateVectorStore implements VectorStore{
     }
 
     @Override
-    public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList,String kid, String docId,Boolean firstTime) {
-        if (firstTime) {
-            createSchema(kid);
-        }
+    public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList,String kid, String docId,List<String> fidList) {
         WeaviateClient client = getClient();
         for (int i = 0; i < chunkList.size(); i++) {
             if (vectorList != null) {
@@ -284,6 +323,7 @@ public class WeaviateVectorStore implements VectorStore{
                 dataSchema.put("content", chunkList.get(i));
                 dataSchema.put("kid", kid);
                 dataSchema.put("docId", docId);
+                dataSchema.put("fid", fidList.get(i));
                 String uuid = UUID.randomUUID(true).toString();
                 dataSchema.put("uuid", uuid);
                 Result<WeaviateObject> result = client.data().creator()
@@ -292,20 +332,7 @@ public class WeaviateVectorStore implements VectorStore{
                         .withVector(vf)
                         .withProperties(dataSchema)
                         .run();
-            }else {
-                Map<String, Object> dataSchema = new HashMap<>();
-                dataSchema.put("content", chunkList.get(i));
-                dataSchema.put("kid", kid);
-                dataSchema.put("docId", docId);
-                String uuid = UUID.randomUUID(true).toString();
-                dataSchema.put("uuid", uuid);
-                Result<WeaviateObject> result = client.data().creator()
-                        .withClassName(className + kid)
-                        .withID(uuid)
-                        .withProperties(dataSchema)
-                        .run();
             }
-
         }
     }
 
@@ -342,33 +369,14 @@ public class WeaviateVectorStore implements VectorStore{
 
     @Override
     public void removeByKid(String kid) {
-        List<String> resultList = new ArrayList<>();
         WeaviateClient client = getClient();
-        Field fieldId = Field.builder().name("uuid").build();
-        WhereFilter where = WhereFilter.builder()
-                .path(new String[]{ "kid" })
-                .operator(Operator.Equal)
-                .valueString(kid)
-                .build();
-        Result<GraphQLResponse> result = client.graphQL().get()
-                .withClassName(className + kid)
-                .withFields(fieldId)
-                .withWhere(where)
-                .run();
-        LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
-        LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
-        ArrayList<LinkedTreeMap> m = l.get(className + kid);
-        for (LinkedTreeMap linkedTreeMap : m){
-            String uuid = linkedTreeMap.get("uuid").toString();
-            resultList.add(uuid);
+        Result<Boolean> result = client.schema().classDeleter().withClassName(className + kid).run();
+        if (result.hasErrors()) {
+            System.out.println("删除schema失败" + result.getError());
+        }else {
+            System.out.println("删除schema成功" + result.getResult());
         }
-        for (String uuid : resultList) {
-            Result<Boolean> deleteResult = client.data().deleter()
-                    .withID(uuid)
-                    .withClassName(className + kid)
-                    .withConsistencyLevel(ConsistencyLevel.ALL)  // default QUORUM
-                    .run();
-        }
+        log.info("drop schema by kid, result = {}",result);
     }
 
     @Override
@@ -542,6 +550,8 @@ public class WeaviateVectorStore implements VectorStore{
         }
         return resultList;
     }
+
+
 
     public Result<Boolean> deleteSchema(String kid) {
         WeaviateClient client = getClient();

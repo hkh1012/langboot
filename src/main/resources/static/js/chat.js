@@ -478,23 +478,7 @@ function removeExampleAttach(o) {
     });
 }
 
-function removeKnowledge(o) {
-    let attrKid = $(o).attr("kid");
-    $.ajax({
-        url: '/knowledge/remove',
-        type: 'POST',
-        data: JSON.stringify({"kid":attrKid}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-            loadKnowledge();
-            console.log(data);
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
-}
+
 
 function loadLocalStatus(){
     let useLk = localStorage.getItem("useLk");

@@ -16,42 +16,48 @@ function addKnowledgeAttach(){
     $("#knowledge-description").val('');
 }
 
+function removeKnowledgeAttach(kid,docId){
+    showConfirm("确定要删除该附件吗？",function (){
+        $.ajax({
+            url: '/knowledge/attach/remove',
+            type: 'POST',
+            data: JSON.stringify({"kid":kid,"docId":docId}),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(data) {
+                closeFormDiv();
+                window.location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    },null);
 
-function uploadAttach(){
-    let id = $("#knowledge-id").val();
-    let kid = $("#knowledge-kid").val();
-    let uid = $("#knowledge-uid").val();
-    let kname = $("#knowledge-name").val();
-    let description = $("#knowledge-description").val();
+}
 
-    if (kname == null || kname.trim() == ''){
-        $("#knowledge-warning-msg").html('知识库名称不能为空!');
-        return;
-    }
-    if (description == null || description.trim() == ''){
-        $("#knowledge-warning-msg").html('知识库描述不能为空!');
-        return;
-    }
-
+function uploadAttach(kid){
+    let formData = new FormData();
+    formData.append("kid",kid);
+    formData.append('file', $('input[type=file]')[0].files[0]);
     $.ajax({
-        url: '/knowledge/save',
+        url: '/knowledge/attach/upload',
         type: 'POST',
-        data: JSON.stringify({"id":id,"kid":kid,"uid":uid,"kname":kname,"description":description}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
             closeFormDiv();
             window.location.reload();
         },
         error: function(xhr, status, error) {
-            console.error(error);
+            // 处理错误
         }
     });
-
 }
 
 function searchKnowledgeAttach(kid){
     let searchContent = $("#knowledge-attach-search-content").val();
-    window.location.href = "/knowledge/attach?kid=" + kid +"&pageNum=" + attachListPageNum + "&searchContent=" + searchContent;
+    window.location.href = "/knowledge/attach?kid=" + kid +"&kname=" + formKname +"&pageNum=" + attachListPageNum + "&searchContent=" + searchContent;
 }
 
