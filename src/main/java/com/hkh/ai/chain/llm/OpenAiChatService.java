@@ -48,7 +48,7 @@ public class OpenAiChatService implements ChatService {
     private OpenAiServiceProxy openAiServiceProxy;
 
     @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser,List<String> nearestExampleList){
+    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser){
         OpenAiService service = openAiServiceProxy.service();
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
@@ -68,10 +68,6 @@ public class OpenAiChatService implements ChatService {
             temp = temp + conversation.getContent();
         }
         ask = temp + ask;
-        if (CollectionUtil.isNotEmpty(nearestExampleList)){
-            ask = "请参照以下示例:\n\n" + nearestExampleList.get(0) + "\n\n我现在的问题是:" + ask;
-        }
-
         final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), ask + (nearestList.size() > 0 ? "\n\n注意：回答问题时，须严格根据我给你的系统上下文内容原文进行回答，请不要自己发挥,回答时保持原来文本的段落层级" : "" ));
         messages.add(userMessage);
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest

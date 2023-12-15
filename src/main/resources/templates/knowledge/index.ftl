@@ -45,7 +45,6 @@
     </div>
     <div class="row" style="margin-top: 12px;margin-bottom: 12px;padding-left: 14px;">
         <a href="#" class="btn btn-success btn-round shadow-lg" onclick="addKnowledge();">新增</a>
-        <a href="#" class="btn btn-outline-success btn-round" style="margin-left: 10px">选择</a>
     </div>
 
     <!-- table -->
@@ -53,7 +52,7 @@
         <thead class="thead-light">
         <tr>
             <th scope="col"> #      </th>
-            <th scope="col"> kid	</th>
+            <th scope="col"> 编号	</th>
             <th scope="col"> 知识库名称	</th>
             <th scope="col"> 描述	</th>
             <th scope="col"> 作者	</th>
@@ -64,9 +63,7 @@
             <#list pageInfo.list as item>
                 <tr>
                     <th scope="row">
-                        <label>
-                            <input type="radio" name="knowledge" class="form-radio-input">
-                        </label>
+                        ${item.id}
                     </th>
                     <td> ${item.kid} </td>
                     <td> ${item.kname} </td>

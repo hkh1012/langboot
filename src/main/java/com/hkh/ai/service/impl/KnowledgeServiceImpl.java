@@ -40,8 +40,6 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
     private final EmbeddingService embeddingService;
     private final KnowledgeAttachService knowledgeAttachService;
     private final KnowledgeFragmentService knowledgeFragmentService;
-    private final ExampleAttachService exampleAttachService;
-    private final SysConfig sysConfig;
     private final ResourceLoaderFactory resourceLoaderFactory;
     @Override
     public void saveOne(KnowledgeSaveRequest request, SysUser sysUser) {
@@ -179,44 +177,6 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
             }
         }
         return list;
-    }
-
-    @Override
-    public void uploadExample(KnowledgeUploadExampleRequest request) {
-        String fileName = request.getFile().getOriginalFilename();
-        List<String> chunkList = new ArrayList<>();
-        ExampleAttach exampleAttach = new ExampleAttach();
-        exampleAttach.setKid(request.getKid());
-        String docId = RandomUtil.randomString(10);
-        exampleAttach.setDocId(docId);
-        exampleAttach.setDocName(fileName);
-        exampleAttach.setDocType(fileName.substring(fileName.lastIndexOf(".")+1));
-        String content = "";
-        ResourceLoader resourceLoader = resourceLoaderFactory.getLoaderByFileType(exampleAttach.getDocType());
-        try {
-            content = resourceLoader.getContent(request.getFile().getInputStream());
-            chunkList = resourceLoader.getChunkList(content);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("store content occur exception ",e);
-        }
-        exampleAttach.setContent(content);
-        exampleAttach.setCreateTime(LocalDateTime.now());
-        exampleAttachService.save(exampleAttach);
-        embeddingService.storeExampleEmbeddings(chunkList, request.getKid(), docId,true);
-    }
-
-    @Override
-    public void removeExample(ExampleRemoveRequest request) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("kid",request.getKid());
-        exampleAttachService.removeByMap(map);
-        embeddingService.removeExampleByKid(request.getKid());
-    }
-
-    @Override
-    public List<ExampleAttach> listExampleByMap(Map<String, Object> map) {
-        return exampleAttachService.listByMap(map);
     }
 
     @Override

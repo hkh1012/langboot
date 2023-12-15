@@ -12,10 +12,6 @@ public interface EmbeddingService {
 
     List<Double> getQueryVector(String query);
 
-    void storeExampleEmbeddings(List<String> chunkList, String kid, String docId, Boolean firstTime);
-
-    void removeExampleByKid(String kid);
-
     void createSchema(String kid);
 
     void removeByKidAndFid(String kid, String fid);

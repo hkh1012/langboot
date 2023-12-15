@@ -13,16 +13,13 @@ import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
-import com.hkh.ai.domain.ExampleAttach;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
-import com.hkh.ai.service.ExampleAttachService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +49,6 @@ public class SseController {
     private final EmbeddingService embeddingService;
     private final ConversationService conversationService;
     private final PromptRetrieverProperties promptRetrieverProperties;
-    private final ExampleAttachService exampleAttachService;
 
     @SneakyThrows
     @PostMapping(path = "send")
@@ -68,7 +64,6 @@ public class SseController {
             CustomChatMessage customChatMessage = new CustomChatMessage(content,sid);
             ChatService chatService = chatServiceFactory.getChatService();
             List<String> nearestList = new ArrayList<>();
-            List<String> nearestExampleList = new ArrayList<>();
             if (useLk){
                 VectorStore vectorStore = vectorStoreFactory.getVectorStore();
                 Vectorization vectorization = vectorizationFactory.getEmbedding();
@@ -79,15 +74,8 @@ public class SseController {
                     // 使用外部的嵌入向量模型
                     List<Double> queryVector = embeddingService.getQueryVector(content);
                     nearestList = vectorStore.nearest(queryVector,kid);
-                    Map<String,Object> map = new HashMap<>();
-                    map.put("kid",kid);
-                    List<ExampleAttach> exampleAttachList = exampleAttachService.listByMap(map);
-                    if (CollectionUtil.isNotEmpty(exampleAttachList)){
-                        nearestExampleList = vectorStore.nearestExample(queryVector,kid);
-                    }
                 }
                 log.info("知识库向量检索结果为{}",nearestList);
-                log.info("示例库向量检索结果为{}",nearestExampleList);
             }
             if (useLk && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
                 try {
@@ -101,7 +89,7 @@ public class SseController {
                     throw new RuntimeException(e);
                 }
             }else {
-                chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser,nearestExampleList);
+                chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
             }
         }
         return ResultData.success("发送成功");

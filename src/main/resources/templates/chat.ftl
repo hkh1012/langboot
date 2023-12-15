@@ -109,68 +109,7 @@
                 <label for="knowledgeFile">当前知识库为:</label>
                 <p>无</p><a href="/knowledge/index" target="_self">切换</a>
             </div>
-            <div class="knowledge-save-div" id="knowledge-save-div">
-                <div class="form-group">
-                    <input type="hidden" class="form-control" id="kid">
-                    <input type="text" class="form-control" id="knowledgeName" placeholder="知识库名称">
-                </div>
-                <div class="form-group">
-                    <label for="knowledgeFile">附件</label>
-                    <input type="file" id="knowledgeFile">
-                    <p class="help-block">支持 txt | doc | docx | pdf 等文本文件</p>
-                </div>
-                <button type="button" class="btn btn-default" id="saveKnowledge">提交</button>
-            </div>
-            <div class="knowledge-list-div" id="knowledge-list-div">
-                <table id="knowledge-list-table" class="table">
-                    <thead>
-                    <tr>
-                        <th>选择</th>
-                        <th>知识库</th>
-                        <th>角色</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="knowledge-list-tbody">
 
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="knowledge-attach-div" id="knowledge-attach-div">
-                <a onclick="showKnowledgeForm();">添加附件</a>
-                <table id="knowledge-attach-table" class="table">
-                    <thead>
-                    <tr>
-                        <th>附件</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="knowledge-attach-tbody">
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="example-attach-div" id="example-attach-div">
-                <div class="form-group">
-                    <label for="exampleFile">示例库附件</label>
-                    <input type="file" id="exampleFile">
-                    <p class="help-block">支持 txt | doc | docx | pdf 等文本文件</p>
-                </div>
-                <button type="button" class="btn btn-default" id="saveExample">提交</button>
-                <table id="example-attach-table" class="table">
-                    <thead>
-                    <tr>
-                        <th>附件</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="example-attach-tbody">
-
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 </div>

@@ -22,7 +22,7 @@ public interface ChatService {
      * @param sseEmitter
      * @param sysUser
      */
-    void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser,List<String> nearestExampleList) throws IOException;
+    void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException;
 
     /**
      * 阻塞推理

@@ -287,147 +287,11 @@ function loadConversation(sid){
     },"json");
 }
 
-function saveKnowledge() {
-    let formData = new FormData();
-    let url = '';
-    if (kid){
-        formData.append("kid",kid);
-        url = '/knowledge/upload';
-    }
-    let knowledgeName = $("#knowledgeName").val();
-    if(knowledgeName) {
-        formData.append("kname",knowledgeName);
-        url = '/knowledge/save';
-    }
-    formData.append('file', $('input[type=file]')[0].files[0]);
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            loadKnowledge();
-        },
-        error: function(xhr, status, error) {
-            // 处理错误
-        }
-    });
-}
-
-function saveExample() {
-    let formData = new FormData();
-    let url = '';
-    if (kid){
-        formData.append("kid",kid);
-        url = '/knowledge/uploadExample';
-    }else {
-        alert('请先选择知识库');
-        return false;
-    }
-    formData.append('file', $('input[type=file]')[1].files[0]);
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            loadExample();
-        },
-        error: function(xhr, status, error) {
-            // 处理错误
-        }
-    });
-}
-
-function loadExample() {
-    if (kid){
-    }else {
-        return false;
-    }
-    $.get("/knowledge/example/list/" + kid,{},function (d) {
-        if (d.code=="200"){
-            let exampleList = d.data;
-            $("#example-attach-tbody").html("");
-            if (exampleList.length > 0){
-                for (let i = 0; i < exampleList.length; i++) {
-                    let item = exampleList[i];
-                    $("#example-attach-tbody").append("<tr kid='" + item.kid +"' docId='" + item.docId + "' content='" + item.content +"'  idx='" +i+"'><td>" + item.docName + "</td><td> <a class='previewAttach' onclick='showExamplePreviewModal(this);'>预览</a> | <a class='removeAttach' onclick='removeExampleAttach(this);'>删除</a></td></tr>");
-                }
-            }
-        }
-    },"json");
-}
 
 function showKnowledgeForm(){
     $("#knowledgeName").addClass("h");
 }
 
-function loadKnowledge() {
-    let knowledge = localStorage.getItem("knowledge");
-    localStorage.removeItem("knowledgeList");
-    $.get("/knowledge/list",{},function (d) {
-        if (d.code=="200"){
-            let knowledgeList = d.data;
-            if (knowledgeList.length > 0){
-                $("#knowledge-list-tbody").html("");
-                localStorage.setItem("knowledgeList",JSON.stringify(knowledgeList));
-                if (!knowledge){
-                    knowledge = knowledgeList[0];
-                }else {
-                    knowledge = JSON.parse(knowledge);
-                }
-                kid = knowledge.kid;
-                localStorage.setItem("knowledge",JSON.stringify(knowledge));
-                for (let i = 0; i < knowledgeList.length; i++) {
-                    let item = knowledgeList[i];
-                    let checked = kid == item.kid ? 'checked' : '';
-                    $("#knowledge-list-tbody").append("<tr kid='" + item.kid + "' idx='" +i+"'><td><input type='radio' name='knowledge' onchange='selectThisKnowledge(this);' " + checked + " value='" +item.kid+ "'/></td><td>" + item.kname +"</td><td> " +item.role +"</td><td> <a class='removeKnowledge' kid='" + item.kid +"' onclick='removeKnowledge(this);'>删除</a></td></tr>");
-                    if (checked == 'checked') {
-                        let attachList = item.attachList;
-                        $("#knowledge-attach-tbody").html("");
-                        for (let j = 0; j < attachList.length; j++) {
-                            let attach = attachList[j];
-                            $("#knowledge-attach-tbody").append("<tr kid='" + item.kid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
-                        }
-                    }
-                }
-                loadExample();
-            }
-        }
-    },"json");
-
-}
-
-function selectThisKnowledge(o){
-    $("input[type=radio][name=knowledge]").removeAttr("checked");
-    $(o).attr("checked","checked");
-    let selectKid = $(o).val();
-    kid = selectKid;
-    let knowledgeList = JSON.parse(localStorage.getItem("knowledgeList"));
-    for (let i = 0; i < knowledgeList.length; i++){
-        if (knowledgeList[i].kid == selectKid){
-            let selectedKnowledge = knowledgeList[i];
-            localStorage.setItem("knowledge",JSON.stringify(selectedKnowledge));
-            $("#knowledge-attach-tbody").html("");
-            for (let j = 0; j < selectedKnowledge.attachList.length; j++) {
-                let attach = selectedKnowledge.attachList[j];
-                $("#knowledge-attach-tbody").append("<tr kid='" + selectKid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
-            }
-        }
-    }
-    loadExample();
-}
-
-function showExamplePreviewModal(o) {
-    let modal = $('#previewModal');
-    let content = $(o).parent().parent().attr("content");
-    $(modal).find('#previewContent').html(content);
-    $(modal).modal({
-        keyboard: false
-    })
-}
 
 function showPreviewModal(idx) {
     let modal = $('#previewModal');
@@ -438,44 +302,6 @@ function showPreviewModal(idx) {
     $(modal).modal({
         keyboard: false
     })
-}
-
-function removeAttach(o) {
-    let docId = $(o).parent().parent().attr("docId");
-    let kid = $(o).parent().parent().attr("kid");
-    $.ajax({
-        url: '/knowledge/removeAttach',
-        type: 'POST',
-        data: JSON.stringify({"kid":kid,"docId":docId}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-            console.log(data);
-            loadKnowledge();
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
-}
-
-function removeExampleAttach(o) {
-    let docId = $(o).parent().parent().attr("docId");
-    let kid = $(o).parent().parent().attr("kid");
-    $.ajax({
-        url: '/knowledge/removeExample',
-        type: 'POST',
-        data: JSON.stringify({"kid":kid}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-            console.log(data);
-            loadExample();
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
 }
 
 
@@ -539,12 +365,5 @@ $(function () {
     $(".add-session-btn").click(function() {
         addSession();
     });
-    $("#saveKnowledge").click(function (){
-        saveKnowledge();
-    });
-    // $("#saveExample").click(function (){
-    //     saveExample();
-    // });
     loadSession();
-    loadKnowledge();
 });

@@ -54,28 +54,6 @@ public class KnowledgeController {
     }
 
     /**
-     * 上传示例库
-     * @param request
-     * @return
-     */
-    @PostMapping(value = "uploadExample")
-    public ResultData uploadExample(KnowledgeUploadExampleRequest request){
-        knowledgeService.uploadExample(request);
-        return ResultData.success("上传示例库文件成功");
-    }
-
-    /**
-     * 删除示例库
-     * @param request
-     * @return
-     */
-    @PostMapping("removeExample")
-    public ResultData removeExample(@RequestBody ExampleRemoveRequest request){
-        knowledgeService.removeExample(request);
-        return ResultData.success("删除示例库成功");
-    }
-
-    /**
      * 查询个人所有知识库
      * @param httpServletRequest
      * @return
@@ -89,19 +67,6 @@ public class KnowledgeController {
         List<KnowledgeShare> shareList = knowledgeShareService.listByMap(map);
         List<KnowledgeListResponse> result = knowledgeService.all(mineList,shareList);
         return ResultData.success(result,"查询成功");
-    }
-
-    /**
-     * 查询示例库
-     * @param httpServletRequest
-     * @return
-     */
-    @GetMapping("example/list/{kid}")
-    public ResultData<List<ExampleAttach>> exampleList(HttpServletRequest httpServletRequest,@PathVariable(value = "kid") String kid){
-        Map<String,Object> map = new HashMap<>();
-        map.put("kid",kid);
-        List<ExampleAttach> exampleAttachList = knowledgeService.listExampleByMap(map);
-        return ResultData.success(exampleAttachList,"查询成功");
     }
 
 

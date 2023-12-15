@@ -12,12 +12,6 @@ public interface VectorStore {
     List<String> nearest(List<Double> queryVector,String kid);
     List<String> nearest(String query,String kid);
 
-    void storeExampleEmbeddings(List<String> chunkList, List<List<Double>> vectorList, String kid, String docId, Boolean firstTime);
-
-    void removeExampleByKid(String kid);
-
-    List<String> nearestExample(List<Double> queryVector, String kid);
-
     void newSchema(String kid);
 
     void removeByKidAndFid(String kid, String fid);
