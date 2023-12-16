@@ -69,6 +69,17 @@ public class KnowledgeController {
         return ResultData.success(result,"查询成功");
     }
 
+    /**
+     * 查询个人所有知识库
+     * @param httpServletRequest
+     * @return
+     */
+    @GetMapping("all")
+    public ResultData<List<Knowledge>> all(HttpServletRequest httpServletRequest){
+        List<Knowledge> list = knowledgeService.list();
+        return ResultData.success(list,"查询成功");
+    }
+
 
     @GetMapping("detail/{kid}")
     public ResultData<KnowledgeDetailResponse> detail(@PathVariable(name = "kid") String kid){

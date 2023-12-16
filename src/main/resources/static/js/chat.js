@@ -78,6 +78,7 @@ function sendContent() {
         return false;
     }
     $("#sendBtn").prop("disabled", true);
+    $('#nearest-content').html('');
     conversation.scrollTop = conversation.scrollHeight;
     fillRightChatContent(content);
     initLeftChatContent();
@@ -87,7 +88,13 @@ function sendContent() {
     let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
     $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory})
         .done(function (d) {
-        console.log(d);
+            console.log(d);
+            let _html = '';
+            for (let i = 0; i < d.data.length; i++) {
+                let chunk = d.data[i];
+                _html += '<div class="nearest-chunk">' + chunk + '</div>';
+            }
+            $('#nearest-content').html(_html);
     }).always(function() {
         // 无论请求成功或失败都会被执行的操作
         $("#sendBtn").prop("disabled", false);
@@ -288,24 +295,6 @@ function loadConversation(sid){
 }
 
 
-function showKnowledgeForm(){
-    $("#knowledgeName").addClass("h");
-}
-
-
-function showPreviewModal(idx) {
-    let modal = $('#previewModal');
-    let knowledge = localStorage.getItem("knowledge");
-    let parseKn = JSON.parse(knowledge);
-    let content = parseKn.attachList[idx].content;
-    $(modal).find('#previewContent').html(content);
-    $(modal).modal({
-        keyboard: false
-    })
-}
-
-
-
 function loadLocalStatus(){
     let useLk = localStorage.getItem("useLk");
     if (useLk == null){
@@ -348,6 +337,64 @@ function hideSessionList(){
     $("#left-content").removeClass("left-menu-show");
 }
 
+function openKnowledgeSelectDiv(){
+    $(".knowledge-select-container").removeClass("h");
+    $("#knowledge-all").html('');
+    $('#knowledge-select-warning-msg').html('!');
+    $.get("/knowledge/all",{},function (d) {
+        if (d.code == '200'){
+            if (d.data != null && d.data.length > 0) {
+                console.log(d.data);
+                let _html = '';
+                let knowledgeStr = localStorage.getItem("knowledge");
+                let knowledge = null;
+                if (knowledgeStr){
+                    knowledge = JSON.parse(knowledgeStr);
+                }
+                console.log(knowledge);
+                for (let i = 0; i < d.data.length; i++) {
+                    let item = d.data[i];
+                    let checked = '';
+                    if (knowledge && item.kid == knowledge.kid) {
+                        checked = 'checked';
+                    }
+                    if (item.kid )
+                    _html +='<div class="radio" style="margin: 20px"><label><input type="radio" name="knowledgeRadio" id="knowledgeRadio' +item.kid+'" value="' + item.kid+'" style="margin-right: 5px;" ' + checked +'>' + item.kname+'</label></div>';
+                }
+                $("#knowledge-all").html(_html);
+            }
+        }
+    },"json");
+}
+
+function selectKnowledge(){
+    let selectedKid = $('input[name="knowledgeRadio"]:checked').val();
+    if (!selectedKid){
+        $('#knowledge-select-warning-msg').html('请选择知识库!');
+        return;
+    }
+    kid = selectedKid;
+    let kname = $('input[name="knowledgeRadio"]:checked').parent().text();
+    $("#selected-knowledge").html(kname);
+    let knowledge = {"kid":kid,"kname":kname};
+    localStorage.setItem("knowledge",JSON.stringify(knowledge));
+    $(".knowledge-select-container").addClass("h");
+}
+
+function loadSelectedKnowledge(){
+    let knowledgeStr = localStorage.getItem("knowledge");
+    let knowledge = null;
+    if (knowledgeStr){
+        knowledge = JSON.parse(knowledgeStr);
+        kid = knowledge.kid;
+        $("#selected-knowledge").html(knowledge.kname);
+    }
+}
+
+function closeFormDiv(){
+    $(".knowledge-select-container").addClass("h");
+}
+
 $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
@@ -365,5 +412,6 @@ $(function () {
     $(".add-session-btn").click(function() {
         addSession();
     });
+    loadSelectedKnowledge();
     loadSession();
 });

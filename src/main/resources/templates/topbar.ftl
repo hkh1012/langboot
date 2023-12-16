@@ -42,6 +42,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         ${sysUser.nickName} </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/knowledge/index" >知识库管理</a>
                         <a class="dropdown-item" href="/logout">退出系统</a>
                     </div>
                 </li>
