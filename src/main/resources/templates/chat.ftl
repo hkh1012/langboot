@@ -104,68 +104,52 @@
         </div>
     </div>
     <div id="right-content" class="container1">
-        <div class="knowledge-div">
-            <div class="knowledge-save-div" id="knowledge-save-div">
-                <div class="form-group">
-                    <input type="hidden" class="form-control" id="kid">
-                    <input type="text" class="form-control" id="knowledgeName" placeholder="知识库名称">
-                </div>
-                <div class="form-group">
-                    <label for="knowledgeFile">附件</label>
-                    <input type="file" id="knowledgeFile">
-                    <p class="help-block">支持 txt | doc | docx | pdf 等文本文件</p>
-                </div>
-                <button type="button" class="btn btn-default" id="saveKnowledge">提交</button>
+        <div class="knowledge-selected-div" style="padding: 5px;">
+            当前知识库:<span id="selected-knowledge" style="color: red;font-size: 18px;">无</span> <button type="button" class="btn btn-sm btn-success btn-round" onclick="openKnowledgeSelectDiv();">切换</button>
+        </div>
+        <div class="nearest-div" style="padding: 5px;">
+            <label>相关内容</label>
+            <div class="row nearest-content" id="nearest-content">
+
             </div>
-            <div class="knowledge-list-div" id="knowledge-list-div">
-                <table id="knowledge-list-table" class="table">
-                    <thead>
-                    <tr>
-                        <th>选择</th>
-                        <th>知识库</th>
-                        <th>角色</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="knowledge-list-tbody">
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="knowledge-attach-div" id="knowledge-attach-div">
-                <a onclick="showKnowledgeForm();">添加附件</a>
-                <table id="knowledge-attach-table" class="table">
-                    <thead>
-                    <tr>
-                        <th>附件</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="knowledge-attach-tbody">
-
-                    </tbody>
-                </table>
-            </div>
-
         </div>
     </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content" style="max-height: 800px;overflow-y: scroll;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="previewModalLabel">标题</h4>
+<div class="knowledge-select-container h">
+    <div class="knowledge-edit-form">
+        <div class="knowledge-edit-form-content">
+            <div class="form-group">
+                <div class="col col-flex-right">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" style="cursor: pointer;" viewBox="0 0 384 512" onclick="closeFormDiv();">
+                        <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
+                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                    </svg>
+                </div>
             </div>
-            <div class="modal-body">
-                <pre id="previewContent">
+            <div class="form-group">
+                <div class="col">
+                    <h4>知识库选择</h4>
+                </div>
+            </div>
 
-                </pre>
+            <div class="form-group">
+                <form class="form-inline">
+                    <div class="col" id="knowledge-all" style="font-size: 16px;">
+
+                    </div>
+                </form>
+
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <div class="form-group">
+                <div class="col">
+                    <h6 id="knowledge-select-warning-msg" style="color: red;"></h6>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col col-flex-right">
+                    <button type="button" class="btn btn-outline-danger btn-round" onclick="closeFormDiv();">取消</button>
+                    <button type="button" class="btn btn-success btn-round" style="margin-left: 10px;" onclick="selectKnowledge();">确认</button>
+                </div>
             </div>
         </div>
     </div>

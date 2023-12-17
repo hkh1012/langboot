@@ -6,17 +6,18 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * 知识库
- * @TableName knowledge
+ * 知识片段
+ * @TableName knowledge_fragment
  */
-@TableName(value ="knowledge")
+@TableName(value ="knowledge_fragment")
 @Data
-public class Knowledge implements Serializable {
+public class KnowledgeFragment implements Serializable {
     /**
      * 
      */
@@ -30,22 +31,28 @@ public class Knowledge implements Serializable {
     private String kid;
 
     /**
-     * 用户ID
+     * 文档ID
      */
-    @TableField(value = "uid")
-    private Integer uid;
+    @TableField(value = "doc_id")
+    private String docId;
 
     /**
-     * 知识库名称
+     * 知识片段ID
      */
-    @TableField(value = "kname")
-    private String kname;
+    @TableField(value = "fid")
+    private String fid;
 
     /**
-     * 描述
+     * 片段索引下标
      */
-    @TableField(value = "description")
-    private String description;
+    @TableField(value = "idx")
+    private Integer idx;
+
+    /**
+     * 文档内容
+     */
+    @TableField(value = "content")
+    private String content;
 
     /**
      * 

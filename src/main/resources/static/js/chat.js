@@ -78,6 +78,7 @@ function sendContent() {
         return false;
     }
     $("#sendBtn").prop("disabled", true);
+    $('#nearest-content').html('');
     conversation.scrollTop = conversation.scrollHeight;
     fillRightChatContent(content);
     initLeftChatContent();
@@ -87,7 +88,13 @@ function sendContent() {
     let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
     $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory})
         .done(function (d) {
-        console.log(d);
+            console.log(d);
+            let _html = '';
+            for (let i = 0; i < d.data.length; i++) {
+                let chunk = d.data[i];
+                _html += '<div class="nearest-chunk">' + chunk + '</div>';
+            }
+            $('#nearest-content').html(_html);
     }).always(function() {
         // 无论请求成功或失败都会被执行的操作
         $("#sendBtn").prop("disabled", false);
@@ -287,141 +294,6 @@ function loadConversation(sid){
     },"json");
 }
 
-function saveKnowledge() {
-    let formData = new FormData();
-    let url = '';
-    if (kid){
-        formData.append("kid",kid);
-        url = '/knowledge/upload';
-    }
-    let knowledgeName = $("#knowledgeName").val();
-    if(knowledgeName) {
-        formData.append("kname",knowledgeName);
-        url = '/knowledge/save';
-    }
-    formData.append('file', $('input[type=file]')[0].files[0]);
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            loadKnowledge();
-        },
-        error: function(xhr, status, error) {
-            // 处理错误
-        }
-    });
-}
-
-function showKnowledgeForm(){
-    $("#knowledgeName").addClass("h");
-}
-
-function loadKnowledge() {
-    let knowledge = localStorage.getItem("knowledge");
-    localStorage.removeItem("knowledgeList");
-    $.get("/knowledge/list",{},function (d) {
-        if (d.code=="200"){
-            let knowledgeList = d.data;
-            if (knowledgeList.length > 0){
-                $("#knowledge-list-tbody").html("");
-                localStorage.setItem("knowledgeList",JSON.stringify(knowledgeList));
-                if (!knowledge){
-                    knowledge = knowledgeList[0];
-                }else {
-                    knowledge = JSON.parse(knowledge);
-                }
-                kid = knowledge.kid;
-                localStorage.setItem("knowledge",JSON.stringify(knowledge));
-                for (let i = 0; i < knowledgeList.length; i++) {
-                    let item = knowledgeList[i];
-                    let checked = kid == item.kid ? 'checked' : '';
-                    $("#knowledge-list-tbody").append("<tr kid='" + item.kid + "' idx='" +i+"'><td><input type='radio' name='knowledge' onchange='selectThisKnowledge(this);' " + checked + " value='" +item.kid+ "'/></td><td>" + item.kname +"</td><td> " +item.role +"</td><td> <a class='removeKnowledge' kid='" + item.kid +"' onclick='removeKnowledge(this);'>删除</a></td></tr>");
-                    if (checked == 'checked') {
-                        let attachList = item.attachList;
-                        $("#knowledge-attach-tbody").html("");
-                        for (let j = 0; j < attachList.length; j++) {
-                            let attach = attachList[j];
-                            $("#knowledge-attach-tbody").append("<tr kid='" + item.kid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
-                        }
-                    }
-                }
-            }
-        }
-    },"json");
-
-}
-
-function selectThisKnowledge(o){
-    $("input[type=radio][name=knowledge]").removeAttr("checked");
-    $(o).attr("checked","checked");
-    let selectKid = $(o).val();
-    kid = selectKid;
-    let knowledgeList = JSON.parse(localStorage.getItem("knowledgeList"));
-    for (let i = 0; i < knowledgeList.length; i++){
-        if (knowledgeList[i].kid == selectKid){
-            let selectedKnowledge = knowledgeList[i];
-            localStorage.setItem("knowledge",JSON.stringify(selectedKnowledge));
-            $("#knowledge-attach-tbody").html("");
-            for (let j = 0; j < selectedKnowledge.attachList.length; j++) {
-                let attach = selectedKnowledge.attachList[j];
-                $("#knowledge-attach-tbody").append("<tr kid='" + selectKid +"' docId='" + attach.docId + "' idx='" +j+"'><td>" + attach.docName + "</td><td> <a class='previewAttach' onclick='showPreviewModal(" + j + ");'>预览</a> | <a class='removeAttach' onclick='removeAttach(this);'>删除</a></td></tr>");
-            }
-        }
-    }
-
-}
-
-
-function showPreviewModal(idx) {
-    let modal = $('#previewModal');
-    let knowledge = localStorage.getItem("knowledge");
-    let parseKn = JSON.parse(knowledge);
-    let content = parseKn.attachList[idx].content;
-    $(modal).find('#previewContent').html(content);
-    $(modal).modal({
-        keyboard: false
-    })
-}
-
-function removeAttach(o) {
-    let docId = $(o).parent().parent().attr("docId");
-    let kid = $(o).parent().parent().attr("kid");
-    $.ajax({
-        url: '/knowledge/removeAttach',
-        type: 'POST',
-        data: JSON.stringify({"kid":kid,"docId":docId}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-            console.log(data);
-            loadKnowledge();
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
-}
-
-function removeKnowledge(o) {
-    let attrKid = $(o).attr("kid");
-    $.ajax({
-        url: '/knowledge/remove',
-        type: 'POST',
-        data: JSON.stringify({"kid":attrKid}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-            loadKnowledge();
-            console.log(data);
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
-}
 
 function loadLocalStatus(){
     let useLk = localStorage.getItem("useLk");
@@ -465,6 +337,64 @@ function hideSessionList(){
     $("#left-content").removeClass("left-menu-show");
 }
 
+function openKnowledgeSelectDiv(){
+    $(".knowledge-select-container").removeClass("h");
+    $("#knowledge-all").html('');
+    $('#knowledge-select-warning-msg').html('!');
+    $.get("/knowledge/all",{},function (d) {
+        if (d.code == '200'){
+            if (d.data != null && d.data.length > 0) {
+                console.log(d.data);
+                let _html = '';
+                let knowledgeStr = localStorage.getItem("knowledge");
+                let knowledge = null;
+                if (knowledgeStr){
+                    knowledge = JSON.parse(knowledgeStr);
+                }
+                console.log(knowledge);
+                for (let i = 0; i < d.data.length; i++) {
+                    let item = d.data[i];
+                    let checked = '';
+                    if (knowledge && item.kid == knowledge.kid) {
+                        checked = 'checked';
+                    }
+                    if (item.kid )
+                    _html +='<div class="radio" style="margin: 20px"><label><input type="radio" name="knowledgeRadio" id="knowledgeRadio' +item.kid+'" value="' + item.kid+'" style="margin-right: 5px;" ' + checked +'>' + item.kname+'</label></div>';
+                }
+                $("#knowledge-all").html(_html);
+            }
+        }
+    },"json");
+}
+
+function selectKnowledge(){
+    let selectedKid = $('input[name="knowledgeRadio"]:checked').val();
+    if (!selectedKid){
+        $('#knowledge-select-warning-msg').html('请选择知识库!');
+        return;
+    }
+    kid = selectedKid;
+    let kname = $('input[name="knowledgeRadio"]:checked').parent().text();
+    $("#selected-knowledge").html(kname);
+    let knowledge = {"kid":kid,"kname":kname};
+    localStorage.setItem("knowledge",JSON.stringify(knowledge));
+    $(".knowledge-select-container").addClass("h");
+}
+
+function loadSelectedKnowledge(){
+    let knowledgeStr = localStorage.getItem("knowledge");
+    let knowledge = null;
+    if (knowledgeStr){
+        knowledge = JSON.parse(knowledgeStr);
+        kid = knowledge.kid;
+        $("#selected-knowledge").html(knowledge.kname);
+    }
+}
+
+function closeFormDiv(){
+    $(".knowledge-select-container").addClass("h");
+}
+
 $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
@@ -482,9 +412,6 @@ $(function () {
     $(".add-session-btn").click(function() {
         addSession();
     });
-    $("#saveKnowledge").click(function (){
-        saveKnowledge();
-    });
+    loadSelectedKnowledge();
     loadSession();
-    loadKnowledge();
 });

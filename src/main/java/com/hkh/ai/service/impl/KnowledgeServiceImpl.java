@@ -4,27 +4,23 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hkh.ai.config.SysConfig;
-import com.hkh.ai.domain.Knowledge;
-import com.hkh.ai.domain.KnowledgeAttach;
+import com.hkh.ai.domain.*;
 import com.hkh.ai.chain.loader.ResourceLoader;
 import com.hkh.ai.chain.loader.ResourceLoaderFactory;
-import com.hkh.ai.domain.KnowledgeShare;
-import com.hkh.ai.domain.SysUser;
-import com.hkh.ai.request.KnowledgeAttachRemoveRequest;
-import com.hkh.ai.request.KnowledgeRemoveRequest;
-import com.hkh.ai.request.KnowledgeSaveRequest;
-import com.hkh.ai.request.KnowledgeUploadRequest;
+import com.hkh.ai.request.*;
 import com.hkh.ai.response.KnowledgeDetailResponse;
 import com.hkh.ai.response.KnowledgeListResponse;
-import com.hkh.ai.service.EmbeddingService;
-import com.hkh.ai.service.KnowledgeAttachService;
-import com.hkh.ai.service.KnowledgeService;
+import com.hkh.ai.service.*;
 import com.hkh.ai.mapper.KnowledgeMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -43,27 +39,39 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
 
     private final EmbeddingService embeddingService;
     private final KnowledgeAttachService knowledgeAttachService;
-    private final SysConfig sysConfig;
+    private final KnowledgeFragmentService knowledgeFragmentService;
     private final ResourceLoaderFactory resourceLoaderFactory;
     @Override
     public void saveOne(KnowledgeSaveRequest request, SysUser sysUser) {
-        Knowledge knowledge = new Knowledge();
-        knowledge.setKid(RandomUtil.randomString(10));
-        knowledge.setUid(sysUser.getId());
-        knowledge.setKname(request.getKname());
-        knowledge.setCreateTime(LocalDateTime.now());
-        save(knowledge);
-        storeContent(request.getFile(),knowledge.getKid(),true);
+        if (StringUtils.isBlank(request.getKid())){
+            String kid = RandomUtil.randomString(10);
+            Knowledge knowledge = new Knowledge();
+            knowledge.setKid(kid);
+            knowledge.setUid(sysUser.getId());
+            knowledge.setKname(request.getKname());
+            knowledge.setDescription(request.getDescription());
+            knowledge.setCreateTime(LocalDateTime.now());
+            save(knowledge);
+            embeddingService.createSchema(kid);
+        }else {
+            Knowledge knowledge = this.getById(request.getId());
+            knowledge.setKid(request.getKid());
+            knowledge.setUid(request.getUid());
+            knowledge.setKname(request.getKname());
+            knowledge.setDescription(request.getDescription());
+            saveOrUpdate(knowledge);
+        }
     }
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void upload(KnowledgeUploadRequest request) {
-        storeContent(request.getFile(), request.getKid(),false);
+        storeContent(request.getFile(), request.getKid());
     }
 
     @Override
-    public void storeContent(MultipartFile file, String kid,Boolean firstTime) {
+    public void storeContent(MultipartFile file, String kid) {
         String fileName = file.getOriginalFilename();
         List<String> chunkList = new ArrayList<>();
         KnowledgeAttach knowledgeAttach = new KnowledgeAttach();
@@ -74,9 +82,25 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
         knowledgeAttach.setDocType(fileName.substring(fileName.lastIndexOf(".")+1));
         String content = "";
         ResourceLoader resourceLoader = resourceLoaderFactory.getLoaderByFileType(knowledgeAttach.getDocType());
+        List<String> fids = new ArrayList<>();
         try {
             content = resourceLoader.getContent(file.getInputStream());
             chunkList = resourceLoader.getChunkList(content);
+            List<KnowledgeFragment> fragments = new ArrayList<>();
+            LocalDateTime now = LocalDateTime.now();
+            for (int i = 0; i < chunkList.size(); i++) {
+                String fid = RandomUtil.randomString(16);
+                fids.add(fid);
+                KnowledgeFragment knowledgeFragment = new KnowledgeFragment();
+                knowledgeFragment.setKid(kid);
+                knowledgeFragment.setDocId(docId);
+                knowledgeFragment.setFid(fid);
+                knowledgeFragment.setIdx(i);
+                knowledgeFragment.setContent(chunkList.get(i));
+                knowledgeFragment.setCreateTime(now);
+                fragments.add(knowledgeFragment);
+            }
+            knowledgeFragmentService.saveBatch(fragments);
         } catch (IOException e) {
             e.printStackTrace();
             log.error("store content occur exception ",e);
@@ -84,7 +108,7 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
         knowledgeAttach.setContent(content);
         knowledgeAttach.setCreateTime(LocalDateTime.now());
         knowledgeAttachService.save(knowledgeAttach);
-        embeddingService.storeEmbeddings(chunkList,kid,docId,firstTime);
+        embeddingService.storeEmbeddings(chunkList,kid,docId,fids);
     }
 
     @Override
@@ -110,6 +134,7 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
         map.put("kid",request.getKid());
         map.put("doc_id",request.getDocId());
         knowledgeAttachService.removeByMap(map);
+        knowledgeFragmentService.removeByMap(map);
         embeddingService.removeByDocId(request.getKid(),request.getDocId());
     }
 
@@ -119,6 +144,7 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
         map.put("kid",request.getKid());
         this.removeByMap(map);
         knowledgeAttachService.removeByMap(map);
+        knowledgeFragmentService.removeByMap(map);
         embeddingService.removeByKid(request.getKid());
     }
 
@@ -151,6 +177,31 @@ public class KnowledgeServiceImpl extends ServiceImpl<KnowledgeMapper, Knowledge
             }
         }
         return list;
+    }
+
+    @Override
+    public PageInfo<Knowledge> pageInfo(KnowledgePageRequest knowledgePageRequest) {
+        QueryWrapper<Knowledge> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("kname",knowledgePageRequest.getSearchContent())
+                .or().like("description",knowledgePageRequest.getSearchContent())
+        ;
+        queryWrapper.orderByDesc("create_time");
+        PageHelper.startPage(knowledgePageRequest.getPageNum(), knowledgePageRequest.getPageSize());
+        PageInfo<Knowledge> pageInfo = new PageInfo<>(list(queryWrapper));
+        pageInfo.getList().stream().forEach(item -> {
+            if (StringUtils.isBlank(item.getDescription())) {
+                item.setDescription("");
+            }
+        });
+        return pageInfo;
+    }
+
+    @Override
+    public Knowledge getOneByKid(String kid) {
+        QueryWrapper<Knowledge> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("kid",kid);
+        Knowledge knowledge = this.getOne(queryWrapper, false);
+        return knowledge;
     }
 
 }

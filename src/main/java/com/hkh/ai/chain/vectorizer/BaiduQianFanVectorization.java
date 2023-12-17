@@ -37,6 +37,7 @@ public class BaiduQianFanVectorization implements Vectorization{
             body.put("user_id", UUID.fastUUID());
 
             String jsonStrResult = HttpUtil.post(url + "?access_token=" + accessToken,body.toJSONString());
+            System.out.println(jsonStrResult);
             BaiduQianFanVectorizationResult baiduQianFanVectorizationResult = JSONObject.parseObject(jsonStrResult, BaiduQianFanVectorizationResult.class);
             List<BaiduQianFanVectorizationResult.BaiuQianFanVectorizationResultItem> embeddings = baiduQianFanVectorizationResult.getData();
             for (BaiduQianFanVectorizationResult.BaiuQianFanVectorizationResultItem item : embeddings){

@@ -22,6 +22,7 @@ import io.milvus.response.QueryResultsWrapper;
 import io.milvus.response.SearchResultsWrapper;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,11 @@ public class MilvusVectorStore implements VectorStore{
                 .withDataType(DataType.VarChar)
                 .withMaxLength(20)
                 .build();
+        FieldType fidField = FieldType.newBuilder()
+                .withName("fid")
+                .withDataType(DataType.VarChar)
+                .withMaxLength(20)
+                .build();
         FieldType vectorField = FieldType.newBuilder()
                 .withName("fv")
                 .withDataType(DataType.FloatVector)
@@ -99,6 +105,7 @@ public class MilvusVectorStore implements VectorStore{
                 .addFieldType(contentField)
                 .addFieldType(kidField)
                 .addFieldType(docIdField)
+                .addFieldType(fidField)
                 .addFieldType(vectorField)
                 .build();
         milvusServiceClient.createCollection(createCollectionReq);
@@ -120,16 +127,32 @@ public class MilvusVectorStore implements VectorStore{
     }
 
     @Override
-    public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList, String kid, String docId, Boolean firstTime) {
-        if (firstTime) {
-            createSchema(kid);
-        }
-        milvusServiceClient.createPartition(
-                CreatePartitionParam.newBuilder()
+    public void newSchema(String kid) {
+        createSchema(kid);
+    }
+
+    @Override
+    public void removeByKidAndFid(String kid, String fid) {
+        milvusServiceClient.delete(
+                DeleteParam.newBuilder()
                         .withCollectionName(collectionName + kid)
-                        .withPartitionName(docId)
+                        .withExpr("fid == " + fid)
                         .build()
         );
+    }
+
+    @Override
+    public void storeEmbeddings(List<String> chunkList, List<List<Double>> vectorList, String kid, String docId, List<String> fidList) {
+
+        if (StringUtils.isNotBlank(docId)){
+            milvusServiceClient.createPartition(
+                    CreatePartitionParam.newBuilder()
+                            .withCollectionName(collectionName + kid)
+                            .withPartitionName(docId)
+                            .build()
+            );
+        }
+
         List<List<Float>> vectorFloatList = new ArrayList<>();
         List<String> kidList = new ArrayList<>();
         List<String> docIdList = new ArrayList<>();
@@ -148,6 +171,7 @@ public class MilvusVectorStore implements VectorStore{
         fields.add(new InsertParam.Field("content", chunkList));
         fields.add(new InsertParam.Field("kid", kidList));
         fields.add(new InsertParam.Field("docId", docIdList));
+        fields.add(new InsertParam.Field("fid", fidList));
         fields.add(new InsertParam.Field("fv", vectorFloatList));
 
         InsertParam insertParam = InsertParam.newBuilder()
@@ -225,4 +249,5 @@ public class MilvusVectorStore implements VectorStore{
     public List<String> nearest(String query, String kid) {
         return null;
     }
+
 }

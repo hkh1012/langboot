@@ -1,5 +1,6 @@
 package com.hkh.ai.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.hkh.ai.chain.llm.ChatService;
 import com.hkh.ai.chain.llm.ChatServiceFactory;
 import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
@@ -19,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -55,8 +53,9 @@ public class SseController {
     @SneakyThrows
     @PostMapping(path = "send")
     @ResponseBody
-    public ResultData send(HttpServletRequest httpServletRequest, String sessionId, String content,String kid,String sid,Boolean useLk,Boolean useHistory) {
+    public ResultData<List<String>> send(HttpServletRequest httpServletRequest, String sessionId, String content,String kid,String sid,Boolean useLk,Boolean useHistory) {
         SseEmitter sseEmitter = sseCache.get(sessionId);
+        List<String> nearestList = new ArrayList<>();
         if (sseEmitter != null) {
             SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
             List<Conversation> history = new ArrayList<>();
@@ -65,7 +64,6 @@ public class SseController {
             }
             CustomChatMessage customChatMessage = new CustomChatMessage(content,sid);
             ChatService chatService = chatServiceFactory.getChatService();
-            List<String> nearestList = new ArrayList<>();
             if (useLk){
                 VectorStore vectorStore = vectorStoreFactory.getVectorStore();
                 Vectorization vectorization = vectorizationFactory.getEmbedding();
@@ -77,7 +75,7 @@ public class SseController {
                     List<Double> queryVector = embeddingService.getQueryVector(content);
                     nearestList = vectorStore.nearest(queryVector,kid);
                 }
-                log.info("向量检索结果为{}",nearestList);
+                log.info("知识库向量检索结果为{}",nearestList);
             }
             if (useLk && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
                 try {
@@ -94,7 +92,7 @@ public class SseController {
                 chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
             }
         }
-        return ResultData.success("发送成功");
+        return ResultData.success(nearestList,"发送成功");
     }
 
     @GetMapping(path = "over")

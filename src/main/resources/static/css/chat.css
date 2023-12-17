@@ -280,12 +280,12 @@ a:hover {
     cursor: pointer;
 }
 
-.knowledge-save-div{
+.knowledge-save-div,example-attach-div{
     margin: 10px;
     border-bottom: 1px solid #e5e7eb;
 }
 
-.knowledge-attach-div{
+.knowledge-attach-div,.example-attach-div{
     margin: 10px;
 }
 
@@ -424,5 +424,45 @@ a:hover {
         padding-left: 20px;
         padding-right: 20px;
     }
+}
+
+.knowledge-select-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    background-color: #3338;
+    z-index: 9999;
+}
+
+.h{
+    display: none;
+}
+
+.knowledge-edit-form{
+    width: 50%;
+    height: 50%;
+    margin: 10% auto;
+    background-color: white;
+    padding: 2%;
+}
+
+.col-flex-right{
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.nearest-content{
+    padding: 10px 20px 10px 20px;
+    max-height: 800px;
+    overflow-y: scroll;
+}
+
+.nearest-chunk{
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px dashed red;
 }
 
