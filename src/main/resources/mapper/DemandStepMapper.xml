@@ -12,7 +12,6 @@
             <result property="description" column="description" jdbcType="VARCHAR"/>
             <result property="role" column="role" jdbcType="VARCHAR"/>
             <result property="userId" column="user_id" jdbcType="INTEGER"/>
-            <result property="unambiguous" column="unambiguous" jdbcType="BIT"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
     </resultMap>

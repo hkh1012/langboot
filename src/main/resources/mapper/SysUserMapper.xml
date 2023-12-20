@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hkh.openai.mapper.SysUserMapper">
+<mapper namespace="com.hkh.ai.mapper.SysUserMapper">
 
     <resultMap id="BaseResultMap" type="com.hkh.ai.domain.SysUser">
             <id property="id" column="id" jdbcType="INTEGER"/>
