@@ -61,12 +61,9 @@ public class BaiduQianFanCompletionWebClient {
         });
 
         flux.subscribe(
-                new Consumer<JSONObject>() {
-                    @Override
-                    public void accept(JSONObject jsonObject) {
-                        Flux<String> stringFlux = streamChatCompletion(requestBody);
-                        stringFlux.subscribe(baiduQianFanCompletionBizProcessor::bizProcess);
-                    }
+                jsonObject -> {
+                    Flux<String> stringFlux = streamChatCompletion(requestBody);
+                    stringFlux.subscribe(baiduQianFanCompletionBizProcessor::bizProcess);
                 },
                 System.err::println,
                 () -> System.out.println("emitter completed")
