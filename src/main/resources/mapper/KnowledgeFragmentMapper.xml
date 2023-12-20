@@ -9,6 +9,7 @@
             <result property="kid" column="kid" jdbcType="VARCHAR"/>
             <result property="docId" column="doc_id" jdbcType="VARCHAR"/>
             <result property="idx" column="idx" jdbcType="INTEGER"/>
+            <result property="fid" column="fid" jdbcType="VARCHAR"/>
             <result property="content" column="content" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
@@ -16,7 +17,7 @@
 
     <sql id="Base_Column_List">
         id,kid,doc_id,
-        idx,content,create_time,
+        idx,fid,content,create_time,
         create_by
     </sql>
 </mapper>
