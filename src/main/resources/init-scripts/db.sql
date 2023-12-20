@@ -76,6 +76,20 @@ CREATE TABLE `knowledge_share` (
     `kname` varchar(50) DEFAULT NULL COMMENT '知识库名称',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COMMENT='知识库分享表';
+
+DROP TABLE IF EXISTS `knowledge_fragment`;
+CREATE TABLE `knowledge_fragment` (
+                                      `id` int(11) NOT NULL AUTO_INCREMENT,
+                                      `kid` varchar(10) NOT NULL COMMENT '知识库ID',
+                                      `doc_id` varchar(10) DEFAULT NULL COMMENT '文档ID',
+                                      `fid` varchar(16) NOT NULL COMMENT '知识片段ID',
+                                      `idx` int(11) NOT NULL COMMENT '片段索引下标',
+                                      `content` text NOT NULL COMMENT '文档内容',
+                                      `create_time` datetime DEFAULT NULL,
+                                      `create_by` varchar(50) DEFAULT NULL,
+                                      PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8mb4 COMMENT='知识片段';
+
 -- ----------------------------
 -- Table structure for sys_model
 -- ----------------------------
