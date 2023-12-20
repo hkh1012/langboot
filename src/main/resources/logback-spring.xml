@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="true">
 
+    <property name="LOG_HOME" value="/usr/logs/langchain"></property>
+
     <!-- appender是configuration的子节点，是负责写日志的组件。 -->
     <!-- ConsoleAppender：把日志输出到控制台 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -27,7 +29,7 @@
     <!--             2.如果日期没有发生变化，但是当前日志的文件大小超过10MB时，对当前日志进行分割 重命名-->
     <appender name="info_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--日志文件路径和名称-->
-        <File>logs/passport_info.log</File>
+        <File>${LOG_HOME}/passport_info.log</File>
         <!--是否追加到文件末尾,默认为true-->
         <append>true</append>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -42,7 +44,7 @@
             <!-- 日志文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
             <!-- 文件名：logs/project_info.2017-12-05.0.log -->
             <!-- 注意：SizeAndTimeBasedRollingPolicy中 ％i和％d令牌都是强制性的，必须存在，要不会报错 -->
-            <fileNamePattern>logs/passport_info.%d.%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/passport_info.%d.%i.log</fileNamePattern>
             <!-- 每产生一个日志文件，该日志文件的保存期限为30天, ps:maxHistory的单位是根据fileNamePattern中的翻转策略自动推算出来的,例如上面选用了yyyy-MM-dd,则单位为天
             如果上面选用了yyyy-MM,则单位为月,另外上面的单位默认为yyyy-MM-dd-->
             <maxHistory>30</maxHistory>
@@ -66,7 +68,7 @@
     <!--             2.如果日期没有发生变化，但是当前日志的文件大小超过10MB时，对当前日志进行分割 重命名-->
     <appender name="error_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--日志文件路径和名称-->
-        <File>logs/passport_error.log</File>
+        <File>${LOG_HOME}/passport_error.log</File>
         <!--是否追加到文件末尾,默认为true-->
         <append>true</append>
         <!-- ThresholdFilter过滤低于指定阈值的事件。 对于等于或高于阈值的事件，ThresholdFilter将在调用其decision（）方法时响应NEUTRAL。 但是，将拒绝级别低于阈值的事件 -->
@@ -80,7 +82,7 @@
             <!-- 活动文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
             <!-- 文件名：logs/project_error.2017-12-05.0.log -->
             <!-- 注意：SizeAndTimeBasedRollingPolicy中 ％i和％d令牌都是强制性的，必须存在，要不会报错 -->
-            <fileNamePattern>logs/passport_error.%d.%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/passport_error.%d.%i.log</fileNamePattern>
             <!-- 每产生一个日志文件，该日志文件的保存期限为30天, ps:maxHistory的单位是根据fileNamePattern中的翻转策略自动推算出来的,例如上面选用了yyyy-MM-dd,则单位为天
             如果上面选用了yyyy-MM,则单位为月,另外上面的单位默认为yyyy-MM-dd-->
             <maxHistory>30</maxHistory>
