@@ -52,6 +52,13 @@ public class SysUser implements Serializable {
     @TableField(value = "mobile")
     private String mobile;
 
+
+    /**
+     * 管理员标记
+     */
+    @TableField(value = "admin_flag")
+    private Boolean adminFlag;
+
     /**
      * 头像
      */

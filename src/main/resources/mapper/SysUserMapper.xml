@@ -11,6 +11,7 @@
             <result property="password" column="password" jdbcType="VARCHAR"/>
             <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
             <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+            <result property="adminFlag" column="admin_flag" jdbcType="BIT"/>
             <result property="avatarUrl" column="avatar_url" jdbcType="VARCHAR"/>
             <result property="registerTime" column="register_time" jdbcType="TIMESTAMP"/>
             <result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
@@ -21,7 +22,7 @@
 
     <sql id="Base_Column_List">
         id,user_name,email,
-        password,nick_name,mobile,
+        password,nick_name,mobile,admin_flag,
         avatar_url,register_time,last_login_time,
         std_tokens,create_time,create_by
     </sql>

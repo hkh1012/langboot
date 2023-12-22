@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
     public ModelAndView authExceptionHandler(AuthException e) {
         log.error("认证失败：",e.getMessage(),e);
         ModelAndView modelAndView = new ModelAndView("error/401");
+        modelAndView.addObject("errorMsg",e.getMessage());
         return modelAndView;
     }
 

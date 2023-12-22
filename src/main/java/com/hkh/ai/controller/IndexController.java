@@ -1,6 +1,7 @@
 package com.hkh.ai.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.hkh.ai.common.annotation.AdminRequired;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.Knowledge;
 import com.hkh.ai.domain.KnowledgeAttach;
@@ -243,6 +244,7 @@ public class IndexController {
      * @return
      */
     @GetMapping(value = {"/knowledge/index"})
+    @AdminRequired
     public String knowledgeIndex(HttpServletRequest request, Model model, KnowledgePageRequest knowledgePageRequest) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         model.addAttribute("sysUser",sysUser);
@@ -259,6 +261,7 @@ public class IndexController {
      * @return
      */
     @GetMapping(value = {"/knowledge/attach"})
+    @AdminRequired
     public String knowledgeAttach(HttpServletRequest request, Model model, KnowledgeAttachPageRequest knowledgeAttachPageRequest) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         model.addAttribute("sysUser",sysUser);
@@ -277,6 +280,7 @@ public class IndexController {
      * @return
      */
     @GetMapping(value = {"/knowledge/fragment"})
+    @AdminRequired
     public String knowledgeFragment(HttpServletRequest request, Model model, KnowledgeFragmentPageRequest knowledgeFragmentPageRequest) {
         SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         model.addAttribute("sysUser",sysUser);
