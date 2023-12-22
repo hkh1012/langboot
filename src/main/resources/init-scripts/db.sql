@@ -185,6 +185,7 @@ CREATE TABLE `sys_user` (
   `nick_name` varchar(50) NOT NULL COMMENT '昵称',
   `mobile` varchar(20) NOT NULL COMMENT '手机号',
   `avatar_url` varchar(255) DEFAULT NULL COMMENT '头像',
+  `admin_flag` bit DEFAULT false NULL COMMENT '管理员角色',
   `register_time` datetime DEFAULT NULL COMMENT '注册时间',
   `last_login_time` datetime DEFAULT NULL COMMENT '最近登录时间',
   `std_tokens` bigint(20) DEFAULT NULL COMMENT '标准token余量',
@@ -193,4 +194,4 @@ CREATE TABLE `sys_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
-INSERT INTO `sys_user` (`id`, `user_name`, `email`, `password`, `nick_name`, `mobile`, `avatar_url`, `register_time`, `last_login_time`, `std_tokens`, `create_time`, `create_by`) VALUES (1, 'demo', 'xxx@qq.com', 'e10adc3949ba59abbe56e057f20f883e', '心远', '18000000000', NULL, '2023-6-15 13:53:42', '2023-6-15 13:53:45', 10000, '2023-6-15 13:53:53', '18000000000');
+INSERT INTO `sys_user` (`id`, `user_name`, `email`, `password`, `nick_name`, `mobile`, `avatar_url`, admin_flag,`register_time`, `last_login_time`, `std_tokens`, `create_time`, `create_by`) VALUES (1, 'demo', 'xxx@qq.com', 'e10adc3949ba59abbe56e057f20f883e', '心远', '18000000000', NULL, false,'2023-6-15 13:53:42', '2023-6-15 13:53:45', 10000, '2023-6-15 13:53:53', '18000000000');

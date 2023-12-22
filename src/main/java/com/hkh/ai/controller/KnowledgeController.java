@@ -1,6 +1,7 @@
 package com.hkh.ai.controller;
 
 import com.hkh.ai.common.ResultData;
+import com.hkh.ai.common.annotation.AdminRequired;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.*;
 import com.hkh.ai.request.*;
@@ -36,6 +37,7 @@ public class KnowledgeController {
      * @return
      */
     @PostMapping(value = "save")
+    @AdminRequired
     public ResultData save(@RequestBody KnowledgeSaveRequest request, HttpServletRequest httpServletRequest){
         SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         knowledgeService.saveOne(request,sysUser);
@@ -48,6 +50,7 @@ public class KnowledgeController {
      * @return
      */
     @PostMapping(value = "attach/upload")
+    @AdminRequired
     public ResultData upload(KnowledgeUploadRequest request){
         knowledgeService.upload(request);
         return ResultData.success("上传知识库文件成功");
@@ -88,24 +91,28 @@ public class KnowledgeController {
     }
 
     @PostMapping("attach/remove")
+    @AdminRequired
     public ResultData removeAttach(@RequestBody KnowledgeAttachRemoveRequest request){
         knowledgeService.removeAttach(request);
         return ResultData.success("删除知识库附件成功");
     }
 
     @PostMapping("remove")
+    @AdminRequired
     public ResultData remove(@RequestBody KnowledgeRemoveRequest request){
         knowledgeService.removeKnowledge(request);
         return ResultData.success("删除知识库成功");
     }
 
     @PostMapping("fragment/remove")
+    @AdminRequired
     public ResultData fragmentRemove(@RequestBody KnowledgeFragmentRemoveRequest request){
         knowledgeFragmentService.removeFragment(request);
         return ResultData.success("删除知识片段成功");
     }
 
     @PostMapping("fragment/save")
+    @AdminRequired
     public ResultData fragmentSave(@RequestBody KnowledgeFragmentSaveRequest request){
         knowledgeFragmentService.saveFragment(request);
         return ResultData.success("删除知识片段成功");
