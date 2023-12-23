@@ -11,9 +11,11 @@ import com.hkh.ai.chain.vectorstore.VectorStore;
 import com.hkh.ai.chain.vectorstore.VectorStoreFactory;
 import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.constant.SysConstants;
+import com.hkh.ai.domain.ChatRequestLog;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.service.ChatRequestLogService;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +52,7 @@ public class SseController {
     private final EmbeddingService embeddingService;
     private final ConversationService conversationService;
     private final PromptRetrieverProperties promptRetrieverProperties;
+    private final ChatRequestLogService chatRequestLogService;
 
     @SneakyThrows
     @PostMapping(path = "send")
@@ -58,6 +62,13 @@ public class SseController {
         List<String> nearestList = new ArrayList<>();
         if (sseEmitter != null) {
             SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+            ChatRequestLog chatRequestLog = new ChatRequestLog();
+            chatRequestLog.setUserId(sysUser.getId());
+            chatRequestLog.setKid(kid);
+            chatRequestLog.setRequestTime(LocalDateTime.now());
+            chatRequestLog.setContent(content);
+            chatRequestLog.setCreateTime(LocalDateTime.now());
+            chatRequestLogService.save(chatRequestLog);
             List<Conversation> history = new ArrayList<>();
             if (useHistory){
                 history = conversationService.history(sid);
