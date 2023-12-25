@@ -11,7 +11,7 @@ function showConfirm(message, confirmCallback, cancelCallback) {
         '<div class="modal-body">' + message + '</div>' +
         '<div class="modal-footer">' +
         '<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>' +
-        '<button type="button" class="btn btn-primary" id="confirmBtn">确认</button>' +
+        '<button type="button" class="btn btn-success" id="confirmBtn">确认</button>' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -36,4 +36,12 @@ function showConfirm(message, confirmCallback, cancelCallback) {
             cancelCallback();
         }
     });
-};
+}
+
+function alertMsg(msg){
+    $("#alertMsgText").text(msg);
+    $("#alertMsgDiv").removeClass("h");
+    setTimeout(function () {
+        $("#alertMsgDiv").addClass("h");
+    },1500);
+}

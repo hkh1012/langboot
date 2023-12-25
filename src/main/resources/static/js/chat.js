@@ -126,19 +126,23 @@ function fixMarkdown(message) {
 }
 
 function removeConversation(o){
-    $.ajax({
-        url: '/conversation/remove',
-        type: 'POST',
-        data: JSON.stringify({"sid":sid}),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-            $("#chatList").html('');
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
+    showConfirm("确定要清空该会话历史记录吗？",function (){
+        $.ajax({
+            url: '/conversation/remove',
+            type: 'POST',
+            data: JSON.stringify({"sid":sid}),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(data) {
+                $("#chatList").html('');
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    } ,null);
+
+
 }
 
 function useLocalKnowledge(o){
@@ -147,9 +151,11 @@ function useLocalKnowledge(o){
         useLk = 'false';
     }
     if (useLk == "false"){
+        alertMsg("已启用知识库",true);
         localStorage.setItem("useLk","true");
         $(o).addClass("selected")
     }else {
+        alertMsg("未启用知识库",true);
         localStorage.setItem("useLk","false");
         $(o).removeClass("selected")
     }
@@ -161,9 +167,11 @@ function useHistory(o){
         useHistory = 'false';
     }
     if (useHistory == "false"){
+        alertMsg("已携带历史对话",true);
         localStorage.setItem("useHistory","true");
         $(o).addClass("selected")
     }else {
+        alertMsg("未携带历史对话",true);
         localStorage.setItem("useHistory","false");
         $(o).removeClass("selected")
     }
@@ -335,12 +343,18 @@ function showSessionList(){
 function hideSessionList(){
     $("#full-screen-bg").addClass("h");
     $("#left-content").removeClass("left-menu-show");
+    $("#right-content").removeClass("right-content-show");
+}
+
+function showRightContent(){
+    $("#full-screen-bg").removeClass("h");
+    $("#right-content").addClass("right-content-show");
 }
 
 function openKnowledgeSelectDiv(){
     $(".knowledge-select-container").removeClass("h");
     $("#knowledge-all").html('');
-    $('#knowledge-select-warning-msg').html('!');
+    $('#knowledge-select-warning-msg').html('');
     $.get("/knowledge/all",{},function (d) {
         if (d.code == '200'){
             if (d.data != null && d.data.length > 0) {

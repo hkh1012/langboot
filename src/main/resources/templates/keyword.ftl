@@ -24,7 +24,7 @@
         enabled. Please enable
         Javascript and reload this page!</h2></noscript>
 
-<#include "topbar.ftl">
+<#include "common/topbar.ftl">
 <main class="container" style="margin-top: 100px;">
     <form>
         <div class="form-group">
