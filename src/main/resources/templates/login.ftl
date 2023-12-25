@@ -24,8 +24,8 @@
             </div>
             <form action="/login" method="post">
                 <div class="form-group">
-                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名demo">
-                    <input type="password" id="password" name="password" class="form-control" placeholder="密码123456">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="密码">
                 </div>
                 <button id="login" class="btn btn-success btn-lg btn-block" type="submit">登  录</button>
             </form>
