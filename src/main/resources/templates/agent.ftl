@@ -23,7 +23,7 @@
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
         enabled. Please enable
         Javascript and reload this page!</h2></noscript>
-<#include "topbar.ftl">
+<#include "common/topbar.ftl">
 <main class="container" style="margin-top: 100px;">
     <ul>
         <li><a href="/agent/cs">智能客服(电商)</a></li>

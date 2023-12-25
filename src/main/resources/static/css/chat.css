@@ -266,9 +266,10 @@ pre {
     color: #5fb15f;
 }
 
-.iconKnowledge2{
+.iconKnowledgeSet{
     color: #7d7d7d !important;
 }
+
 
 .header-fix-btn a.selected{
     color: #5fb15f !important;
@@ -338,7 +339,7 @@ a:hover {
     display: none;
 }
 
-.showSessionList,.iconKnowledge2 {
+.showSessionList {
     color: #7d7d7d;
 }
 .session-title{
@@ -356,6 +357,15 @@ a:hover {
     left: 0px;
     background-color: #FFF;
     display: flex !important;
+}
+
+.right-content-show{
+    position: fixed;
+    z-index: 1001;
+    top: 0px;
+    right: 0px;
+    background-color: #FFF;
+    display: block !important;
 }
 
 .full-screen-bg{
@@ -379,6 +389,21 @@ a:hover {
     margin-bottom: 0px;
 }
 
+.knowledge-edit-form{
+    width: 50%;
+    height: 50%;
+    margin: 10% auto;
+    background-color: white;
+    padding: 2%;
+}
+
+#alertMsgDiv{
+    position: fixed;
+    top: 70px;
+    left: 30%;
+    right: 30%;
+}
+
 @media screen and (max-width: 980px){
     #left-content {
         display: none;
@@ -398,6 +423,10 @@ a:hover {
         width: 100% !important;
         border-top: 1px solid #f5f5f5;
     }
+    .iconKnowledge{
+        margin-left: 5px;
+        margin-right: 5px;
+    }
     .chat-input {
         width: 100%;
         justify-content: space-between;
@@ -406,8 +435,11 @@ a:hover {
         width: 100%;
     }
 
-    .iconKnowledge,.iconHistory {
-        display: none;
+    #alertMsgDiv{
+        position: fixed;
+        top: 70px;
+        left: 10%;
+        right: 10%;
     }
 
     .header-fix-btn {
@@ -423,6 +455,14 @@ a:hover {
         align-items: center;
         padding-left: 20px;
         padding-right: 20px;
+    }
+
+    .knowledge-edit-form{
+        width: 80%;
+        height: 60%;
+        margin: 10% auto;
+        background-color: white;
+        padding: 2%;
     }
 }
 
@@ -440,13 +480,7 @@ a:hover {
     display: none;
 }
 
-.knowledge-edit-form{
-    width: 50%;
-    height: 50%;
-    margin: 10% auto;
-    background-color: white;
-    padding: 2%;
-}
+
 
 .col-flex-right{
     display: flex;
