@@ -15,11 +15,11 @@
 | mysql        | mysql-connector-j                            | 
 | orm框架        | mybatis-plus                                 | 
 | openai库      | openai-java                                  |
-| 前端           | freemarker、bootstrap、jquery                  | 
+| 前端           | freemarker、bootstrap、jquery、recorder.js      | 
 | stream-chat  | SSE                                          | 
 | LLMs         | openai、chatglm2、文心一言                         | 
 | embeddings   | openai、text2vec-transformers、文心一言            |
-| vector store | weaviate、milvus                                    |
+| vector store | weaviate、milvus                              |
 
 ## langchain 原理
 <img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>
@@ -48,6 +48,7 @@
       - [ ] 用户注册
       - [ ] 第三方登录
     - [x] 基于 SSE 实现 Stream Chat
+    - [x] 语音输入输出
     - [x] 会话管理
     - [x] 知识库管理
     - [ ] 支持搜索引擎问答

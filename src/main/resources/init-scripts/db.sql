@@ -76,6 +76,44 @@ CREATE TABLE `knowledge_share` (
     `kname` varchar(50) DEFAULT NULL COMMENT '知识库名称',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COMMENT='知识库分享表';
+
+-- ----------------------------
+-- Table structure for knowledge_fragment
+-- ----------------------------
+DROP TABLE IF EXISTS `knowledge_fragment`;
+CREATE TABLE `knowledge_fragment` (
+                                      `id` int(11) NOT NULL AUTO_INCREMENT,
+                                      `kid` varchar(10) NOT NULL COMMENT '知识库ID',
+                                      `doc_id` varchar(10) DEFAULT NULL COMMENT '文档ID',
+                                      `fid` varchar(16) NOT NULL COMMENT '知识片段ID',
+                                      `idx` int(11) NOT NULL COMMENT '片段索引下标',
+                                      `content` text NOT NULL COMMENT '文档内容',
+                                      `create_time` datetime DEFAULT NULL,
+                                      `create_by` varchar(50) DEFAULT NULL,
+                                      PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8mb4 COMMENT='知识片段';
+
+-- ----------------------------
+-- Table structure for media_file
+-- ----------------------------
+DROP TABLE IF EXISTS `media_file`;
+CREATE TABLE `media_file` (
+                              `id` int(11) NOT NULL AUTO_INCREMENT,
+                              `cid` int(11) NOT NULL DEFAULT '0' COMMENT '对话ID',
+                              `mfid` varchar(64) NOT NULL COMMENT '媒体文件ID',
+                              `media_type` int(11) NOT NULL COMMENT '媒体类型：1视频，2音频，3图片',
+                              `file_suffix` varchar(20) NOT NULL COMMENT '文件后缀',
+                              `file_name` varchar(100) NOT NULL COMMENT '文件名',
+                              `file_size` bigint(20) NOT NULL COMMENT '文件大小(单位字节)',
+                              `file_time` bigint(20) DEFAULT NULL COMMENT '时长(单位秒)',
+                              `file_path` varchar(255) NOT NULL COMMENT '文件路径',
+                              `http_url` varchar(1000) NOT NULL COMMENT 'http全路径',
+                              `create_time` datetime DEFAULT NULL,
+                              `create_by` varchar(50) DEFAULT NULL,
+                              PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8mb4 COMMENT='媒体文件';
+
+
 -- ----------------------------
 -- Table structure for sys_model
 -- ----------------------------
@@ -143,6 +181,18 @@ CREATE TABLE `agent_field` (
    `create_by` varchar(50) DEFAULT NULL,
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='代理领域';
+
+DROP TABLE IF EXISTS `chat_request_log`;
+CREATE TABLE `chat_request_log` (
+                                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                                    `user_id` int(11) NOT NULL COMMENT '用户ID',
+                                    `kid` varchar(20) CHARACTER SET utf8 DEFAULT NULL COMMENT '知识库ID',
+                                    `request_time` datetime NOT NULL COMMENT '请求时间',
+                                    `content` text COMMENT '内容',
+                                    `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+                                    `create_by` varchar(50) DEFAULT NULL COMMENT '创建人',
+                                    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1022 DEFAULT CHARSET=utf8mb4 COMMENT='对话请求日志';
 
 -- ----------------------------
 -- Table structure for access_token

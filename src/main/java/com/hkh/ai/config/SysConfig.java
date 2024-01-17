@@ -10,4 +10,7 @@ public class SysConfig {
 
     @Value("${upload.path}")
     private String uploadPath;
+
+    @Value("${resource.domain}")
+    private String resourceDomain;
 }
