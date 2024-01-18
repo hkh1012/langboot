@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.mapper.ConversationMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,10 +18,12 @@ import java.util.List;
 * @createDate 2023-06-20 16:58:23
 */
 @Service
+@AllArgsConstructor
 public class ConversationServiceImpl extends ServiceImpl<ConversationMapper, Conversation> implements ConversationService{
 
+    private final ConversationMapper conversationMapper;
     @Override
-    public void saveConversation(Integer userId, String sessionId, String content, String qa) {
+    public int saveConversation(Integer userId, String sessionId, String content, String qa) {
         Conversation conversation = new Conversation();
         conversation.setUserId(userId);
         conversation.setSid(sessionId);
@@ -28,7 +31,8 @@ public class ConversationServiceImpl extends ServiceImpl<ConversationMapper, Con
         conversation.setType(qa);
         conversation.setQaTime(LocalDateTime.now());
         conversation.setCreateTime(LocalDateTime.now());
-        save(conversation);
+        conversationMapper.insert(conversation);
+        return conversation.getId();
     }
 
     @Override

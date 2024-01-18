@@ -17,6 +17,10 @@ html, body {
     margin-bottom: 50px;
 }
 
+.margin-bottom250{
+    margin-bottom: 250px !important;
+}
+
 #conversation{
     height: 100%;
     overflow-y: scroll;
@@ -404,6 +408,73 @@ a:hover {
     right: 30%;
 }
 
+.voice-btn{
+    position: absolute;
+    margin-right: 12px;
+    color: gray;
+}
+
+.voice-close-btn{
+    position: absolute;
+    margin-right: 12px;
+    color: gray;
+}
+
+.voiceTopDiv{
+    height: 25px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.voiceMidDiv{
+    text-align: center;
+}
+
+.voiceMidTitleDiv{
+    height: 40px;
+    font-size: 20px;
+}
+
+/*.voiceMidMsgDiv{*/
+/*    font-size: 12px;*/
+/*    height: 20px;*/
+/*}*/
+
+.voiceWaveDiv{
+    height: 100px;
+}
+
+.wave-container{
+    width: 80%;
+    height: 80%;
+    margin: 0 auto;
+}
+
+.voiceBottomDiv{
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.voiceBottomLeftDiv{
+    display: flex;
+}
+
+
+.voiceBottomRightDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+
 @media screen and (max-width: 980px){
     #left-content {
         display: none;
@@ -464,6 +535,7 @@ a:hover {
         background-color: white;
         padding: 2%;
     }
+
 }
 
 .knowledge-select-container {

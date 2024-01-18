@@ -14,24 +14,27 @@ import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.ChatRequestLog;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
+import com.hkh.ai.domain.MediaFile;
 import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.request.AudioChatRequest;
+import com.hkh.ai.response.AudioChatResponse;
 import com.hkh.ai.service.ChatRequestLogService;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
+import com.hkh.ai.service.MediaFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,6 +57,7 @@ public class SseController {
     private final PromptRetrieverProperties promptRetrieverProperties;
     private final ChatRequestLogService chatRequestLogService;
 
+    private final MediaFileService mediaFileService;
     @SneakyThrows
     @PostMapping(path = "send")
     @ResponseBody
@@ -104,6 +108,45 @@ public class SseController {
             }
         }
         return ResultData.success(nearestList,"发送成功");
+    }
+
+    @PostMapping(path = "audioChat")
+    @ResponseBody
+    public ResultData<AudioChatResponse> audioChat(HttpServletRequest httpServletRequest, @RequestBody AudioChatRequest request) {
+        SseEmitter sseEmitter = sseCache.get(request.getSessionId());
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        List<String> nearestList = new ArrayList<>();
+        List<Conversation> history = new ArrayList<>();
+        if (request.getUseHistory()){
+            history = conversationService.history(request.getSid());
+        }
+        CustomChatMessage customChatMessage = new CustomChatMessage(request.getContent(), request.getSid());
+        ChatService chatService = chatServiceFactory.getChatService();
+        if (request.getUseLk()){
+            VectorStore vectorStore = vectorStoreFactory.getVectorStore();
+            Vectorization vectorization = vectorizationFactory.getEmbedding();
+            if (vectorization instanceof LocalAiVectorization){
+                // 使用 weaviate向量数据库内置的嵌入向量模型
+                nearestList = vectorStore.nearest(request.getContent(),request.getKid());
+            }else {
+                // 使用外部的嵌入向量模型
+                List<Double> queryVector = embeddingService.getQueryVector(request.getContent());
+                nearestList = vectorStore.nearest(queryVector,request.getKid());
+            }
+            log.info("知识库向量检索结果为{}",nearestList);
+        }
+        AudioChatResponse audioChatResponse = new AudioChatResponse();
+        audioChatResponse.setNearestList(nearestList);
+        if (request.getUseLk() && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
+            String goalKeeperWords = "对不起，本地知识库未找到相关内容，请您尝试其他提问方式。";
+            conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), customChatMessage.getContent(), "Q");
+            conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), goalKeeperWords, "A");
+            audioChatResponse.setContent(goalKeeperWords);
+            return ResultData.success(audioChatResponse,"发送成功");
+        }else {
+            chatService.audioChat(customChatMessage,nearestList,history,sseEmitter,sysUser, request.getMediaId());
+            return ResultData.success(audioChatResponse,"发送成功");
+        }
     }
 
     @GetMapping(path = "over")

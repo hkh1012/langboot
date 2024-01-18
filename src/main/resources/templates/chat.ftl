@@ -13,6 +13,14 @@
 <#--    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>-->
     <script src="/static/js/showdown.min.js"></script>
     <script src="/static/js/common/confirm.js"></script>
+    <script src="/static/js/recorder/recorder.mp3.min.js"></script>
+<#--    <script src="/static/js/recorder/recorder.wav.min.js"></script>-->
+    <script src="/static/js/recorder/app.js"></script>
+
+    <script src="/static/js/recorder/engine/wav.js"></script>
+    <script src="/static/js/recorder/extensions/waveview.js"></script>
+    <script src="/static/js/recorder/extensions/wavesurfer.view.js"></script>
+
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -74,7 +82,7 @@
                 </div>
             </div>
         </div>
-        <div class="row bottom-fix-btn" style="position: fixed;height: 50px;background-color: #fff;left: 50%;bottom: 10px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;display: flex;">
+        <div class="row bottom-fix-btn" id="chatOpeDiv" style="position: fixed;height: 50px;background-color: #fff;left: 50%;bottom: 10px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;display: flex;">
             <div class="col-md-12 chat-input" >
                 <div class="col-md-1 chat-icons">
                     <a title="删除对话内容" class="iconA" href="javascript:void(0);" onclick="removeConversation(this);">
@@ -96,11 +104,43 @@
                         </svg>
                     </a>
                 </div>
-                <div class="col-md-10 chat-input-mid" style="margin-left: 0px;margin-right: 0px;">
+                <div class="col-md-10 chat-input-mid" style="margin-left: 0px;margin-right: 0px;display: flex;justify-content: flex-end;align-items: center;">
                     <input type="text" id="sayContent" class="form-control" placeholder="来说点什么吧...">
+                        <svg onclick="triggerToVoice();" class="voice-btn" xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512" fill="currentColor">
+                            <path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/>
+                        </svg>
                 </div>
                 <div class="col-md-1" style="text-align: center;padding-left: 0px;padding-right: 0px;">
                     <button id="sendBtn" class="btn btn-success" data-loading-text="发送中..." style="width: 100%;margin-left: 0px;" type="submit">发 送</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row bottom-fix-btn h" id="voiceDiv" style="position: fixed;background-color: #fff;left: 50%;bottom: 10px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;">
+            <div class="voiceTopDiv">
+                <svg class="voice-close-btn" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512" fill="currentColor" onclick="closeVoiceDiv();">
+                    <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                    <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/>
+                </svg>
+            </div>
+            <div class="voiceMidDiv">
+<#--                <div class="voiceMidTitleDiv" id="voiceMidTitleDiv">我在听，请说话</div>-->
+                <div class="voiceMidTitleDiv" id="voiceMidTitleDiv">点击按钮，开始录音</div>
+<#--                <div class="voiceMidMsgDiv">点击下方，停止录音</div>-->
+            </div>
+            <div class="voiceWaveDiv">
+                <div class="wave-container"></div>
+            </div>
+            <div class="voiceBottomDiv">
+                <div class="voiceBottomLeftDiv">
+                    <button id="voiceRecordBtn" onclick="voiceStartRecord();" class="btn btn-gray" data-loading-text="录音..." style="width: 100%;margin-left: 3px;" type="button">录音</button>
+                    <button id="voicePauseBtn" onclick="voicePauseRecord();" class="btn btn-gray" disabled data-loading-text="暂停..." style="width: 100%;margin-left: 3px;" type="button">暂停</button>
+                    <button id="voiceStopBtn" onclick="voiceStopRecord();" class="btn btn-gray" disabled data-loading-text="停止..." style="width: 100%;margin-left: 3px;" type="button">停止</button>
+                    <button id="voicePlayBtn" onclick="voicePlayRecord();" class="btn btn-gray" disabled data-loading-text="播放..." style="width: 100%;margin-left: 3px;" type="button">播放</button>
+                </div>
+                <div class="voiceBottomRightDiv">
+                    <button id="voiceRedoBtn" onclick="voiceRedo();" class="btn btn-gray" disabled data-loading-text="取消..." style="width: 100%;margin-left: 3px;" type="button">取消</button>
+                    <button id="voiceConfirmBtn" onclick="voiceSubmitRecord();" class="btn btn-gray" disabled data-loading-text="上传中..." style="width: 100%;margin-left: 3px;" type="button">提交</button>
                 </div>
             </div>
         </div>

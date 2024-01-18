@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.ai.mapper.MediaFileMapper">
+
+    <resultMap id="BaseResultMap" type="com.hkh.ai.domain.MediaFile">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="mfid" column="mfid" jdbcType="VARCHAR"/>
+            <result property="cid" column="cid" jdbcType="INTEGER"/>
+            <result property="mediaType" column="media_type" jdbcType="INTEGER"/>
+            <result property="fileSuffix" column="file_suffix" jdbcType="VARCHAR"/>
+            <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
+            <result property="fileSize" column="file_size" jdbcType="BIGINT"/>
+            <result property="fileTime" column="file_time" jdbcType="BIGINT"/>
+            <result property="filePath" column="file_path" jdbcType="VARCHAR"/>
+            <result property="httpUrl" column="http_url" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,cid,mfid,media_type,
+        file_suffix,file_name,file_size,
+        file_time,file_path,http_url,
+        create_time,create_by
+    </sql>
+</mapper>

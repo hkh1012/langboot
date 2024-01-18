@@ -20,10 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -126,5 +127,19 @@ public class ChatglmChatService implements ChatService {
     @Override
     public String functionCompletion(String content,String functionName,String description ,Class clazz) {
         return JSONObject.toJSONString(blockCompletion(content));
+    }
+
+    @Override
+    public String audioToText(File audio,String prompt) {
+        return null;
+    }
+
+    @Override
+    public void audioChat(CustomChatMessage customChatMessage, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser,String mediaId) {
+    }
+
+    @Override
+    public InputStream createSpeech(String content) {
+        return null;
     }
 }

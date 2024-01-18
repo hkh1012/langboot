@@ -12,7 +12,7 @@ import java.util.List;
 */
 public interface ConversationService extends IService<Conversation> {
 
-    void saveConversation(Integer userId, String sessionId, String content, String qa);
+    int saveConversation(Integer userId, String sessionId, String content, String qa);
 
     List<Conversation> listBySessionId(String sessionId);
 
