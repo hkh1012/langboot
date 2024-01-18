@@ -508,6 +508,7 @@ function voiceStartRecord(){
     $("#voiceStopBtn").removeAttr("disabled");
     $("#voicePlayBtn").attr("disabled","disabled");
     $("#voiceRedoBtn").removeAttr("disabled");
+    $("#voiceMidTitleDiv").html("我在听，请说话");
 }
 
 function voicePauseRecord(){
@@ -530,6 +531,7 @@ function voiceStopRecord(){
     $("#voiceStopBtn").attr("disabled","disabled");
     $("#voicePlayBtn").removeAttr("disabled");
     $("#voiceConfirmBtn").removeAttr("disabled");
+    $("#voiceMidTitleDiv").html("点击按钮，开始录音");
 }
 
 function voicePlayRecord(){
@@ -548,6 +550,7 @@ function voiceRedo(){
     recordStatus.started = false;
     recordStatus.pausing = false;
     recordStatus.recording = false;
+    recStop();
     wave = null;
     recBlob = null;
     audio = null;
@@ -557,10 +560,12 @@ function voiceRedo(){
     $("#voicePlayBtn").attr("disabled","disabled");
     $("#voiceRedoBtn").attr("disabled","disabled");
     $("#voiceConfirmBtn").attr("disabled","disabled");
+    $("#voiceMidTitleDiv").html("点击按钮，开始录音");
 }
 
 function voiceSubmitRecord(){
     recUpload();
+    $("#voiceMidTitleDiv").html("点击按钮，开始录音");
 }
 
 

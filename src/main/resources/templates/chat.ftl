@@ -124,7 +124,8 @@
                 </svg>
             </div>
             <div class="voiceMidDiv">
-                <div class="voiceMidTitleDiv">我在听，请说话</div>
+<#--                <div class="voiceMidTitleDiv" id="voiceMidTitleDiv">我在听，请说话</div>-->
+                <div class="voiceMidTitleDiv" id="voiceMidTitleDiv">点击按钮，开始录音</div>
 <#--                <div class="voiceMidMsgDiv">点击下方，停止录音</div>-->
             </div>
             <div class="voiceWaveDiv">
