@@ -483,11 +483,11 @@ var recordStatus = {
 }
 
 function closeVoiceDiv(){
-    voiceRedo();
     $("#chatOpeDiv").removeClass("h");
     $("#voiceDiv").addClass("h");
     $("#chatList").removeClass("margin-bottom250");
     conversation.scrollTop = conversation.scrollHeight;
+    voiceCancel();
 }
 
 function triggerToVoice(){
@@ -507,7 +507,7 @@ function voiceStartRecord(){
     $("#voicePauseBtn").removeAttr("disabled");
     $("#voiceStopBtn").removeAttr("disabled");
     $("#voicePlayBtn").attr("disabled","disabled");
-    $("#voiceRedoBtn").removeAttr("disabled");
+    $("#voiceCancelBtn").removeAttr("disabled");
     $("#voiceMidTitleDiv").html("我在听，请说话");
 }
 
@@ -525,13 +525,13 @@ function voicePauseRecord(){
 function voiceStopRecord(){
     recordStatus.started = false;
     recordStatus.recording = false;
-    recStop();
-    $("#voiceRecordBtn").removeAttr("disabled");
+    // $("#voiceRecordBtn").removeAttr("disabled");
     $("#voicePauseBtn").attr("disabled","disabled");
     $("#voiceStopBtn").attr("disabled","disabled");
     $("#voicePlayBtn").removeAttr("disabled");
-    $("#voiceConfirmBtn").removeAttr("disabled");
-    $("#voiceMidTitleDiv").html("点击按钮，开始录音");
+    $("#voiceSubmitBtn").removeAttr("disabled");
+    $("#voiceMidTitleDiv").html("点击按钮，提交录音");
+    recStop();
 }
 
 function voicePlayRecord(){
@@ -545,25 +545,35 @@ function voicePlayRecord(){
     recordStatus.playing = !recordStatus.playing;
 }
 
-function voiceRedo(){
-    recordStatus.playing = false;
-    recordStatus.started = false;
-    recordStatus.pausing = false;
-    recordStatus.recording = false;
+function voiceCancel(){
+    initRecordStatus();
+    initRecordBtns();
+    $("#voiceMidTitleDiv").html("点击按钮，开始录音");
     recStop();
     wave = null;
     recBlob = null;
     audio = null;
+}
+
+function initRecordStatus(){
+    recordStatus.playing = false;
+    recordStatus.started = false;
+    recordStatus.pausing = false;
+    recordStatus.recording = false;
+}
+
+function initRecordBtns(){
     $("#voiceRecordBtn").removeAttr("disabled");
     $("#voicePauseBtn").attr("disabled","disabled");
     $("#voiceStopBtn").attr("disabled","disabled");
     $("#voicePlayBtn").attr("disabled","disabled");
-    $("#voiceRedoBtn").attr("disabled","disabled");
-    $("#voiceConfirmBtn").attr("disabled","disabled");
-    $("#voiceMidTitleDiv").html("点击按钮，开始录音");
+    $("#voiceCancelBtn").attr("disabled","disabled");
+    $("#voiceSubmitBtn").attr("disabled","disabled");
 }
 
 function voiceSubmitRecord(){
+    initRecordBtns();
+    initRecordStatus();
     recUpload();
     $("#voiceMidTitleDiv").html("点击按钮，开始录音");
 }

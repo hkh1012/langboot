@@ -139,8 +139,8 @@
                     <button id="voicePlayBtn" onclick="voicePlayRecord();" class="btn btn-gray" disabled data-loading-text="播放..." style="width: 100%;margin-left: 3px;" type="button">播放</button>
                 </div>
                 <div class="voiceBottomRightDiv">
-                    <button id="voiceRedoBtn" onclick="voiceRedo();" class="btn btn-gray" disabled data-loading-text="取消..." style="width: 100%;margin-left: 3px;" type="button">取消</button>
-                    <button id="voiceConfirmBtn" onclick="voiceSubmitRecord();" class="btn btn-gray" disabled data-loading-text="上传中..." style="width: 100%;margin-left: 3px;" type="button">提交</button>
+                    <button id="voiceCancelBtn" onclick="voiceCancel();" class="btn btn-gray" disabled data-loading-text="取消..." style="width: 100%;margin-left: 3px;" type="button">取消</button>
+                    <button id="voiceSubmitBtn" onclick="voiceSubmitRecord();" class="btn btn-gray" disabled data-loading-text="上传中..." style="width: 100%;margin-left: 3px;" type="button">提交</button>
                 </div>
             </div>
         </div>
