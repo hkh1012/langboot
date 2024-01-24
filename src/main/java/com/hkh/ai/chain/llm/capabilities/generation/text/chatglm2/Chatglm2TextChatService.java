@@ -1,7 +1,7 @@
-package com.hkh.ai.chain.llm;
+package com.hkh.ai.chain.llm.capabilities.generation.text.chatglm2;
 
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSONObject;
+import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;
@@ -20,15 +20,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
 @Slf4j
-public class ChatglmChatService implements ChatService {
+public class Chatglm2TextChatService implements TextChatService {
 
     @Value("${chain.llm.chatglm.baseurl}")
     private String baseUrl;
@@ -42,7 +40,7 @@ public class ChatglmChatService implements ChatService {
     @Override
     public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser){
         // 参考 OpenAi 库实现 Chatglm 流式对话
-        ChatglmService service = new ChatglmService(baseUrl);
+        Chatglm2Service service = new Chatglm2Service(baseUrl);
 
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
@@ -102,7 +100,7 @@ public class ChatglmChatService implements ChatService {
 
     @Override
     public String blockCompletion(String content) {
-        ChatglmService service = new ChatglmService(baseUrl);
+        Chatglm2Service service = new Chatglm2Service(baseUrl);
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
         List<Integer> promptTokens = enc.encode(content);
@@ -124,22 +122,4 @@ public class ChatglmChatService implements ChatService {
         return chatCompletion.getChoices().get(0).getMessage().getContent();
     }
 
-    @Override
-    public String functionCompletion(String content,String functionName,String description ,Class clazz) {
-        return JSONObject.toJSONString(blockCompletion(content));
-    }
-
-    @Override
-    public String audioToText(File audio,String prompt) {
-        return null;
-    }
-
-    @Override
-    public void audioChat(CustomChatMessage customChatMessage, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser,String mediaId) {
-    }
-
-    @Override
-    public InputStream createSpeech(String content) {
-        return null;
-    }
 }

@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
+@Deprecated
 public class LocalAiVectorization implements Vectorization {
     @Override
     public List<List<Double>> batchVectorization(List<String> chunkList) {

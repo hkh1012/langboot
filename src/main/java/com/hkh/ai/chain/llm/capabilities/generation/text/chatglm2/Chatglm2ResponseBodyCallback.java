@@ -1,4 +1,4 @@
-package com.hkh.ai.chain.llm;
+package com.hkh.ai.chain.llm.capabilities.generation.text.chatglm2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.OpenAiError;
@@ -17,13 +17,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class ChatglmResponseBodyCallback implements Callback<ResponseBody> {
+public class Chatglm2ResponseBodyCallback implements Callback<ResponseBody> {
     private static final ObjectMapper mapper = OpenAiService.defaultObjectMapper();
 
     private FlowableEmitter<SSE> emitter;
     private boolean emitDone;
 
-    public ChatglmResponseBodyCallback(FlowableEmitter<SSE> emitter, boolean emitDone) {
+    public Chatglm2ResponseBodyCallback(FlowableEmitter<SSE> emitter, boolean emitDone) {
         this.emitter = emitter;
         this.emitDone = emitDone;
     }

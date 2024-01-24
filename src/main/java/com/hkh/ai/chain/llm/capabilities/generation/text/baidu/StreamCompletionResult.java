@@ -1,9 +1,13 @@
-package com.hkh.ai.chain.llm.baiduqianfan;
+package com.hkh.ai.chain.llm.capabilities.generation.text.baidu;
 
 import lombok.Data;
 
+/**
+ * 流式响应结果
+ * @author huangkh
+ */
 @Data
-public class BlockCompletionResult {
+public class StreamCompletionResult {
 
     private String id;
 
@@ -11,9 +15,13 @@ public class BlockCompletionResult {
 
     private Long created;
 
-    private String result;
+    private Integer sentence_id;
+
+    private Boolean is_end;
 
     private Boolean is_truncated;
+
+    private String result;
 
     private Boolean need_clear_history;
 

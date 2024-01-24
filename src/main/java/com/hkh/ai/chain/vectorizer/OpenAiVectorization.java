@@ -16,7 +16,6 @@ import java.util.List;
 
 @Component
 @Slf4j
-@Primary
 public class OpenAiVectorization implements Vectorization {
 
     @Value("${chain.vectorization.openai.model}")

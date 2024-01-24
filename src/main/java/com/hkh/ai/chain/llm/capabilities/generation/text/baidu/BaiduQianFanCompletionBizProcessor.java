@@ -1,4 +1,4 @@
-package com.hkh.ai.chain.llm.baiduqianfan;
+package com.hkh.ai.chain.llm.capabilities.generation.text.baidu;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.ai.domain.CustomChatMessage;

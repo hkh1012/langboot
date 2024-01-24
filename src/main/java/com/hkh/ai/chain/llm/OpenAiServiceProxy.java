@@ -14,8 +14,6 @@ import java.util.concurrent.ExecutorService;
 @Component
 public class OpenAiServiceProxy {
 
-
-
     @Value("${proxy.enable}")
     private Boolean proxyEnable;
 
@@ -31,7 +29,7 @@ public class OpenAiServiceProxy {
     @Value("${chain.llm.openai.token}")
     private String apiToken;
 
-    @Value("${chain.llm.openai.baseurl}")
+    @Value("${proxy.http.baseurl}")
     private String baseUrl;
 
     public OpenAiService service(){

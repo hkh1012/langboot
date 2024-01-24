@@ -1,4 +1,4 @@
-package com.hkh.ai.chain.llm;
+package com.hkh.ai.chain.llm.capabilities.generation.text.chatglm2;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -39,6 +39,7 @@ import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
@@ -46,7 +47,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ChatglmService {
+public class Chatglm2Service {
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300L);
     private static final ObjectMapper mapper = defaultObjectMapper();
 
@@ -57,7 +58,7 @@ public class ChatglmService {
      * Creates a new OpenAiService that wraps OpenAiApi
      *
      */
-    public ChatglmService(String baseUrl) {
+    public Chatglm2Service(String baseUrl) {
         this(baseUrl,DEFAULT_TIMEOUT);
     }
 
@@ -66,7 +67,7 @@ public class ChatglmService {
      *
      * @param timeout http read timeout, Duration.ZERO means no timeout
      */
-    public ChatglmService(String baseUrl,final Duration timeout) {
+    public Chatglm2Service(String baseUrl, final Duration timeout) {
         ObjectMapper mapper = defaultObjectMapper();
         OkHttpClient client = defaultClient(timeout);
         Retrofit retrofit = defaultRetrofit(baseUrl,client, mapper);
@@ -82,7 +83,7 @@ public class ChatglmService {
      *
      * @param api OpenAiApi instance to use for all methods
      */
-    public ChatglmService(final OpenAiApi api) {
+    public Chatglm2Service(final OpenAiApi api) {
         this.api = api;
         this.executorService = null;
     }
@@ -97,7 +98,7 @@ public class ChatglmService {
      * @param api             OpenAiApi instance to use for all methods
      * @param executorService the ExecutorService from client.dispatcher().executorService()
      */
-    public ChatglmService(final OpenAiApi api, final ExecutorService executorService) {
+    public Chatglm2Service(final OpenAiApi api, final ExecutorService executorService) {
         this.api = api;
         this.executorService = executorService;
     }
@@ -144,7 +145,7 @@ public class ChatglmService {
 
     public File uploadFile(String purpose, String filepath) {
         java.io.File file = new java.io.File(filepath);
-        RequestBody purposeBody = RequestBody.create(okhttp3.MultipartBody.FORM, purpose);
+        RequestBody purposeBody = RequestBody.create(MultipartBody.FORM, purpose);
         RequestBody fileBody = RequestBody.create(MediaType.parse("text"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", filepath, fileBody);
 
@@ -286,7 +287,7 @@ public class ChatglmService {
      * @param emitDone If true the last message ([DONE]) is emitted
      */
     public static Flowable<SSE> stream(Call<ResponseBody> apiCall, boolean emitDone) {
-        return Flowable.create(emitter -> apiCall.enqueue(new ChatglmResponseBodyCallback(emitter, emitDone)), BackpressureStrategy.BUFFER);
+        return Flowable.create(emitter -> apiCall.enqueue(new Chatglm2ResponseBodyCallback(emitter, emitDone)), BackpressureStrategy.BUFFER);
     }
 
     /**

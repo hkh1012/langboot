@@ -1,4 +1,4 @@
-package com.hkh.ai.chain.llm.baiduqianfan;
+package com.hkh.ai.chain.llm.capabilities.generation.text.baidu;
 
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.PostConstruct;
@@ -11,8 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
 
 /**
  * 百度千帆 web client
@@ -53,7 +51,7 @@ public class BaiduQianFanCompletionWebClient {
 
     }
 
-    public Flux<JSONObject> createFlux(JSONObject requestBody,BaiduQianFanCompletionBizProcessor baiduQianFanCompletionBizProcessor){
+    public Flux<JSONObject> createFlux(JSONObject requestBody, BaiduQianFanCompletionBizProcessor baiduQianFanCompletionBizProcessor){
         log.info("createFlux 参数：{}",requestBody);
         Flux<JSONObject> flux = Flux.create(emitter -> {
             emitter.next(requestBody);

@@ -1,7 +1,5 @@
 package com.hkh.ai.chain.vectorstore;
 
-import com.hkh.ai.chain.retrieve.PromptRetrieverFactory;
-import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.DataType;
 import io.milvus.grpc.SearchResults;
@@ -47,8 +45,6 @@ public class MilvusVectorStore implements VectorStore{
     private String collectionName;
 
     private MilvusServiceClient milvusServiceClient;
-    private final PromptRetrieverFactory promptRetrieverFactory;
-    private final PromptRetrieverProperties promptRetrieverProperties;
 
     @PostConstruct
     public void init(){
@@ -59,11 +55,6 @@ public class MilvusVectorStore implements VectorStore{
                         .withDatabaseName("default")
                         .build()
         );
-    }
-
-    public MilvusVectorStore(PromptRetrieverFactory promptRetrieverFactory, PromptRetrieverProperties promptRetrieverProperties) {
-        this.promptRetrieverFactory = promptRetrieverFactory;
-        this.promptRetrieverProperties = promptRetrieverProperties;
     }
 
     private void createSchema(String kid) {

@@ -1,9 +1,9 @@
-package com.hkh.ai.chain.llm.baiduqianfan;
+package com.hkh.ai.chain.llm.capabilities.generation;
 
 /**
  * 百度千帆相关 API
  */
-public interface ChatApis {
+public interface BaiduChatApis {
 
     String ERNIE_BOT = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions";
 

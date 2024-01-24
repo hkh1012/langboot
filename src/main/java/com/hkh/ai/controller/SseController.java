@@ -1,27 +1,21 @@
 package com.hkh.ai.controller;
 
-import cn.hutool.core.collection.CollectionUtil;
-import com.hkh.ai.chain.llm.ChatService;
-import com.hkh.ai.chain.llm.ChatServiceFactory;
-import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
+import com.hkh.ai.chain.llm.capabilities.generation.audio.AudioChatService;
+import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.chain.vectorizer.LocalAiVectorization;
 import com.hkh.ai.chain.vectorizer.Vectorization;
-import com.hkh.ai.chain.vectorizer.VectorizationFactory;
 import com.hkh.ai.chain.vectorstore.VectorStore;
-import com.hkh.ai.chain.vectorstore.VectorStoreFactory;
 import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.ChatRequestLog;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
-import com.hkh.ai.domain.MediaFile;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.request.AudioChatRequest;
 import com.hkh.ai.response.AudioChatResponse;
 import com.hkh.ai.service.ChatRequestLogService;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
-import com.hkh.ai.service.MediaFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -31,11 +25,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -48,16 +41,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SseController {
     private static Map<String, SseEmitter> sseCache = new ConcurrentHashMap<>();
 
-    private final ChatServiceFactory chatServiceFactory;
-    private final VectorStoreFactory vectorStoreFactory;
-    private final VectorizationFactory vectorizationFactory;
+    private final TextChatService textChatService;
+    private final AudioChatService audioChatService;
+    private final VectorStore vectorStore;
+    private final Vectorization vectorization;
 
     private final EmbeddingService embeddingService;
     private final ConversationService conversationService;
-    private final PromptRetrieverProperties promptRetrieverProperties;
     private final ChatRequestLogService chatRequestLogService;
 
-    private final MediaFileService mediaFileService;
     @SneakyThrows
     @PostMapping(path = "send")
     @ResponseBody
@@ -78,10 +70,7 @@ public class SseController {
                 history = conversationService.history(sid);
             }
             CustomChatMessage customChatMessage = new CustomChatMessage(content,sid);
-            ChatService chatService = chatServiceFactory.getChatService();
             if (useLk){
-                VectorStore vectorStore = vectorStoreFactory.getVectorStore();
-                Vectorization vectorization = vectorizationFactory.getEmbedding();
                 if (vectorization instanceof LocalAiVectorization){
                     // 使用 weaviate向量数据库内置的嵌入向量模型
                     nearestList = vectorStore.nearest(content,kid);
@@ -92,20 +81,7 @@ public class SseController {
                 }
                 log.info("知识库向量检索结果为{}",nearestList);
             }
-            if (useLk && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
-                try {
-                    String goalKeeperWords = "Sorry，本地知识库未找到相关内容，请您尝试其他方式。";
-                    conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), customChatMessage.getContent(), "Q");
-                    conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), goalKeeperWords, "A");
-                    sseEmitter.send(goalKeeperWords);
-                    sseEmitter.send("[END]");
-                } catch (IOException e) {
-                    log.error("sseEmitter send occur error",e);
-                    throw new RuntimeException(e);
-                }
-            }else {
-                chatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
-            }
+            textChatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
         }
         return ResultData.success(nearestList,"发送成功");
     }
@@ -121,10 +97,7 @@ public class SseController {
             history = conversationService.history(request.getSid());
         }
         CustomChatMessage customChatMessage = new CustomChatMessage(request.getContent(), request.getSid());
-        ChatService chatService = chatServiceFactory.getChatService();
         if (request.getUseLk()){
-            VectorStore vectorStore = vectorStoreFactory.getVectorStore();
-            Vectorization vectorization = vectorizationFactory.getEmbedding();
             if (vectorization instanceof LocalAiVectorization){
                 // 使用 weaviate向量数据库内置的嵌入向量模型
                 nearestList = vectorStore.nearest(request.getContent(),request.getKid());
@@ -137,16 +110,9 @@ public class SseController {
         }
         AudioChatResponse audioChatResponse = new AudioChatResponse();
         audioChatResponse.setNearestList(nearestList);
-        if (request.getUseLk() && promptRetrieverProperties.isStrict() && nearestList.size() == 0){
-            String goalKeeperWords = "对不起，本地知识库未找到相关内容，请您尝试其他提问方式。";
-            conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), customChatMessage.getContent(), "Q");
-            conversationService.saveConversation(sysUser.getId(),customChatMessage.getSessionId(), goalKeeperWords, "A");
-            audioChatResponse.setContent(goalKeeperWords);
-            return ResultData.success(audioChatResponse,"发送成功");
-        }else {
-            chatService.audioChat(customChatMessage,nearestList,history,sseEmitter,sysUser, request.getMediaId());
-            return ResultData.success(audioChatResponse,"发送成功");
-        }
+        audioChatService.audioChat(customChatMessage,nearestList,history,sseEmitter,sysUser, request.getMediaId());
+        return ResultData.success(audioChatResponse,"发送成功");
+
     }
 
     @GetMapping(path = "over")

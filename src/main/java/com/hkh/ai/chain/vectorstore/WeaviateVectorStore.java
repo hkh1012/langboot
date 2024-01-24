@@ -3,8 +3,6 @@ package com.hkh.ai.chain.vectorstore;
 import cn.hutool.core.lang.UUID;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.internal.LinkedTreeMap;
-import com.hkh.ai.chain.retrieve.PromptRetriever;
-import com.hkh.ai.chain.retrieve.PromptRetrieverFactory;
 import com.hkh.ai.chain.retrieve.PromptRetrieverProperties;
 import io.weaviate.client.Config;
 import io.weaviate.client.WeaviateClient;
@@ -17,7 +15,10 @@ import io.weaviate.client.v1.graphql.model.GraphQLResponse;
 import io.weaviate.client.v1.graphql.query.argument.NearTextArgument;
 import io.weaviate.client.v1.graphql.query.argument.NearVectorArgument;
 import io.weaviate.client.v1.graphql.query.fields.Field;
-import io.weaviate.client.v1.misc.model.*;
+import io.weaviate.client.v1.misc.model.Meta;
+import io.weaviate.client.v1.misc.model.ReplicationConfig;
+import io.weaviate.client.v1.misc.model.ShardingConfig;
+import io.weaviate.client.v1.misc.model.VectorIndexConfig;
 import io.weaviate.client.v1.schema.model.DataType;
 import io.weaviate.client.v1.schema.model.Property;
 import io.weaviate.client.v1.schema.model.Schema;
@@ -27,7 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -41,11 +45,9 @@ public class WeaviateVectorStore implements VectorStore{
     @Value("${chain.vector.store.weaviate.classname}")
     private String className;
 
-    private final PromptRetrieverFactory promptRetrieverFactory;
     private final PromptRetrieverProperties promptRetrieverProperties;
 
-    public WeaviateVectorStore(PromptRetrieverFactory promptRetrieverFactory, PromptRetrieverProperties promptRetrieverProperties) {
-        this.promptRetrieverFactory = promptRetrieverFactory;
+    public WeaviateVectorStore(PromptRetrieverProperties promptRetrieverProperties) {
         this.promptRetrieverProperties = promptRetrieverProperties;
     }
 
@@ -316,9 +318,7 @@ public class WeaviateVectorStore implements VectorStore{
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
         ArrayList<LinkedTreeMap> m = l.get(className + kid);
-        PromptRetriever<ArrayList<LinkedTreeMap>> promptRetriever = promptRetrieverFactory.getPromptRetriever();
-        ArrayList<LinkedTreeMap> retrieved = promptRetriever.retrieve(m);
-        for (LinkedTreeMap linkedTreeMap : retrieved){
+        for (LinkedTreeMap linkedTreeMap : m){
             String content = linkedTreeMap.get("content").toString();
             resultList.add(content);
         }
@@ -352,9 +352,7 @@ public class WeaviateVectorStore implements VectorStore{
         LinkedTreeMap<String,Object> t = (LinkedTreeMap<String, Object>) result.getResult().getData();
         LinkedTreeMap<String,ArrayList<LinkedTreeMap>> l = (LinkedTreeMap<String, ArrayList<LinkedTreeMap>>) t.get("Get");
         ArrayList<LinkedTreeMap> m = l.get(className + kid);
-        PromptRetriever<ArrayList<LinkedTreeMap>> promptRetriever = promptRetrieverFactory.getPromptRetriever();
-        ArrayList<LinkedTreeMap> retrieved = promptRetriever.retrieve(m);
-        for (LinkedTreeMap linkedTreeMap : retrieved){
+        for (LinkedTreeMap linkedTreeMap : m){
             String content = linkedTreeMap.get("content").toString();
             resultList.add(content);
         }
