@@ -1,13 +1,11 @@
 package com.hkh.ai.controller;
 
-import com.hkh.ai.chain.llm.capabilities.generation.audio.AudioChatService;
 import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.annotation.AdminRequired;
 import com.hkh.ai.common.constant.SysConstants;
-import com.hkh.ai.domain.MediaFile;
 import com.hkh.ai.domain.SysUser;
-import com.hkh.ai.request.*;
-import com.hkh.ai.service.MediaFileService;
+import com.hkh.ai.request.SpecialNounRemoveRequest;
+import com.hkh.ai.request.SpecialNounSaveRequest;
 import com.hkh.ai.service.SpecialNounService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.File;
 
 /**
  * 专有名称功能

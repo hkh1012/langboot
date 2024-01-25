@@ -8,12 +8,13 @@
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="pinyin" column="pinyin" jdbcType="VARCHAR"/>
             <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="sort" column="sort" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,pinyin,content,
+        id,pinyin,content,sort,
         create_time,create_by
     </sql>
 </mapper>

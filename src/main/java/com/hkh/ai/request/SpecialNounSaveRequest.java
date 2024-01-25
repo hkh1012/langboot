@@ -11,4 +11,6 @@ public class SpecialNounSaveRequest {
 
     private String content;
 
+    private Integer sort;
+
 }

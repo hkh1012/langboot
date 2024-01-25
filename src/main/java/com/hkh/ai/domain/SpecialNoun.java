@@ -37,6 +37,12 @@ public class SpecialNoun implements Serializable {
     private String content;
 
     /**
+     * 排序字段
+     */
+    @TableField(value = "sort")
+    private Integer sort;
+
+    /**
      * 
      */
     @TableField(value = "create_time")

@@ -37,7 +37,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <input type="text" class="form-control input-round" id="special-search-content" value="${formData.searchContent}" placeholder="专有名词内容/拼音">
+            <input type="text" class="form-control input-round" id="special-search-content" value="${formData.searchContent}" placeholder="专业名词内容/拼音">
         </div>
         <div class="col">
             <button type="submit" class="btn btn-outline-success btn-round" onclick="searchSpecialNoun();">搜索</button>
@@ -54,6 +54,7 @@
             <th scope="col"> #      </th>
             <th scope="col"> 专有名词	</th>
             <th scope="col"> 拼音	</th>
+            <th scope="col"> 排序	</th>
             <th scope="col"> 操作	</th>
         </tr>
         </thead>
@@ -65,8 +66,9 @@
                     </th>
                     <td> ${item.content} </td>
                     <td> ${item.pinyin} </td>
+                    <td> ${item.sort} </td>
                     <td>
-                        <span class="btn btn-sm btn-outline-primary btn-round" onclick="editSpecialNoun({id:'${item.id}',content:'${item.content}',pinyin:'${item.pinyin}'});">编辑</span>
+                        <span class="btn btn-sm btn-outline-primary btn-round" onclick="editSpecialNoun({id:'${item.id}',content:'${item.content}',pinyin:'${item.pinyin}',sort:'${item.sort}'});">编辑</span>
                         <span class="btn btn-sm btn-outline-danger btn-round" onclick="removeSpecialNoun('${item.id}')">删除</span>
                     </td>
                 </tr>
@@ -98,6 +100,7 @@
             <div class="col">
                 <input type="text" class="form-control form-check-inline" id="special-content" placeholder="专有名词">
                 <input type="text" class="form-control form-check-inline" id="special-pinyin" placeholder="拼音">
+                <input type="text" class="form-control form-check-inline" id="special-sort" placeholder="排序字段">
                 <input type="hidden" class="form-control" id="special-id">
             </div>
         </div>
