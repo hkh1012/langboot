@@ -44,6 +44,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <#if sysUser.adminFlag == true>
                             <a class="dropdown-item" href="/knowledge/index" >知识库管理</a>
+                            <a class="dropdown-item" href="/special/index" >名词管理</a>
                         </#if>
 
                         <a class="dropdown-item" href="/logout">退出系统</a>

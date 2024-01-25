@@ -3,16 +3,15 @@ package com.hkh.ai.controller;
 import com.github.pagehelper.PageInfo;
 import com.hkh.ai.common.annotation.AdminRequired;
 import com.hkh.ai.common.constant.SysConstants;
-import com.hkh.ai.domain.Knowledge;
-import com.hkh.ai.domain.KnowledgeAttach;
-import com.hkh.ai.domain.KnowledgeFragment;
-import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.domain.*;
 import com.hkh.ai.request.KnowledgeAttachPageRequest;
 import com.hkh.ai.request.KnowledgeFragmentPageRequest;
 import com.hkh.ai.request.KnowledgePageRequest;
+import com.hkh.ai.request.SpecialNounPageRequest;
 import com.hkh.ai.service.KnowledgeAttachService;
 import com.hkh.ai.service.KnowledgeFragmentService;
 import com.hkh.ai.service.KnowledgeService;
+import com.hkh.ai.service.SpecialNounService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -30,6 +29,7 @@ public class IndexController {
     private final KnowledgeService knowledgeService;
     private final KnowledgeAttachService knowledgeAttachService;
     private final KnowledgeFragmentService knowledgeFragmentService;
+    private final SpecialNounService specialNounService;
 
     @GetMapping(value = {"/"})
     public String root(HttpServletRequest request, Model model) {
@@ -290,5 +290,22 @@ public class IndexController {
         model.addAttribute("pageInfo",pageInfo);
         model.addAttribute("formData",knowledgeFragmentPageRequest);
         return "knowledge/fragment";
+    }
+
+    /**
+     * 专有名词管理页面
+     * @param request
+     * @param model
+     * @return
+     */
+    @GetMapping(value = {"/special/index"})
+    @AdminRequired
+    public String specialIndex(HttpServletRequest request, Model model, SpecialNounPageRequest specialNounPageRequest) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        model.addAttribute("sysUser",sysUser);
+        PageInfo<SpecialNoun> pageInfo = specialNounService.pageInfo(specialNounPageRequest);
+        model.addAttribute("pageInfo",pageInfo);
+        model.addAttribute("formData",specialNounPageRequest);
+        return "special/index";
     }
 }
