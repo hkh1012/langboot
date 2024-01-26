@@ -1,4 +1,4 @@
-package com.hkh.ai.chain.llm.capabilities.generation.text.baidu;
+package com.hkh.ai.chain.llm.capabilities.generation;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;

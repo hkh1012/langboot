@@ -34,13 +34,8 @@ public class OpenAiFunctionChatService implements FunctionChatService {
     private String defaultModel;
 
     @Autowired
-    private ConversationService conversationService;
-
-    @Autowired
     private OpenAiServiceProxy openAiServiceProxy;
 
-    @Autowired
-    private MediaFileService mediaFileService;
     @Override
     public String functionCompletion(String content,String functionName,String description ,Class clazz) {
         OpenAiService service = openAiServiceProxy.service();

@@ -46,9 +46,6 @@ public class OpenAiTextChatService implements TextChatService {
     @Autowired
     private OpenAiServiceProxy openAiServiceProxy;
 
-    @Autowired
-    private MediaFileService mediaFileService;
-
     @Override
     public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException {
         OpenAiService service = openAiServiceProxy.service();

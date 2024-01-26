@@ -30,7 +30,7 @@ public class TextChatServiceFactory {
     public TextChatService getTextChatService(){
         if("openai".equals(type)){
             return openAiTextChatService;
-        }else if("chatglm".equals(type)){
+        }else if("chatglm2".equals(type)){
             return chatglm2TextChatService;
         }else if("baidu".equals(type)){
             return baiduQianFanTextChatService;

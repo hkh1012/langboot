@@ -1,7 +1,7 @@
 package com.hkh.ai.domain.function;
 
 /**
- * 天气温度单位
+ * 日期区间枚举
  */
 public enum DatePeriod {
     THE_DAY_BEFORE_YESTERDAY("前天"),

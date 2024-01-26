@@ -1,6 +1,7 @@
-package com.hkh.ai.chain.llm.capabilities.generation.text.baidu;
+package com.hkh.ai.chain.llm.capabilities.generation.text.zhipu;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.hkh.ai.chain.llm.capabilities.generation.text.zhipu.StreamCompletionResult;
 import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.service.ConversationService;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -22,7 +24,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Slf4j
-public class BaiduQianFanCompletionBizProcessor {
+public class ZhipuCompletionBizProcessor {
 
     private final ConversationService conversationService;
 
@@ -41,9 +43,9 @@ public class BaiduQianFanCompletionBizProcessor {
     public void bizProcess(String item){
         log.info(item);
         StreamCompletionResult resultObj = JSONObject.parseObject(item, StreamCompletionResult.class);
-        String content = resultObj.getResult();
+        String content = resultObj.getChoices().get(0).getDelta().getContent();
         try {
-            if (resultObj.getIs_end()) {
+            if (StringUtils.isNotBlank(resultObj.getChoices().get(0).getFinish_reason())) {
                 this.getSseEmitter().send("[END]");
                 String fullContent = this.getSb().toString();
                 List<Integer> completionToken = this.getEnc().encode(fullContent);

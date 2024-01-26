@@ -3,6 +3,7 @@ package com.hkh.ai.chain.llm.capabilities.generation.text.baidu;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.hkh.ai.chain.llm.capabilities.generation.BaiduQianFanUtil;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
