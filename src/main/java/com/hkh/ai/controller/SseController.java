@@ -2,7 +2,7 @@ package com.hkh.ai.controller;
 
 import com.hkh.ai.chain.llm.capabilities.generation.audio.AudioChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
-import com.hkh.ai.chain.vectorizer.LocalAiVectorization;
+import com.hkh.ai.chain.vectorizer.local.LocalAiVectorization;
 import com.hkh.ai.chain.vectorizer.Vectorization;
 import com.hkh.ai.chain.vectorstore.VectorStore;
 import com.hkh.ai.common.ResultData;

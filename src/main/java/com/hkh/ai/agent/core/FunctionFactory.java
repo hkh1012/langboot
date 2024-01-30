@@ -66,7 +66,8 @@ public class FunctionFactory {
         HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
         String prompt = FunctionTypePrompt.prompt(role,stepName,description);
-        String resultJsonStr = completionService.function(sysUser, prompt,"function_type","get the type of function required to completion task", FunctionTypeFuncObj.class);
+        String resultJsonStr = null;
+//            completionService.function(sysUser, prompt,"function_type","get the type of function required to completion task", FunctionTypeFuncObj.class);
         FunctionTypeFuncObj functionTypeFuncObj = JSONObject.parseObject(resultJsonStr,FunctionTypeFuncObj.class);
         log.info("[AGENT]完成步骤{}需要的能力类型为{}",stepName,functionTypeFuncObj.getFunctionType().getType());
         return functionTypeFuncObj.getFunctionType();

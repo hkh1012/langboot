@@ -1,8 +1,12 @@
 package com.hkh.ai.chain.llm.capabilities.generation.function.openai;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hkh.ai.chain.llm.OpenAiServiceProxy;
+import com.hkh.ai.chain.llm.capabilities.generation.function.ChatFunctionObject;
 import com.hkh.ai.chain.llm.capabilities.generation.function.FunctionChatService;
+import com.hkh.ai.chain.llm.capabilities.generation.function.FunctionCompletionResult;
+import com.hkh.ai.chain.llm.capabilities.generation.text.zhipu.BlockCompletionResult;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.MediaFileService;
 import com.knuddels.jtokkit.Encodings;
@@ -22,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * openai函数调用实现
@@ -37,7 +42,7 @@ public class OpenAiFunctionChatService implements FunctionChatService {
     private OpenAiServiceProxy openAiServiceProxy;
 
     @Override
-    public String functionCompletion(String content,String functionName,String description ,Class clazz) {
+    public List<FunctionCompletionResult> functionCompletion(String content, List<ChatFunctionObject> functionObjectList) {
         OpenAiService service = openAiServiceProxy.service();
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
@@ -48,12 +53,11 @@ public class OpenAiFunctionChatService implements FunctionChatService {
         final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
         messages.add(userMessage);
 
-        FunctionExecutor functionExecutor = getFunctionExecutor(functionName,description,clazz);
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
                 .builder()
                 .model(defaultModel)
                 .messages(messages)
-                .functions(functionExecutor.getFunctions())
+                .functions(functionObjectList)
                 .functionCall(ChatCompletionRequest.ChatCompletionRequestFunctionCall.of("auto"))
                 .n(1)
                 .logitBias(new HashMap<>())
@@ -61,17 +65,20 @@ public class OpenAiFunctionChatService implements FunctionChatService {
         log.info("functionCompletion chatCompletionRequest ===> {}",chatCompletionRequest);
         ChatCompletionResult chatCompletion = service.createChatCompletion(chatCompletionRequest);
         log.info("functionCompletion ==> {}",chatCompletion.toString());
-        ChatCompletionChoice chatCompletionChoice = chatCompletion.getChoices().get(0);
-        ChatMessage message = chatCompletionChoice.getMessage();
-        return JSONObject.toJSONString(message);
-    }
+        List<ChatCompletionChoice> chatCompletionChoiceList = chatCompletion.getChoices();
 
-    private FunctionExecutor getFunctionExecutor(String functionName,String description ,Class clazz){
-        FunctionExecutor functionExecutor = new FunctionExecutor(Collections.singletonList(ChatFunction.builder()
-                .name(functionName)
-                .description(description)
-                .executor(clazz, w -> w)
-                .build()));
-        return functionExecutor;
+        List<FunctionCompletionResult> functionResultList = new ArrayList<>();
+        for (int i = 0; i < chatCompletionChoiceList.size(); i++) {
+            ChatCompletionChoice choice = chatCompletionChoiceList.get(i);
+            FunctionCompletionResult functionCompletionResult = new FunctionCompletionResult();
+            functionCompletionResult.setType("function");
+            functionCompletionResult.setName(choice.getMessage().getFunctionCall().getName());
+            JsonNode arguments = choice.getMessage().getFunctionCall().getArguments();
+            JSONObject jsonObject = JSONObject.parseObject(arguments.asText());
+            functionCompletionResult.setArguments(jsonObject);
+            functionResultList.add(functionCompletionResult);
+        }
+
+        return functionResultList;
     }
 }

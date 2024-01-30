@@ -1,5 +1,6 @@
-package com.hkh.ai.chain.vectorizer;
+package com.hkh.ai.chain.vectorizer.huggingface;
 
+import com.hkh.ai.chain.vectorizer.Vectorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

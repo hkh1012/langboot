@@ -1,9 +1,10 @@
-package com.hkh.ai.chain.vectorizer;
+package com.hkh.ai.chain.vectorizer.baidu;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.ai.chain.llm.capabilities.generation.BaiduQianFanUtil;
+import com.hkh.ai.chain.vectorizer.Vectorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class BaiduQianFanVectorization implements Vectorization{
+public class BaiduQianFanVectorization implements Vectorization {
 
     @Autowired
     private BaiduQianFanUtil baiduQianFanUtil;

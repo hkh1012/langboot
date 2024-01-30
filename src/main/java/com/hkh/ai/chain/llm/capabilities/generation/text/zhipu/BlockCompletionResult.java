@@ -19,41 +19,40 @@ public class BlockCompletionResult {
     private BlockCompletionResultUsage usage;
 
     @Data
-    class BlockCompletionResultUsage{
+    public class BlockCompletionResultUsage{
         private int prompt_tokens;
         private int completion_tokens;
         private int total_tokens;
     }
 
     @Data
-    class BlockCompletionResultChoice{
+    public class BlockCompletionResultChoice{
         private int index;
         private String finish_reason;
 
         private BlockCompletionResultChoiceMessage message;
+    }
 
-        @Data
-        class BlockCompletionResultChoiceMessage{
-            private String role;
-            private String content;
+    @Data
+    public class BlockCompletionResultChoiceMessage{
+        private String role;
+        private String content;
 
-            private List<BlockCompletionResultChoiceMessageToolCall> tool_calls;
+        private List<BlockCompletionResultChoiceMessageToolCall> tool_calls;
+    }
 
-            @Data
-            class BlockCompletionResultChoiceMessageToolCall{
-                private String id;
-                private String type;
+    @Data
+    public class BlockCompletionResultChoiceMessageToolCall{
+        private String id;
+        private String type;
 
-                private BlockCompletionResultChoiceMessageToolCallFunction function;
+        private BlockCompletionResultChoiceMessageToolCallFunction function;
+    }
 
-                @Data
-                class BlockCompletionResultChoiceMessageToolCallFunction{
-                    private String name;
-                    private JSONObject arguments;
-                }
-
-            }
-        }
+    @Data
+    public class BlockCompletionResultChoiceMessageToolCallFunction{
+        private String name;
+        private JSONObject arguments;
     }
 
 }

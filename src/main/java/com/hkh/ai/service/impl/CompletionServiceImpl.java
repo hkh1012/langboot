@@ -2,7 +2,8 @@ package com.hkh.ai.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.hkh.ai.chain.llm.capabilities.generation.function.FunctionChatService;
+import com.google.common.collect.Lists;
+import com.hkh.ai.chain.llm.capabilities.generation.function.*;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.domain.function.LocationWeather;
@@ -12,6 +13,9 @@ import com.hkh.ai.util.FunctionReflect;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -60,35 +64,48 @@ public class CompletionServiceImpl implements CompletionService {
     }
 
     @Override
-    public String function(SysUser sysUser, String content, String functionName, String description, Class clazz) {
-        String completionResult = functionChatService.functionCompletion(content, functionName, description,clazz);
-        JSONObject chatMessage = JSONObject.parseObject(completionResult);
-        String returnContent = chatMessage.getString("content");
-        if (StrUtil.isBlank(returnContent)){
-            JSONObject functionCall = chatMessage.getJSONObject("function_call");
-            String function = functionCall.getString("name");
-            JSONObject arguments = functionCall.getJSONObject("arguments");
-            String reflect = (String) FunctionReflect.reflect(function, arguments);
-            return reflect;
-        }else {
-            return returnContent;
+    public String function(SysUser sysUser, String content, List<ChatFunctionObject> functionObjectList) {
+        List<FunctionCompletionResult> functions = functionChatService.functionCompletion(content, functionObjectList);
+        String result = "";
+        if (functions!=null && functions.size()>0){
+            for (int i = 0; i < functions.size(); i++) {
+                FunctionCompletionResult function = functions.get(i);
+                String functionName = function.getName();
+                JSONObject arguments = function.getArguments();
+                String reflect = (String) FunctionReflect.reflect(functionName, arguments);
+                result = result + reflect  + " ";
+            }
         }
+        return result;
     }
 
     @Override
     public String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request) {
-        String completionResult = function(sysUser,request.getContent(), "get_location_weather", "the weather of a location ", LocationWeather.class);
+        // 定义参数
+        FunctionParametersField locationField = new FunctionParametersField("location","string","city, for example: 常州,苏州,上海");
+        FunctionParametersField dateEnumField = new FunctionParametersField("datePeriod","enum","日期区间枚举");
+        List<FunctionParametersField> parametersFields  = new ArrayList<>();
+        parametersFields.add(locationField);
+        parametersFields.add(dateEnumField);
+
+        // 必填参数
+        String[] required = {"location","datePeriod"};
+
+        ChatFunctionObject weatherFunctionBuilder = new ChatFunctionObject();
+        ChatFunctionObject weatherFunction = weatherFunctionBuilder
+                .build("get_location_weather",
+                        "the weather of a location",
+                        Lists.newArrayList("location","datePeriod"),
+                        Lists.newArrayList("string","enum"),
+                        Lists.newArrayList("city, for example: 常州,苏州,上海","日期区间枚举"),
+                        required);
+
+        List<ChatFunctionObject> functionObjectList = new ArrayList<>();
+        functionObjectList.add(weatherFunction);
+
+        String completionResult = function(sysUser,request.getContent(), functionObjectList);
         log.info("functionWeather completionResult = {}",completionResult);
         return completionResult;
-    }
-
-    @Override
-    public <T> T completeObj(SysUser sysUser, String content, String functionName, String description, Class<T> clazz) {
-        String completionResult = functionChatService.functionCompletion(content, functionName, description,clazz);
-        JSONObject chatMessage = JSONObject.parseObject(completionResult);
-        JSONObject functionCall = chatMessage.getJSONObject("function_call");
-        JSONObject arguments = functionCall.getJSONObject("arguments");
-        return arguments.to(clazz);
     }
 
 }

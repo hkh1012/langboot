@@ -1,4 +1,4 @@
-package com.hkh.ai.chain.vectorizer;
+package com.hkh.ai.chain.vectorizer.baidu;
 
 import lombok.Data;
 

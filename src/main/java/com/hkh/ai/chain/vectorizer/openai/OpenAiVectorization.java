@@ -1,6 +1,7 @@
-package com.hkh.ai.chain.vectorizer;
+package com.hkh.ai.chain.vectorizer.openai;
 
 import com.hkh.ai.chain.llm.OpenAiServiceProxy;
+import com.hkh.ai.chain.vectorizer.Vectorization;
 import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;

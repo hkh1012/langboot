@@ -43,7 +43,8 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
     public void propose(SysUser sysUser, AgentDemandProposeRequest request) {
         AgentField agentField = agentFieldService.getByFid(request.getFid());
         String content = DemandProposePrompt.prompt(agentField.getFieldName(),request.getContent());
-        DemandFuncObj demandFuncObj = completionService.completeObj(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
+        DemandFuncObj demandFuncObj = null;
+//                completionService.completeObj(sysUser, content,"demand_propose","get the roles and the steps of the demand", DemandFuncObj.class);
         log.info("[AGENT]完成目标需要的角色与步骤: {}",demandFuncObj);
         Demand demand = saveDemand(sysUser, RandomUtil.randomString(32), request.getFid(), request.getContent());
         stepRole(sysUser,agentField,demand,demandFuncObj.getRoles(),demandFuncObj.getSteps());
@@ -66,7 +67,8 @@ public class DemandServiceImpl extends ServiceImpl<DemandMapper, Demand> impleme
     public void stepRole(SysUser sysUser, AgentField agentField, Demand demand, List<DemandRoleFuncObj> roles, List<DemandStepFunObj> steps) {
         for (int i = 0; i < steps.size(); i++) {
             String content = DemandStepRolePrompt.prompt(agentField.getFieldName(),demand.getContent(), StrUtil.join(",",roles),steps.get(i).getDescription());
-            String resultJsonStr = completionService.function(sysUser, content,"choose_the_step_role","get the role who finish the demand step", StepRoleFuncObj.class);
+            String resultJsonStr = null;
+//                    completionService.function(sysUser, content,"choose_the_step_role","get the role who finish the demand step", StepRoleFuncObj.class);
             log.info("[AGENT]完成步骤{}对应的负责角色为{}",steps.get(i).getStepName(),resultJsonStr);
             demandStepService.saveDemandStep(demand.getDid(),agentField.getFid(),steps.get(i).getStepName(),steps.get(i).getDescription(),resultJsonStr,sysUser.getId());
         }
