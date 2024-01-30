@@ -1,10 +1,8 @@
 package com.hkh.ai.chain.llm.capabilities.generation.function;
 
+import com.hkh.ai.chain.llm.capabilities.generation.function.baidu.BaiduAiFunctionChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.function.openai.OpenAiFunctionChatService;
-import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
-import com.hkh.ai.chain.llm.capabilities.generation.text.baidu.BaiduQianFanTextChatService;
-import com.hkh.ai.chain.llm.capabilities.generation.text.chatglm2.Chatglm2TextChatService;
-import com.hkh.ai.chain.llm.capabilities.generation.text.openai.OpenAiTextChatService;
+import com.hkh.ai.chain.llm.capabilities.generation.function.zhipu.ZhipuAiFunctionChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,15 +17,27 @@ public class FunctionChatServiceFactory {
 
     @Autowired
     private OpenAiFunctionChatService openAiFunctionChatService;
+    @Autowired
+    private BaiduAiFunctionChatService baiduAiFunctionChatService;
+    @Autowired
+    private ZhipuAiFunctionChatService zhipuAiFunctionChatService;
 
-    public FunctionChatServiceFactory(OpenAiFunctionChatService openAiFunctionChatService) {
+    public FunctionChatServiceFactory(OpenAiFunctionChatService openAiFunctionChatService,
+                                      BaiduAiFunctionChatService baiduAiFunctionChatService,
+                                      ZhipuAiFunctionChatService zhipuAiFunctionChatService) {
         this.openAiFunctionChatService = openAiFunctionChatService;
+        this.baiduAiFunctionChatService = baiduAiFunctionChatService;
+        this.zhipuAiFunctionChatService = zhipuAiFunctionChatService;
     }
 
     public FunctionChatService getFunctionChatService(){
         if("openai".equals(type)){
             return openAiFunctionChatService;
-        }else {
+        }else if ("baidu".equals(type)){
+            return baiduAiFunctionChatService;
+        }else if ("zhipu".equals(type)){
+            return zhipuAiFunctionChatService;
+        } else {
             return null;
         }
 
