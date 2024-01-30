@@ -4,7 +4,6 @@ import com.hkh.ai.chain.llm.capabilities.generation.function.baidu.BaiduAiFuncti
 import com.hkh.ai.chain.llm.capabilities.generation.function.openai.OpenAiFunctionChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.function.zhipu.ZhipuAiFunctionChatService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +14,9 @@ public class FunctionChatServiceFactory {
     @Value("${chain.llm.function.type}")
     private String type;
 
-    @Autowired
-    private OpenAiFunctionChatService openAiFunctionChatService;
-    @Autowired
-    private BaiduAiFunctionChatService baiduAiFunctionChatService;
-    @Autowired
-    private ZhipuAiFunctionChatService zhipuAiFunctionChatService;
+    private final OpenAiFunctionChatService openAiFunctionChatService;
+    private final BaiduAiFunctionChatService baiduAiFunctionChatService;
+    private final ZhipuAiFunctionChatService zhipuAiFunctionChatService;
 
     public FunctionChatServiceFactory(OpenAiFunctionChatService openAiFunctionChatService,
                                       BaiduAiFunctionChatService baiduAiFunctionChatService,
