@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>首页</title>
+    <title>聊天</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="applicable-device" content="pc,mobile">
     <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -20,7 +20,10 @@
     <script src="/static/js/recorder/engine/wav.js"></script>
     <script src="/static/js/recorder/extensions/waveview.js"></script>
     <script src="/static/js/recorder/extensions/wavesurfer.view.js"></script>
-
+    <script src="/static/js/common/vconsole.min.js"></script>
+    <script>
+        // var vConsole = new window.VConsole();
+    </script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -75,7 +78,7 @@
     <div id="main-content" class="container">
 
         <div class="row" style="height: 100%;">
-            <div class="col-md-12" style="height: 100%;overflow: hidden;padding-left: 0px;padding-right: 0px;">
+            <div class="col-md-12" id="conversationParent" style="height: 100%;overflow: hidden;padding-left: 0px;padding-right: 0px;">
                 <div id="conversation" class="table table-striped">
                     <div id="chatList">
                     </div>
@@ -106,6 +109,9 @@
                 </div>
                 <div class="col-md-10 chat-input-mid" style="margin-left: 0px;margin-right: 0px;display: flex;justify-content: flex-end;align-items: center;">
                     <input type="text" id="sayContent" class="form-control" placeholder="来说点什么吧...">
+                    <svg onclick="triggerToVision()" class="vision-btn" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512" fill="currentColor">
+                        <path d="M448 80c8.8 0 16 7.2 16 16V415.8l-5-6.5-136-176c-4.5-5.9-11.6-9.3-19-9.3s-14.4 3.4-19 9.3L202 340.7l-30.5-42.7C167 291.7 159.8 288 152 288s-15 3.7-19.5 10.1l-80 112L48 416.3l0-.3V96c0-8.8 7.2-16 16-16H448zM64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm80 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"/>
+                    </svg>
                         <svg onclick="triggerToVoice();" class="voice-btn" xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512" fill="currentColor">
                             <path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/>
                         </svg>
@@ -116,6 +122,7 @@
             </div>
         </div>
 
+        <!-- 语音voice面板 -->
         <div class="row bottom-fix-btn h" id="voiceDiv" style="position: fixed;background-color: #fff;left: 50%;bottom: 10px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;">
             <div class="voiceTopDiv">
                 <svg class="voice-close-btn" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512" fill="currentColor" onclick="closeVoiceDiv();">
@@ -141,6 +148,24 @@
                 <div class="voiceBottomRightDiv">
                     <button id="voiceCancelBtn" onclick="voiceCancel();" class="btn btn-gray" disabled data-loading-text="取消..." style="width: 100%;margin-left: 3px;" type="button">取消</button>
                     <button id="voiceSubmitBtn" onclick="voiceSubmitRecord();" class="btn btn-gray" disabled data-loading-text="上传中..." style="width: 100%;margin-left: 3px;" type="button">提交</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图文vision多模态面板 -->
+        <div class="row h" id="visionDiv" style="position: fixed;background-color: #fff;left: 50%;bottom: 0px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;height: 400px;border-top: 1px solid lightgray;">
+            <div class="visionTopDiv">
+                <button id="visionCancelBtn" onclick="visionCancel();" class="btn btn-gray" data-loading-text="取消..."  type="button">取消</button>
+                <button id="visionSubmitBtn" onclick="visionSubmit();" class="btn btn-success" data-loading-text="上传中..."  type="button">提交</button>
+            </div>
+            <div class="visionTextDiv">
+                <textarea id="visionTextArea" placeholder="说点什么试试吧"></textarea>
+            </div>
+            <div class="visionMidDiv" id="visionMidDiv">
+                <div class="visionAddBtn" onclick="visionAddImage();">
+                    <svg  class="vision-add-img-btn" xmlns="http://www.w3.org/2000/svg"  height="40" width="40" viewBox="0 0 448 512" fill="currentColor">
+                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/>
+                    </svg>
                 </div>
             </div>
         </div>

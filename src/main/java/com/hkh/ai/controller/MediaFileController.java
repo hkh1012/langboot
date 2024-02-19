@@ -41,4 +41,15 @@ public class MediaFileController {
         MediaFile mediaFile = mediaFileService.upload(request);
         return ResultData.success(mediaFile,"上传媒体文件成功");
     }
+
+    /**
+     * 上传base64图片文件
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "base64Upload")
+    public ResultData<MediaFile> base64Upload(@RequestBody MediaFileBase64UploadRequest request){
+        MediaFile mediaFile = mediaFileService.base64Upload(request);
+        return ResultData.success(mediaFile,"上传媒体文件成功");
+    }
 }

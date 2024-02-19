@@ -41,30 +41,32 @@ public class ZhipuCompletionBizProcessor {
     private final List<Integer> promptTokens;
 
     public void bizProcess(String item){
-        log.info(item);
-        StreamCompletionResult resultObj = JSONObject.parseObject(item, StreamCompletionResult.class);
-        String content = resultObj.getChoices().get(0).getDelta().getContent();
-        try {
-            if (StringUtils.isNotBlank(resultObj.getChoices().get(0).getFinish_reason())) {
-                this.getSseEmitter().send("[END]");
-                String fullContent = this.getSb().toString();
-                List<Integer> completionToken = this.getEnc().encode(fullContent);
-                System.out.println("total token costs: " + (this.getPromptTokens().size() + completionToken.size()));
-                this.getConversationService().saveConversation(this.getSysUser().getId(), this.getRequest().getSessionId(), this.getSb().toString(), "A");
-            } else {
-                if (content.contains("\n") || content.contains("\r")) {
-                    content = content.replaceAll("\n", "<br>");
-                    content = content.replaceAll("\r", "<br>");
+        System.out.println("智普流式输出:" +item);
+        if (!"[DONE]".equals(item)){
+            StreamCompletionResult resultObj = JSONObject.parseObject(item, StreamCompletionResult.class);
+            String content = resultObj.getChoices().get(0).getDelta().getContent();
+            try {
+                if (StringUtils.isNotBlank(resultObj.getChoices().get(0).getFinish_reason())) {
+                    this.getSseEmitter().send("[END]");
+                    String fullContent = this.getSb().toString();
+                    List<Integer> completionToken = this.getEnc().encode(fullContent);
+                    System.out.println("total token costs: " + (this.getPromptTokens().size() + completionToken.size()));
+                    this.getConversationService().saveConversation(this.getSysUser().getId(), this.getRequest().getSessionId(), this.getSb().toString(), "A");
+                } else {
+                    if (content.contains("\n") || content.contains("\r")) {
+                        content = content.replaceAll("\n", "<br>");
+                        content = content.replaceAll("\r", "<br>");
+                    }
+                    if (content.contains(" ")) {
+                        content = content.replaceAll(" ", "&nbsp;");
+                    }
+                    this.getSb().append(content);
+                    this.getSseEmitter().send(content);
                 }
-                if (content.contains(" ")) {
-                    content = content.replaceAll(" ", "&nbsp;");
-                }
-                this.getSb().append(content);
-                this.getSseEmitter().send(content);
+            } catch (IOException e) {
+                log.error("ZhipuCompletionBizProcessor--->>bizProcess异常", e);
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            log.error("ZhipuCompletionBizProcessor--->>bizProcess异常", e);
-            throw new RuntimeException(e);
         }
 
     }

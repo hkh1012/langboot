@@ -2,9 +2,12 @@ package com.hkh.ai.chain.llm.capabilities.generation.vision.openai;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.net.url.UrlBuilder;
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.hkh.ai.chain.llm.OpenAiServiceProxy;
 import com.hkh.ai.chain.llm.capabilities.generation.vision.VisionChatService;
 import com.hkh.ai.config.SysConfig;
 import com.knuddels.jtokkit.Encodings;
@@ -13,18 +16,31 @@ import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.reactive.ClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
 
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * OpenAi 图文多模态实现
@@ -32,25 +48,41 @@ import java.util.List;
  */
 @Service
 @Slf4j
-@AllArgsConstructor
 public class OpenAiVisionChatService implements VisionChatService {
 
     @Value("${chain.llm.openai.token}")
     private String apiToken;
 
-    @Value("${proxy.http.baseurl}")
-    private String baseUrl;
+    @Value("${proxy.socket.host}")
+    private String host;
 
-    private final SysConfig sysConfig;
+    @Value("${proxy.socket.port}")
+    private String port;
+
+    @Autowired
+    private SysConfig sysConfig;
 
     private WebClient webClient;
 
+    @Autowired
+    private OpenAiServiceProxy openAiServiceProxy;
+
     @PostConstruct
     public void init(){
+        log.info("openai api web client init...");
         // 备注：openai-java 库最新版本仍未集成vision api,待新版本集成后需要统一成 OpenAiServiceProxy 的方式
+        HttpClient httpClient = HttpClient.create()
+                .proxy(typeSpec -> {
+                    typeSpec.type(ProxyProvider.Proxy.HTTP)
+                            .address(new InetSocketAddress(host,Integer.parseInt(port)))
+                    ;
+                });
+
+        ClientHttpConnector clientHttpConnector = new ReactorClientHttpConnector(httpClient);
+
         webClient = WebClient.builder()
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                .baseUrl(baseUrl) //设置代理，此处暂时只支持http baseUrl方式
+                .clientConnector(clientHttpConnector)
                 .build();
     }
 
@@ -72,7 +104,7 @@ public class OpenAiVisionChatService implements VisionChatService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = sdf.format(now);
         for (String imageUrl : imageUrlList){
-            // 如果传的是图片链接，openai无法访问国内的url地址，所有需要将图片转换为base64
+            // 如果传的是图片链接，openai无法访问国内的url地址，所以需要将图片转换为base64
             String fileName = System.currentTimeMillis() + ".png";
             File destFile = new File(sysConfig.getUploadPath() + File.separator + "image" + File.separator + dateStr + File.separator + fileName);
             File file = HttpUtil.downloadFileFromUrl(imageUrl, destFile);
@@ -95,25 +127,53 @@ public class OpenAiVisionChatService implements VisionChatService {
         JSONArray messages = new JSONArray();
         messages.add(visionMessage);
 
+
+
         // 构建请求体
         JSONObject body = new JSONObject();
         body.put("messages",messages);
-        body.put("model","glm-4v");
-        body.put("request_id", UUID.fastUUID());
-        body.put("stream",false);
+        body.put("model","gpt-4-vision-preview");
+//        body.put("request_id", UUID.fastUUID().toString(true));
 
-        ResponseEntity<JSONObject> response = webClient.post()
+
+        Mono<String> response = webClient.post()
                 .uri("https://api.openai.com/v1/chat/completions")
                 .header("Authorization", "Bearer " + apiToken)
                 .header("content-type", "application/json")
                 .bodyValue(body.toJSONString())
                 .retrieve()
-                .toEntity(JSONObject.class)
-                .block();
+                .bodyToMono(String.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    ex.printStackTrace();
+                    HttpStatusCode statusCode = ex.getStatusCode();
+                    String res = ex.getResponseBodyAsString();
+                    log.error("Openai API error: {} {}", statusCode, res);
+                    return Mono.error(new RuntimeException(res));
+                });
+        String responseBody = null;
+        try {
+            responseBody = response.toFuture().get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(responseBody);
 
-        JSONObject responseBody = response.getBody();
 
-        ChatCompletionResult result = JSONObject.parseObject(responseBody.toJSONString(), ChatCompletionResult.class);
+//        HttpRequest httpRequest = new HttpRequest(UrlBuilder.of("https://api.openai.com/v1/chat/completions"));
+//        httpRequest.header("Authorization","Bearer " + apiToken);
+//        httpRequest.header("content-type","application/json");
+//
+//        SocketAddress addr = new InetSocketAddress("127.0.0.1", 7890);
+//        Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+//        httpRequest.setProxy(proxy);
+//        httpRequest.body(body.toJSONString());
+//        System.out.println(System.getProperties());
+//        String resultStr = httpRequest.execute().body();
+//        log.info("openai vision chat result ==> {}",resultStr);
+
+        ChatCompletionResult result = JSONObject.parseObject(responseBody, ChatCompletionResult.class);
         return result.getChoices().get(0).getMessage().getContent();
     }
 }

@@ -76,7 +76,7 @@ public class ZhipuTextChatService implements TextChatService {
         body.put("messages",messages);
         body.put("stream",true);
         body.put("model",zhipuAiUtil.getCompletionModel());
-        body.put("request_id", UUID.fastUUID());
+        body.put("request_id", UUID.fastUUID().toString(true));
         body.put("temperature",0.95);
 
         ZhipuCompletionBizProcessor bizProcessor = ZhipuCompletionBizProcessor.builder()
@@ -111,7 +111,7 @@ public class ZhipuTextChatService implements TextChatService {
         JSONObject body = new JSONObject();
         body.put("messages",messages);
         body.put("model",zhipuAiUtil.getCompletionModel());
-        body.put("request_id", UUID.fastUUID());
+        body.put("request_id", UUID.fastUUID().toString(true));
         body.put("stream",false);
         body.put("temperature",0.95);
 

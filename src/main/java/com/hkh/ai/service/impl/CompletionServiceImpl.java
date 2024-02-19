@@ -81,13 +81,6 @@ public class CompletionServiceImpl implements CompletionService {
 
     @Override
     public String functionWeather(SysUser sysUser, CompletionFunctionWeatherRequest request) {
-        // 定义参数
-        FunctionParametersField locationField = new FunctionParametersField("location","string","city, for example: 常州,苏州,上海");
-        FunctionParametersField dateEnumField = new FunctionParametersField("datePeriod","enum","日期区间枚举");
-        List<FunctionParametersField> parametersFields  = new ArrayList<>();
-        parametersFields.add(locationField);
-        parametersFields.add(dateEnumField);
-
         // 必填参数
         String[] required = {"location","datePeriod"};
 
@@ -96,8 +89,8 @@ public class CompletionServiceImpl implements CompletionService {
                 .build("get_location_weather",
                         "the weather of a location",
                         Lists.newArrayList("location","datePeriod"),
-                        Lists.newArrayList("string","enum"),
-                        Lists.newArrayList("city, for example: 常州,苏州,上海","日期区间枚举"),
+                        Lists.newArrayList("string","string"),
+                        Lists.newArrayList("city, for example: 常州,苏州,上海","日期,格式yyyy-MM-dd"),
                         required);
 
         List<ChatFunctionObject> functionObjectList = new ArrayList<>();

@@ -3,6 +3,7 @@ package com.hkh.ai.chain.llm.capabilities.generation.vision.zhipu;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.HttpRequest;
+import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.ai.chain.llm.capabilities.generation.ZhipuAiUtil;
@@ -46,6 +47,7 @@ public class ZhipuVisionChatService implements VisionChatService {
 
         for (String imageUrl : imageUrlList){
             JSONObject imageUrlJson = new JSONObject();
+//            imageUrlJson.put("url","https://cxjk-static.oss-cn-shanghai.aliyuncs.com/lottery/manoncloud.png");
             imageUrlJson.put("url",imageUrl);
 
             JSONObject imageJson = new JSONObject();
@@ -66,14 +68,16 @@ public class ZhipuVisionChatService implements VisionChatService {
         JSONObject body = new JSONObject();
         body.put("messages",messages);
         body.put("model","glm-4v");
-        body.put("request_id", UUID.fastUUID());
+        body.put("request_id", UUID.fastUUID().toString(true));
         body.put("stream",false);
 
         HttpRequest httpRequest = new HttpRequest(UrlBuilder.of(ZhipuChatApis.COMPLETION_TEXT));
         httpRequest.header("Authorization",accessToken);
         httpRequest.header("content-type","application/json");
+        httpRequest.method(Method.POST);
         httpRequest.body(body.toJSONString());
         String resultStr = httpRequest.execute().body();
+        System.out.println(resultStr);
 
         BlockCompletionResult result = JSONObject.parseObject(resultStr, BlockCompletionResult.class);
         return result.getChoices().get(0).getMessage().getContent();

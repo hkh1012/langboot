@@ -17,8 +17,14 @@ html, body {
     margin-bottom: 50px;
 }
 
-.margin-bottom250{
-    margin-bottom: 250px !important;
+.bottom250{
+    bottom: 250px;
+    padding-top: 250px;
+}
+
+.bottom400{
+    bottom: 400px;
+    padding-top: 400px;
 }
 
 #conversation{
@@ -414,7 +420,19 @@ a:hover {
     color: gray;
 }
 
+.vision-btn{
+    position: absolute;
+    margin-right: 36px;
+    color: gray;
+}
+
 .voice-close-btn{
+    position: absolute;
+    margin-right: 12px;
+    color: gray;
+}
+
+.vision-close-btn{
     position: absolute;
     margin-right: 12px;
     color: gray;
@@ -427,6 +445,65 @@ a:hover {
     flex-direction: column;
     align-items: flex-end;
     justify-content: center;
+}
+
+.visionTopDiv{
+    height: 50px;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.visionTextDiv{
+    padding: 10px;
+}
+
+#visionTextArea{
+    width: 100%;
+    height: 150px;
+    border: 1px solid #ebe1e1;
+    padding: 10px;
+}
+
+.visionMidDiv{
+    padding: 0px 10px 10px 0px;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.visionAddBtn{
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    border: 1px solid #aa9d9d;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9e6e6;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.visionSelectedImage{
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.vision-add-img-btn{
+    color: #c4bdbd;
 }
 
 .voiceMidDiv{

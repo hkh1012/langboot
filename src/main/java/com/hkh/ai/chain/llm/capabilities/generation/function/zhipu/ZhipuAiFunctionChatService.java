@@ -5,6 +5,7 @@ import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONReader;
 import com.hkh.ai.chain.llm.capabilities.generation.ZhipuAiUtil;
 import com.hkh.ai.chain.llm.capabilities.generation.ZhipuChatApis;
 import com.hkh.ai.chain.llm.capabilities.generation.function.ChatFunctionObject;
@@ -34,6 +35,14 @@ public class ZhipuAiFunctionChatService implements FunctionChatService {
     public List<FunctionCompletionResult> functionCompletion(String content, List<ChatFunctionObject> functionObjectList) {
         String accessToken = zhipuAiUtil.getAccessToken();
 
+        JSONArray toolArray = new JSONArray();
+        for (ChatFunctionObject functionObject : functionObjectList){
+            JSONObject tool = new JSONObject();
+            tool.put("type","function");
+            tool.put("function",functionObject);
+            toolArray.add(tool);
+        }
+
         // 构建 message
         JSONArray messages = new JSONArray();
         JSONObject jsonObject = new JSONObject();
@@ -45,16 +54,24 @@ public class ZhipuAiFunctionChatService implements FunctionChatService {
         JSONObject body = new JSONObject();
         body.put("messages",messages);
         body.put("model",zhipuAiUtil.getCompletionModel());
-        body.put("tools", functionObjectList);
+        body.put("tools", toolArray);
         body.put("tool_choice","auto");
 
-        HttpRequest httpRequest = new HttpRequest(UrlBuilder.of(ZhipuChatApis.COMPLETION_TEXT));
-        httpRequest.header("Authorization",accessToken);
-        httpRequest.header("content-type","application/json");
-        httpRequest.body(body.toJSONString());
-        String resultStr = httpRequest.execute().body();
+        String resultStr = HttpRequest.post(ZhipuChatApis.COMPLETION_TEXT)
+                .header("Authorization",accessToken)
+                .header("content-type","application/json")
+                .body(body.toJSONString())
+                .execute().body();
 
-        BlockCompletionResult result = JSONObject.parseObject(resultStr, BlockCompletionResult.class);
+        // 返回的是非标json，需要特殊处理。。。
+        resultStr = resultStr
+                .replaceAll("\\\\\\{","{")
+                .replaceAll("\\\\}\"","}")
+                .replaceAll("\\\\\"", "\"")
+                .replaceAll("\"\\{","{")
+                .replaceAll("}\"","}");
+
+        BlockCompletionResult result = JSONObject.parseObject(resultStr, BlockCompletionResult.class, JSONReader.Feature.AllowUnQuotedFieldNames);
         List<BlockCompletionResult.BlockCompletionResultChoiceMessageToolCall> tool_calls = result.getChoices().get(0).getMessage().getTool_calls();
         List<FunctionCompletionResult> functionResultList = new ArrayList<>();
         for (int i = 0; i < tool_calls.size(); i++) {

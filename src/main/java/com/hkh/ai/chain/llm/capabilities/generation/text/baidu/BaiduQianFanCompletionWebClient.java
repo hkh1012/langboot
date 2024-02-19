@@ -28,7 +28,7 @@ public class BaiduQianFanCompletionWebClient {
 
     @PostConstruct
     public void init(){
-        log.info("baidu api web client init...");
+        log.info("baidu ai web client init...");
         this.webClient = WebClient.builder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
             .build();

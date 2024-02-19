@@ -2,20 +2,20 @@ package com.hkh.ai.controller;
 
 import com.hkh.ai.chain.llm.capabilities.generation.audio.AudioChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
+import com.hkh.ai.chain.llm.capabilities.generation.vision.VisionChatService;
 import com.hkh.ai.chain.vectorizer.local.LocalAiVectorization;
 import com.hkh.ai.chain.vectorizer.Vectorization;
 import com.hkh.ai.chain.vectorstore.VectorStore;
 import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.constant.SysConstants;
-import com.hkh.ai.domain.ChatRequestLog;
-import com.hkh.ai.domain.Conversation;
-import com.hkh.ai.domain.CustomChatMessage;
-import com.hkh.ai.domain.SysUser;
+import com.hkh.ai.domain.*;
 import com.hkh.ai.request.AudioChatRequest;
+import com.hkh.ai.request.VisionChatRequest;
 import com.hkh.ai.response.AudioChatResponse;
 import com.hkh.ai.service.ChatRequestLogService;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
+import com.hkh.ai.service.MediaFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * sse 聊天
@@ -43,12 +44,14 @@ public class SseController {
 
     private final TextChatService textChatService;
     private final AudioChatService audioChatService;
+    private final VisionChatService visionChatService;
     private final VectorStore vectorStore;
     private final Vectorization vectorization;
 
     private final EmbeddingService embeddingService;
     private final ConversationService conversationService;
     private final ChatRequestLogService chatRequestLogService;
+    private final MediaFileService mediaFileService;
 
     @SneakyThrows
     @PostMapping(path = "send")
@@ -112,6 +115,19 @@ public class SseController {
         audioChatResponse.setNearestList(nearestList);
         audioChatService.audioChat(customChatMessage,nearestList,history,sseEmitter,sysUser, request.getMediaId());
         return ResultData.success(audioChatResponse,"发送成功");
+    }
+
+    @PostMapping(path = "visionChat")
+    @ResponseBody
+    public ResultData<String> visionChat(HttpServletRequest httpServletRequest, @RequestBody VisionChatRequest request) {
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        List<MediaFile> mediaFileList = mediaFileService.listByMfids(request.getMediaIds());
+        int questionCid = conversationService.saveConversation(sysUser.getId(),request.getSid(), request.getContent(), "Q");
+        mediaFileService.updateWithCid(request.getMediaIds(),questionCid);
+        List<String> httpUrls = mediaFileList.stream().map((item)->item.getHttpUrl()).collect(Collectors.toList());
+        String result = visionChatService.visionCompletion(request.getContent(), httpUrls);
+        int answerCid = conversationService.saveConversation(sysUser.getId(),request.getSid(), result, "A");
+        return ResultData.success(result,"发送成功");
 
     }
 

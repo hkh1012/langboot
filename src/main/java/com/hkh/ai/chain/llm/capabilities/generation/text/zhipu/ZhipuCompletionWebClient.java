@@ -3,11 +3,13 @@ package com.hkh.ai.chain.llm.capabilities.generation.text.zhipu;
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.ai.chain.llm.capabilities.generation.BaiduQianFanUtil;
 import com.hkh.ai.chain.llm.capabilities.generation.ZhipuAiUtil;
+import com.hkh.ai.chain.llm.capabilities.generation.ZhipuChatApis;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -30,26 +32,25 @@ public class ZhipuCompletionWebClient {
     public void init(){
         log.info("zhipu ai api web client init...");
         this.webClient = WebClient.builder()
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+            .defaultHeader("content-type", "application/json")
             .build();
     }
 
     public Flux<String> streamChatCompletion(JSONObject requestBody){
         log.info("streamChatCompletion 参数：{}",requestBody);
-        String url = zhipuAiUtil.getCompletionModel();
         String accessToken = zhipuAiUtil.getAccessToken();
         return webClient.post()
-                .uri(url)
-                .header(HttpHeaders.CONTENT_TYPE,"application/json")
+                .uri(ZhipuChatApis.COMPLETION_TEXT)
+                .bodyValue(requestBody)
                 .header("Authorization",accessToken)
-                .bodyValue(requestBody.toJSONString())
                 .retrieve()
                 .bodyToFlux(String.class)
                 .onErrorResume(WebClientResponseException.class, ex -> {
+                    ex.printStackTrace();
                     HttpStatusCode statusCode = ex.getStatusCode();
                     String res = ex.getResponseBodyAsString();
                     log.error("ZhipuAI API error: {} {}", statusCode, res);
-                    return Mono.error(new RuntimeException(res));
+                    return Flux.error(new RuntimeException(res));
                 });
 
     }

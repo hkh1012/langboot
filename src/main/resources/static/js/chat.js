@@ -485,7 +485,7 @@ var recordStatus = {
 function closeVoiceDiv(){
     $("#chatOpeDiv").removeClass("h");
     $("#voiceDiv").addClass("h");
-    $("#chatList").removeClass("margin-bottom250");
+    $("#conversationParent").removeClass("bottom250");
     conversation.scrollTop = conversation.scrollHeight;
     voiceCancel();
 }
@@ -494,7 +494,7 @@ function triggerToVoice(){
     console.log('切换到语音模式');
     $("#chatOpeDiv").addClass("h");
     $("#voiceDiv").removeClass("h");
-    $("#chatList").addClass("margin-bottom250");
+    $("#conversationParent").addClass("bottom250");
     conversation.scrollTop = conversation.scrollHeight;
     recReq();
 }
@@ -810,6 +810,119 @@ function recdown64(cls){
     };
     reader.readAsDataURL(recBlob);
 };
+
+function triggerToVision(){
+    console.log('切换到vision模式');
+    $("#visionDiv").removeClass("h");
+    $("#conversationParent").addClass("bottom400");
+    conversation.scrollTop = conversation.scrollHeight;
+}
+
+function visionCancel(){
+    $("#visionDiv").addClass("h");
+    $("#visionMidDiv").find("img").remove(".visionSelectedImage");
+    $("#conversationParent").removeClass("bottom400");
+    conversation.scrollTop = conversation.scrollHeight;
+    uploadImages = [];
+}
+
+var uploadImages = [];
+function visionAddImage(){
+    if (typeof window.FileReader !== 'function') {
+        console.log("抱歉，您的浏览器不支持读取文件！");
+        return;
+    }
+
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*'; // 只接受图像文件
+
+    input.onchange = function(event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function() {
+            // 在这里可以处理所选图像的数据
+            let imageData = reader.result;
+            let image = document.createElement('img');
+            image.src = imageData;
+            image.className='visionSelectedImage';
+            $(".visionAddBtn").before(image);
+            $.ajax({
+                url: '/media/base64Upload',
+                type: 'POST',
+                data: JSON.stringify({"base64Image":imageData}),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(resp) {
+                    // 相似度文本
+                    uploadImages.push(resp.data);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+function fillRightChatContentImages(images){
+    let lastQuestion = $(".human-question").last();
+    let _imgHtml = '';
+    for (let i = 0; i < images.length; i++) {
+        let image = images[i];
+        _imgHtml += "<img id='" + image.mfid + "' src='" + image.httpUrl + "' class='visionSelectedImage'>";
+    }
+    lastQuestion.append("<div class='human-question-images'>" + _imgHtml +"</div>");
+    conversation.scrollTop = conversation.scrollHeight;
+}
+
+function visionSubmit(){
+    let content = $("#visionTextArea").val();
+    if (content == null || content.trim().length == 0){
+        alertMsg("请输入文本内容",true);
+        return;
+    }
+    if (uploadImages.length==0){
+        alertMsg("请至少上传一张图片",true);
+        return;
+    }
+
+    $('#nearest-content').html('');
+    conversation.scrollTop = conversation.scrollHeight;
+    fillRightChatContent(content);
+    fillRightChatContentImages(uploadImages);
+    initLeftChatContent();
+    lastChild = $(resultDiv).children().last().children().first();
+    let useLk = !localStorage.getItem("useLk") ? false : localStorage.getItem("useLk");
+    let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
+
+    let mediaIds = [];
+    for (let i = 0; i < uploadImages.length; i++) {
+        mediaIds.push(uploadImages[i].mfid);
+    }
+    $.ajax({
+        url: '/sse/visionChat',
+        type: 'POST',
+        data: JSON.stringify({"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory,"mediaIds":mediaIds}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(resp) {
+            fillLeftChatContent(resp.data);
+            $("#visionTextArea").val("");
+            $("#visionMidDiv").find("img").remove(".visionSelectedImage");
+            uploadImages = [];
+        },
+        error: function(xhr, status, error) {
+            $("#visionTextArea").val("");
+            $("#visionMidDiv").find("img").remove(".visionSelectedImage");
+            uploadImages = [];
+            console.error(error);
+        }
+    });
+}
 
 
 $(function () {

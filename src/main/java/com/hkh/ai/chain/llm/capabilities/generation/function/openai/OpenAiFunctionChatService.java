@@ -74,8 +74,8 @@ public class OpenAiFunctionChatService implements FunctionChatService {
             functionCompletionResult.setType("function");
             functionCompletionResult.setName(choice.getMessage().getFunctionCall().getName());
             JsonNode arguments = choice.getMessage().getFunctionCall().getArguments();
-            JSONObject jsonObject = JSONObject.parseObject(arguments.asText());
-            functionCompletionResult.setArguments(jsonObject);
+            String argumentsStr = JSONObject.toJSONString(arguments);
+            functionCompletionResult.setArguments(JSONObject.parseObject(argumentsStr));
             functionResultList.add(functionCompletionResult);
         }
 

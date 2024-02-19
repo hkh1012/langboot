@@ -32,8 +32,8 @@ public class ZhipuAiUtil {
     private String completionModel;
 
     /**
-     * 百度千帆开饭的embedding api model（默认：bge-large-zh）
-     * 可选模型：Embedding-V1、bge-large-zh、bge-large-en
+     * 可选模型：embedding-2
+     *
      */
     @Value("${chain.vectorization.zhipu.model}")
     private String embeddingModel;
@@ -60,12 +60,14 @@ public class ZhipuAiUtil {
         queryWrapper.ge("expired_time",LocalDateTime.now().plusSeconds(60L));
         AccessToken accessToken = accessTokenService.getOne(queryWrapper,false);
         if (accessToken == null){
-            String[] keys = appKey.split(".");
+            String[] keys = appKey.split("\\.");
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime expiredTime = now.plusSeconds(60 * 60 * 24);
+
             Map<String,String> jwtHeader = new HashMap<>();
             jwtHeader.put("alg","HS256");
             jwtHeader.put("sign_type","SIGN");
+
             Map<String,Object> payloads = new HashMap<>();
             payloads.put("api_key",keys[0]);
             payloads.put("exp",expiredTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
@@ -74,7 +76,7 @@ public class ZhipuAiUtil {
             JWT jwt = JWT.create()
                     .addHeaders(jwtHeader)
                     .addPayloads(payloads)
-                    .setSigner(JWTSignerUtil.createSigner("HS256", DatatypeConverter.parseBase64Binary(keys[1])));
+                    .setSigner(JWTSignerUtil.createSigner("HS256", keys[1].getBytes()));
             String jwtToken = jwt.sign();
 
             AccessToken newAccessToken = new AccessToken();

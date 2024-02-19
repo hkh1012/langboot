@@ -1,11 +1,14 @@
 package com.hkh.ai.service.impl;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hkh.ai.config.SysConfig;
 import com.hkh.ai.domain.MediaFile;
+import com.hkh.ai.request.MediaFileBase64UploadRequest;
 import com.hkh.ai.request.MediaFileUploadRequest;
 import com.hkh.ai.service.MediaFileService;
 import com.hkh.ai.mapper.MediaFileMapper;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
 * @author huangkh
@@ -145,6 +149,58 @@ public class MediaFileServiceImpl extends ServiceImpl<MediaFileMapper, MediaFile
                 }
             }
         }
+    }
+
+    @Override
+    public MediaFile base64Upload(MediaFileBase64UploadRequest request) {
+        String mediaId = StrUtil.uuid();
+        String suffix = "png";
+        String uuidFileName = mediaId + "." + suffix;
+        int mediaType = getMediaTypeBySuffix(suffix);
+        String mediaTypeStr = getMediaTypeStr(mediaType);
+        String subPath =  mediaTypeStr + "/" + DateUtil.format(new Date(),"yyyy-MM-dd");
+        String fileSavePath = sysConfig.getUploadPath() + "/" + subPath + "/" + uuidFileName;
+        File file = Base64.decodeToFile(request.getBase64Image().split(",")[1], new File(fileSavePath));
+        String httpUrl = sysConfig.getResourceDomain() + "/" + subPath + "/" + uuidFileName;
+        long size = 0;
+        try {
+            InputStream inputStream =  new FileInputStream(file);
+            byte[] bytes = inputStream.readAllBytes();
+            size = bytes.length;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setCid(0);
+        mediaFile.setMfid(mediaId);
+        mediaFile.setFileName(uuidFileName);
+        mediaFile.setFileSuffix(suffix);
+        mediaFile.setMediaType(mediaType);
+        mediaFile.setFilePath(fileSavePath);
+        mediaFile.setFileSize(size);
+        mediaFile.setHttpUrl(httpUrl);
+        mediaFile.setCreateTime(LocalDateTime.now());
+        save(mediaFile);
+        return mediaFile;
+    }
+
+    @Override
+    public List<MediaFile> listByMfids(List<String> mediaIds) {
+        QueryWrapper<MediaFile> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("mfid",mediaIds);
+        queryWrapper.orderByAsc("id");
+        return list(queryWrapper);
+    }
+
+    @Override
+    public void updateWithCid(List<String> mediaIds, int questionCid) {
+        UpdateWrapper<MediaFile> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.in("mfid",mediaIds);
+        updateWrapper.set("cid",questionCid);
+        this.update(updateWrapper);
     }
 
     private int getMediaTypeBySuffix(String suffix){

@@ -17,31 +17,29 @@
 | openai库      | openai-java                                  |
 | 前端           | freemarker、bootstrap、jquery、recorder.js      | 
 | stream-chat  | SSE                                          | 
-| LLMs         | openai、chatglm2、文心一言                         | 
+| LLMs         | openai、chatglm2、文心一言 、智普AI                   | 
 | embeddings   | openai、text2vec-transformers、文心一言            |
 | vector store | weaviate、milvus                              |
 
 ## langchain 原理
 <img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>
 
-## 路线图
-已完成本地知识库上传、及完成openai、chatglm2两个LLMs模型流式聊天功能。未来计划会接入更多大语言模型，以满足更多需求场景。
+## 模型能力矩阵
+| 模型/能力     | 文本生成 | 流式输出 | 语音  | 函数调用 | 图片生成 | 多模态(VISION) | 嵌入EMBEDDING |
+|-----------|------|------|-----|------|---------|-------------|-------------|
+| openai    | 支持   | 支持   | 支持  | 支持   |-| 支持          | 支持          |
+| 百度(文心)    | 支持   | 支持   | -   | 支持   |-| -           | 支持          |
+| 智普(GLM-4) | 支持   | 支持   | -   | 支持   |-| 支持          | 支持          |
+| chatglm2  | 支持   | 支持   | -   | -    |-| -           | -           |
+| ... ...   | -    | -    | -   | -    |-| -           |-  |
+
+## 功能路线图
+已完成本地知识库上传、及完成openai、chatglm2、百度、智普GLM-4四个LLMs模型流式聊天功能。未来计划会接入更多大语言模型，以满足更多需求场景。
 - [ ] Langchain 知识库
     - [x] 接入非结构化文档（已支持 md、pdf、docx、txt、csv 等文件格式）
     - [ ] 搜索引擎接入
     - [ ] 结构化数据接入（如Excel、SQL 等）
     - [ ] 知识图谱/图数据库接入
-- [ ] 增加更多 LLM 模型支持
-    - [x] [OPENAI](https://platform.openai.com/docs/api-reference)
-    - [x] [THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b)
-    - [x] [百度/文心一言](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t)
-    - [ ] [THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b)
-    - 
-- [ ] 增加更多 Embedding 模型支持
-    - [x] [OPENAI/embedding](https://platform.openai.com/docs/api-reference/embeddings)
-    - [x] [weaviate/text2vec-transformers](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers)
-    - [x] [百度/文心一言](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/dllz04sro)
-    - [ ] [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)
 - [ ] 系统功能
     - [ ] 用户
       - [x] 用户登录
