@@ -156,7 +156,18 @@
         <div class="row h" id="visionDiv" style="position: fixed;background-color: #fff;left: 50%;bottom: 0px;transform: translateX(-50%);width: inherit;margin-right: 0px;margin-left: 0px;height: 400px;border-top: 1px solid lightgray;">
             <div class="visionTopDiv">
                 <button id="visionCancelBtn" onclick="visionCancel();" class="btn btn-gray" data-loading-text="取消..."  type="button">取消</button>
-                <button id="visionSubmitBtn" onclick="visionSubmit();" class="btn btn-success" data-loading-text="上传中..."  type="button">提交</button>
+                <button id="visionSubmitBtn" onclick="imageSubmit();" class="btn btn-success" data-loading-text="上传中..."  type="button">提交</button>
+            </div>
+            <div class="visionModeDiv">
+                <div class="form-check form-check-inline" style="display:inline;margin-left: 24px;">
+                    <input class="form-check-input" type="radio" name="imageMode" id="imageModeVision" value="1" checked>
+                    <label class="form-check-label" for="imageModeVision" style="font-weight: 400;">图文多模态</label>
+                </div>
+                <div class="form-check form-check-inline" style="display:inline;margin-left: 24px;">
+                    <input class="form-check-input" type="radio" name="imageMode" id="imageModeText2Image" value="2">
+                    <label class="form-check-label" for="imageModeText2Image" style="font-weight: 400;">文生图</label>
+                </div>
+
             </div>
             <div class="visionTextDiv">
                 <textarea id="visionTextArea" placeholder="说点什么试试吧"></textarea>

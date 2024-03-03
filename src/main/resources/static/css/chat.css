@@ -40,7 +40,7 @@ html, body {
     border-radius: 5px;
 }
 
-.gpt-answer{
+.gpt-answer,.gpt-answer-image{
     background-color: #f4f6f8;
     /*width: fit-content;*/
     padding: 12px 10px 12px 16px;
@@ -345,6 +345,14 @@ a:hover {
     margin-left: 10px;
 }
 
+.session-item:hover .session-item-operate{
+    display: block !important;
+}
+
+.session-item:hover .session-item-remove{
+    display: block !important;
+}
+
 .header-fix-btn{
     display: none;
 }
@@ -457,6 +465,15 @@ a:hover {
     align-items: center;
     padding-left: 10px;
     padding-right: 10px;
+}
+
+.visionModeDiv{
+    height: 50px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
 }
 
 .visionTextDiv{

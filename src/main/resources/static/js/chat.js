@@ -97,6 +97,11 @@ function isLineBreak(str) {
 }
 
 function sendContent() {
+    let sending = $("#sendBtn").prop("disabled");
+    if (sending){
+        alertMsg("消息已经发送，请稍后",true);
+        return ;
+    }
     answerContent = "";
     let content = $("#sayContent").val();
     if (content.trim() == ""){
@@ -179,6 +184,13 @@ function fillLeftChatContentAudio(multiple) {
     setTimeout(function(){
         (window.URL||webkitURL).revokeObjectURL(audio.src);
     },5000);
+
+}
+
+function fillLeftChatContentImage(mediaFileList){
+    for (let i = 0; i < mediaFileList.length; i++) {
+        $("<div class='gpt-answer-image' id='" + mediaFileList[i].mfid +"'><img src='" + mediaFileList[i].httpUrl +"' class='visionSelectedImage'></div>").insertAfter(lastChild);
+    }
 
 }
 
@@ -299,6 +311,11 @@ function setSession(o){
  * 添加会话
  */
 function addSession() {
+    let sessionItems = $("#left-top").find(".session-item");
+    if (sessionItems != null && sessionItems.length >= 10) {
+        alertMsg("会话数不能超过10个",true);
+        return;
+    }
     $.ajax({
         url: '/chatSession/save',
         type: 'POST',
@@ -331,16 +348,26 @@ function saveSessionTitle(o){
     });
 }
 function removeSession(o){
+    event.preventDefault();
+    event.stopPropagation();
+    event.cancelBubble = true;
+    let _sid = $(o).parent().parent().attr("sid");
     $.ajax({
         url: '/chatSession/remove',
         type: 'POST',
-        data: JSON.stringify({"sid":sid}),
+        data: JSON.stringify({"sid":_sid}),
         dataType: 'json',
         contentType: 'application/json',
         success: function(data) {
-            $(resultDiv).html('');
-            sid = '';
+            // sid = '';
             $(o).parent().parent().remove();
+            if (_sid == sid){
+                sid = '';
+                localStorage.setItem("sid",sid);
+                $(resultDiv).html('');
+                loadSession();
+            }
+
         },
         error: function(xhr, status, error) {
             console.error(error);
@@ -394,7 +421,7 @@ function loadLocalStatus(){
     }
     let localSid = localStorage.getItem("sid");
     let o = null;
-    if (localSid == null || localSid == undefined || localSid == 'undefined'){
+    if (localSid == null || localSid == undefined || localSid == 'undefined' || localSid == ''){
         o = $("#left-top").find(".session-item")[0];
     }else {
         o = $("#left-top").find("div[sid='"+localSid+"']")[0];
@@ -879,6 +906,16 @@ function fillRightChatContentImages(images){
     conversation.scrollTop = conversation.scrollHeight;
 }
 
+function imageSubmit(){
+    var imageMode = $('input[type="radio"]').filter('[name="imageMode"]:checked').val();
+    console.log(imageMode);
+    if (imageMode == "1"){
+        visionSubmit();
+    }else {
+        createImageSubmit();
+    }
+}
+
 function visionSubmit(){
     let content = $("#visionTextArea").val();
     if (content == null || content.trim().length == 0){
@@ -914,6 +951,52 @@ function visionSubmit(){
             $("#visionTextArea").val("");
             $("#visionMidDiv").find("img").remove(".visionSelectedImage");
             uploadImages = [];
+        },
+        error: function(xhr, status, error) {
+            $("#visionTextArea").val("");
+            $("#visionMidDiv").find("img").remove(".visionSelectedImage");
+            uploadImages = [];
+            console.error(error);
+        }
+    });
+}
+
+function createImageSubmit(){
+    let content = $("#visionTextArea").val();
+    if (content == null || content.trim().length == 0){
+        alertMsg("请输入文本内容",true);
+        return;
+    }
+
+    $('#nearest-content').html('');
+    conversation.scrollTop = conversation.scrollHeight;
+    fillRightChatContent(content);
+    if (uploadImages.length > 0){
+        fillRightChatContentImages(uploadImages);
+    }
+    initLeftChatContent();
+    lastChild = $(resultDiv).children().last().children().first();
+    let useLk = !localStorage.getItem("useLk") ? false : localStorage.getItem("useLk");
+    let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
+
+    let mediaIds = [];
+    for (let i = 0; i < uploadImages.length; i++) {
+        mediaIds.push(uploadImages[i].mfid);
+    }
+    $.ajax({
+        url: '/sse/createImageChat',
+        type: 'POST',
+        data: JSON.stringify({"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory,"mediaIds":mediaIds}),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(resp) {
+            let data = resp.data;
+            fillLeftChatContent(data.textMsg);
+            fillLeftChatContentImage(data.mediaFileList);
+            $("#visionTextArea").val("");
+            $("#visionMidDiv").find("img").remove(".visionSelectedImage");
+            uploadImages = [];
+            conversation.scrollTop = conversation.scrollHeight;
         },
         error: function(xhr, status, error) {
             $("#visionTextArea").val("");

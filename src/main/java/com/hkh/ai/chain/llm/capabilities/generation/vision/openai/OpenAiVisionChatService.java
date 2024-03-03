@@ -153,25 +153,12 @@ public class OpenAiVisionChatService implements VisionChatService {
         String responseBody = null;
         try {
             responseBody = response.toFuture().get();
+            log.info("open ai vision response ==> {}",responseBody);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(responseBody);
-
-
-//        HttpRequest httpRequest = new HttpRequest(UrlBuilder.of("https://api.openai.com/v1/chat/completions"));
-//        httpRequest.header("Authorization","Bearer " + apiToken);
-//        httpRequest.header("content-type","application/json");
-//
-//        SocketAddress addr = new InetSocketAddress("127.0.0.1", 7890);
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
-//        httpRequest.setProxy(proxy);
-//        httpRequest.body(body.toJSONString());
-//        System.out.println(System.getProperties());
-//        String resultStr = httpRequest.execute().body();
-//        log.info("openai vision chat result ==> {}",resultStr);
 
         ChatCompletionResult result = JSONObject.parseObject(responseBody, ChatCompletionResult.class);
         return result.getChoices().get(0).getMessage().getContent();

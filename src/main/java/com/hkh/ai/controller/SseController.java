@@ -1,6 +1,8 @@
 package com.hkh.ai.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.hkh.ai.chain.llm.capabilities.generation.audio.AudioChatService;
+import com.hkh.ai.chain.llm.capabilities.generation.image.ImageChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.vision.VisionChatService;
 import com.hkh.ai.chain.vectorizer.local.LocalAiVectorization;
@@ -10,8 +12,11 @@ import com.hkh.ai.common.ResultData;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.*;
 import com.hkh.ai.request.AudioChatRequest;
+import com.hkh.ai.request.ImageChatRequest;
+import com.hkh.ai.request.MediaFileBase64UploadRequest;
 import com.hkh.ai.request.VisionChatRequest;
 import com.hkh.ai.response.AudioChatResponse;
+import com.hkh.ai.response.CreateImageChatResponse;
 import com.hkh.ai.service.ChatRequestLogService;
 import com.hkh.ai.service.ConversationService;
 import com.hkh.ai.service.EmbeddingService;
@@ -27,6 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +51,8 @@ public class SseController {
     private final TextChatService textChatService;
     private final AudioChatService audioChatService;
     private final VisionChatService visionChatService;
+    private final ImageChatService imageChatService;
+
     private final VectorStore vectorStore;
     private final Vectorization vectorization;
 
@@ -128,8 +136,41 @@ public class SseController {
         String result = visionChatService.visionCompletion(request.getContent(), httpUrls);
         int answerCid = conversationService.saveConversation(sysUser.getId(),request.getSid(), result, "A");
         return ResultData.success(result,"发送成功");
-
     }
+
+    @PostMapping(path = "createImageChat")
+    @ResponseBody
+    public ResultData<CreateImageChatResponse> createImageChat(HttpServletRequest httpServletRequest, @RequestBody ImageChatRequest request) {
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        List<MediaFile> medias = new ArrayList<>();
+        List<String> mediaIds = new ArrayList<>();
+        List<String> base64List = null;
+        int questionCid = conversationService.saveConversation(sysUser.getId(),request.getSid(), request.getContent(), "Q");
+        if (CollectionUtil.isEmpty(request.getMediaIds())){
+            base64List = imageChatService.createImage(request.getContent());
+        }else {
+            List<MediaFile> mediaFileList = mediaFileService.listByMfids(request.getMediaIds());
+            mediaFileService.updateWithCid(request.getMediaIds(),questionCid);
+            List<String> httpUrls = mediaFileList.stream().map((item)->item.getHttpUrl()).collect(Collectors.toList());
+            base64List = imageChatService.editImage(request.getContent(), httpUrls);
+        }
+        for (String base64Image : base64List){
+            MediaFileBase64UploadRequest mediaFileBase64UploadRequest = new MediaFileBase64UploadRequest();
+            mediaFileBase64UploadRequest.setBase64Image(base64Image);
+            MediaFile mediaFile = mediaFileService.base64Upload(mediaFileBase64UploadRequest);
+            medias.add(mediaFile);
+            mediaIds.add(mediaFile.getMfid());
+        }
+        String textMsg = "图片消息";
+        int answerCid = conversationService.saveConversation(sysUser.getId(),request.getSid(), textMsg, "A");
+        mediaFileService.updateWithCid(mediaIds,answerCid);
+        CreateImageChatResponse response = new CreateImageChatResponse();
+        response.setTextMsg(textMsg);
+        response.setMediaFileList(medias);
+        return ResultData.success(response,"发送成功");
+    }
+
+
 
     @GetMapping(path = "over")
     public String over(String sessionId) {
