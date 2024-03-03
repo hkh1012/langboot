@@ -17,7 +17,7 @@
 | openai库      | openai-java                                  |
 | 前端           | freemarker、bootstrap、jquery、recorder.js      | 
 | stream-chat  | SSE                                          | 
-| LLMs         | openai、chatglm2、文心一言 、智普AI                   | 
+| LLMs         | openai、chatglm2、文心一言 、智谱AI                   | 
 | embeddings   | openai、text2vec-transformers、文心一言            |
 | vector store | weaviate、milvus                              |
 
@@ -58,7 +58,7 @@
     - [x] 内容安全
     - [x] 偏好分析
     - [ ] 查重
-    - [ ] 文生图
+    - [x] 文生图
 - [ ] 前端
     - [x] 移动端适配
     - [x] 代码等内容流式输出优化
