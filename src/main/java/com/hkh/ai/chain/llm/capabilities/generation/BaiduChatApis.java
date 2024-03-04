@@ -19,4 +19,8 @@ public interface BaiduChatApis {
 
     String EMBEDDING_BGE_LARGE_EN = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/embeddings/bge_large_en";
 
+    String IMAGE_CREATE = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/text2image/sd_xl";
+
+    String IMAGE_VISION = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/{yourServiceId}";
+
 }

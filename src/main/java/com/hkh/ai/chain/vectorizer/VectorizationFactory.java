@@ -45,7 +45,7 @@ public class VectorizationFactory {
             return huggingFaceInferenceVectorization;
         }else if ("baidu".equals(type)){
             return baiduQianFanVectorization;
-        }else if ("zhipuai".equals(type)) {
+        }else if ("zhipu".equals(type)) {
             return zhipuAiVectorization;
         }else {
             return null;

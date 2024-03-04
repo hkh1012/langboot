@@ -4,6 +4,7 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.ai.chain.llm.capabilities.generation.ZhipuAiUtil;
@@ -25,7 +26,7 @@ public class ZhipuAiVectorization implements Vectorization {
     public List<List<Double>> batchVectorization(List<String> chunkList) {
         List<List<Double>> resultList = new ArrayList<>();
         String accessToken = zhipuAiUtil.getAccessToken();
-        for (int i = 0; i < chunkList.size() + 1; i++) {
+        for (int i = 0; i < chunkList.size(); i++) {
             String chunk = chunkList.get(i);
 
             JSONObject body = new JSONObject();
@@ -35,6 +36,7 @@ public class ZhipuAiVectorization implements Vectorization {
             HttpRequest httpRequest = new HttpRequest(UrlBuilder.of(ZhipuChatApis.EMBEDDING_EMBEDDING_V2));
             httpRequest.header("Authorization",accessToken);
             httpRequest.header("content-type","application/json");
+            httpRequest.method(Method.POST);
             httpRequest.body(body.toJSONString());
             String resultStr = httpRequest.execute().body();
 
