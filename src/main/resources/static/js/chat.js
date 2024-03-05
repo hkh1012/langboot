@@ -1007,6 +1007,9 @@ function createImageSubmit(){
     });
 }
 
+function closePreviewDiv(){
+    $("#previewImageDIv").addClass("h");
+}
 
 $(function () {
     $("form").on('submit', function (e) {
@@ -1024,6 +1027,12 @@ $(function () {
     });
     $(".add-session-btn").click(function() {
         addSession();
+    });
+    $("div").on("click",".visionSelectedImage",function (){
+        console.log(1234)
+        let attr = $(this).attr("src");
+        $("#visionSelectedPreviewImage").attr("src",attr);
+        $("#previewImageDIv").removeClass("h");
     });
     loadSelectedKnowledge();
     loadSession();

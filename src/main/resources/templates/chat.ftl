@@ -239,6 +239,10 @@
             <span aria-hidden="true">×</span>
         </button>
 </div>
+<div id="previewImageDIv" class="full-screen-bg-preview h">
+    <img src="" id="visionSelectedPreviewImage" class="visionSelectedPreviewImage">
+    <button type="button" class="btn btn-outline-danger btn-round" onclick="closePreviewDiv();">关闭</button>
+</div>
 </body>
 <script src="/static/js/chat.js"></script>
 </html>
