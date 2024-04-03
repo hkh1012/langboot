@@ -17,7 +17,7 @@
 | openai库      | openai-java                                  |
 | 前端           | freemarker、bootstrap、jquery、recorder.js      | 
 | stream-chat  | SSE                                          | 
-| LLMs         | openai、chatglm2、文心一言 、智谱AI                   | 
+| LLMs         | openai、chatglm2、文心一言 、智谱AI、Kimi              | 
 | embeddings   | openai、text2vec-transformers、文心一言            |
 | vector store | weaviate、milvus                              |
 
