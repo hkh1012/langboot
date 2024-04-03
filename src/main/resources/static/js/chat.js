@@ -30,6 +30,7 @@ var answerContent = "";
 var source = new EventSource('/sse/subscribe?sessionId=' + sessionId);
 var lastChild = '';
 var kid = '';
+var docId = '';
 var sid = '';
 var audioArr = [];
 source.onmessage = function (event) {
@@ -116,7 +117,9 @@ function sendContent() {
     $("#sayContent").val("");
     let useLk = !localStorage.getItem("useLk") ? false : localStorage.getItem("useLk");
     let useHistory = !localStorage.getItem("useHistory") ? false : localStorage.getItem("useHistory");
-    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useHistory":useHistory})
+    let useDocMode = !localStorage.getItem("useDocMode") ? false : localStorage.getItem("useDocMode");
+    let useNetMode = !localStorage.getItem("useNetMode") ? false : localStorage.getItem("useNetMode");
+    $.post("/sse/send",{"sessionId":sessionId,"content":content,"sid":sid,"kid":kid,"useLk":useLk,"useDocMode":useDocMode,"useNetMode":useNetMode,"docId":docId,"useHistory":useHistory})
         .done(function (d) {
             let _html = '';
             for (let i = 0; i < d.data.length; i++) {
@@ -221,27 +224,124 @@ function removeConversation(o){
             }
         });
     } ,null);
-
-
 }
 
-function useLocalKnowledge(o){
+function useLocalKnowledge(){
     let useLk = localStorage.getItem("useLk");
     if (useLk == null){
         useLk = 'false';
     }
     if (useLk == "false"){
-        alertMsg("已启用知识库",true);
+        alertMsg("已启用本地知识库",true);
         localStorage.setItem("useLk","true");
-        $(o).addClass("selected")
+        $("#setting-item-local-result").html("是");
+
+        localStorage.setItem("useDocMode","false");
+        $("#setting-item-doc-result").html("否");
+        localStorage.setItem("useNetMode","false");
+        $("#setting-item-net-result").html("否");
+
+        $("#setting-item-knowledge-result").removeClass("h")
+        $("#setting-item-file-upload").addClass("h");
     }else {
         alertMsg("未启用知识库",true);
         localStorage.setItem("useLk","false");
-        $(o).removeClass("selected")
+        $("#setting-item-local-result").html("否");
+        $("#setting-item-knowledge-result").addClass("h")
+        $("#setting-item-file-upload").addClass("h");
     }
 }
 
-function useHistory(o){
+function useDocMode(){
+    let useDocMode = localStorage.getItem("useDocMode");
+    if (useDocMode == null){
+        useDocMode = 'false';
+    }
+    if (useDocMode == "false"){
+        alertMsg("已使用文档模式",true);
+        localStorage.setItem("useDocMode","true");
+        $("#setting-item-doc-result").html("是");
+
+        localStorage.setItem("useLk","false");
+        $("#setting-item-local-result").html("否");
+        localStorage.setItem("useNetMode","false");
+        $("#setting-item-net-result").html("否");
+
+        $("#setting-item-file-upload").removeClass("h");
+        $("#setting-item-knowledge-result").addClass("h")
+    }else {
+        alertMsg("未启用文档模式",true);
+        localStorage.setItem("useDocMode","false");
+        $("#setting-item-doc-result").html("否");
+        $("#setting-item-file-upload").addClass("h");
+        $("#setting-item-knowledge-result").addClass("h")
+    }
+}
+
+function uploadDoc(){
+    if (typeof window.FileReader !== 'function') {
+        console.log("抱歉，您的浏览器不支持读取文件！");
+        return;
+    }
+
+    let input = document.createElement('input');
+    input.type = 'file';
+
+    input.onchange = function(event) {
+        var file = event.target.files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+        $.ajax({
+            url: '/media/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                let media = response.data;
+                docId = media.mfid;
+                localStorage.setItem("doc",JSON.stringify(media))
+                $("#setting-item-file-upload").html(media.fileName);
+                $("#setting-item-file-upload").attr("docId",media.mfid);
+            },
+            error: function(xhr, status, error) {
+                // 处理错误
+                console.error(error);
+            }
+        });
+    };
+    input.click();
+}
+
+function useNetMode(){
+    let useNetMode = localStorage.getItem("useNetMode");
+    if (useNetMode == null){
+        useNetMode = 'false';
+    }
+    if (useNetMode == "false"){
+        alertMsg("已启用联网模式",true);
+        localStorage.setItem("useNetMode","true");
+        $("#setting-item-net-result").html("是");
+
+        localStorage.setItem("useLk","false");
+        $("#setting-item-local-result").html("否");
+        localStorage.setItem("useDocMode","false");
+        $("#setting-item-doc-result").html("否");
+
+        $("#setting-item-knowledge-result").addClass("h")
+        $("#setting-item-file-upload").addClass("h");
+
+    }else {
+        alertMsg("未启用联网模式",true);
+        localStorage.setItem("useNetMode","false");
+        $("#setting-item-net-result").html("否");
+
+        $("#setting-item-knowledge-result").addClass("h")
+        $("#setting-item-file-upload").addClass("h");
+    }
+}
+
+function useHistory(){
     let useHistory = localStorage.getItem("useHistory");
     if (useHistory == null){
         useHistory = 'false';
@@ -249,11 +349,11 @@ function useHistory(o){
     if (useHistory == "false"){
         alertMsg("已携带历史对话",true);
         localStorage.setItem("useHistory","true");
-        $(o).addClass("selected")
+        $("#setting-item-history-result").html("是");
     }else {
         alertMsg("未携带历史对话",true);
         localStorage.setItem("useHistory","false");
-        $(o).removeClass("selected")
+        $("#setting-item-history-result").html("否");
     }
 }
 
@@ -404,20 +504,41 @@ function loadLocalStatus(){
         useLk = 'false';
     }
     if (useLk == "false"){
-        $(".iconKnowledge").removeClass("selected");
-        $(".iconKnowledge2").removeClass("selected");
+        $("#setting-item-local-result").html("否");
     }else {
-        $(".iconKnowledge").addClass("selected")
-        $(".iconKnowledge2").addClass("selected")
+        $("#setting-item-local-result").html("是");
+        $("#setting-item-knowledge-result").removeClass("h");
     }
+
+    let useDocMode = localStorage.getItem("useDocMode");
+    if (useDocMode == null){
+        useDocMode = 'false';
+    }
+    if (useDocMode == "false"){
+        $("#setting-item-doc-result").html("否");
+    }else {
+        $("#setting-item-doc-result").html("是");
+        $("#setting-item-file-upload").removeClass("h");
+    }
+
+    let useNetMode = localStorage.getItem("useNetMode");
+    if (useNetMode == null){
+        useNetMode = 'false';
+    }
+    if (useNetMode == "false"){
+        $("#setting-item-net-result").html("否");
+    }else {
+        $("#setting-item-net-result").html("是");
+    }
+
     let useHistory = localStorage.getItem("useHistory");
     if (useHistory == null){
         useHistory = 'false';
     }
     if (useHistory == "false"){
-        $(".iconHistory").removeClass("selected")
+        $("#setting-item-history-result").html("否");
     }else {
-        $(".iconHistory").addClass("selected")
+        $("#setting-item-history-result").html("是");
     }
     let localSid = localStorage.getItem("sid");
     let o = null;
@@ -465,8 +586,9 @@ function openKnowledgeSelectDiv(){
                     if (knowledge && item.kid == knowledge.kid) {
                         checked = 'checked';
                     }
-                    if (item.kid )
-                    _html +='<div class="radio" style="margin: 20px"><label><input type="radio" name="knowledgeRadio" id="knowledgeRadio' +item.kid+'" value="' + item.kid+'" style="margin-right: 5px;" ' + checked +'>' + item.kname+'</label></div>';
+                    if (item.kid ){
+                        _html +='<div class="radio" style="margin: 20px"><label><input type="radio" name="knowledgeRadio" id="knowledgeRadio' +item.kid+'" value="' + item.kid+'" style="margin-right: 5px;" ' + checked +'>' + item.kname+'</label></div>';
+                    }
                 }
                 $("#knowledge-all").html(_html);
             }
@@ -482,7 +604,7 @@ function selectKnowledge(){
     }
     kid = selectedKid;
     let kname = $('input[name="knowledgeRadio"]:checked').parent().text();
-    $("#selected-knowledge").html(kname);
+    $("#setting-item-knowledge-result").html(kname);
     let knowledge = {"kid":kid,"kname":kname};
     localStorage.setItem("knowledge",JSON.stringify(knowledge));
     $(".knowledge-select-container").addClass("h");
@@ -494,7 +616,18 @@ function loadSelectedKnowledge(){
     if (knowledgeStr){
         knowledge = JSON.parse(knowledgeStr);
         kid = knowledge.kid;
-        $("#selected-knowledge").html(knowledge.kname);
+        $("#setting-item-knowledge-result").html(knowledge.kname);
+    }
+}
+
+function loadLocalDoc(){
+    let docStr = localStorage.getItem("doc");
+    let doc = null;
+    if (docStr){
+        doc = JSON.parse(docStr);
+        docId = doc.mfid;
+        $("#setting-item-file-upload").attr("docId",docId);
+        $("#setting-item-file-upload").html(doc.fileName);
     }
 }
 
@@ -745,7 +878,6 @@ function recUpload(){
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(resp) {
-                    console.log(resp.data)
                     sendAudioContent(media,resp.data);
                 },
                 error: function(xhr, status, error) {
@@ -1011,6 +1143,20 @@ function closePreviewDiv(){
     $("#previewImageDIv").addClass("h");
 }
 
+function rightPanelTriggle(){
+    let text = $("#right-content-header-title").text().trim();
+    console.log(text);
+    if (text=="相关知识片段"){
+        $("#right-content-header-title").text("设置");
+        $(".nearest-div").addClass("h");
+        $(".settings-div").removeClass("h");
+    }else if (text=="设置"){
+        $("#right-content-header-title").text("相关知识片段");
+        $(".nearest-div").removeClass("h");
+        $(".settings-div").addClass("h");
+    }
+}
+
 $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
@@ -1029,11 +1175,11 @@ $(function () {
         addSession();
     });
     $("div").on("click",".visionSelectedImage",function (){
-        console.log(1234)
         let attr = $(this).attr("src");
         $("#visionSelectedPreviewImage").attr("src",attr);
         $("#previewImageDIv").removeClass("h");
     });
     loadSelectedKnowledge();
+    loadLocalDoc();
     loadSession();
 });

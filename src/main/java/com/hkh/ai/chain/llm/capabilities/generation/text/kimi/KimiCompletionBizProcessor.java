@@ -1,7 +1,6 @@
-package com.hkh.ai.chain.llm.capabilities.generation.text.zhipu;
+package com.hkh.ai.chain.llm.capabilities.generation.text.kimi;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.hkh.ai.chain.llm.capabilities.generation.text.zhipu.StreamCompletionResult;
 import com.hkh.ai.domain.CustomChatMessage;
 import com.hkh.ai.domain.SysUser;
 import com.hkh.ai.service.ConversationService;
@@ -24,7 +23,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Slf4j
-public class ZhipuCompletionBizProcessor {
+public class KimiCompletionBizProcessor {
 
     private final ConversationService conversationService;
 

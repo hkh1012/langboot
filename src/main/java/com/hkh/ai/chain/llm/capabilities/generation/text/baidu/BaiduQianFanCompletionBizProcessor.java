@@ -61,7 +61,7 @@ public class BaiduQianFanCompletionBizProcessor {
                 this.getSseEmitter().send(content);
             }
         } catch (IOException e) {
-            log.error("ZhipuCompletionBizProcessor--->>bizProcess异常", e);
+            log.error("KimiCompletionBizProcessor--->>bizProcess异常", e);
             throw new RuntimeException(e);
         }
 

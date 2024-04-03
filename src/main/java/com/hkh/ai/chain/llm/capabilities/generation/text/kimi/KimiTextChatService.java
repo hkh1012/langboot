@@ -1,13 +1,12 @@
-package com.hkh.ai.chain.llm.capabilities.generation.text.zhipu;
+package com.hkh.ai.chain.llm.capabilities.generation.text.kimi;
 
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.hkh.ai.chain.llm.capabilities.generation.ZhipuAiUtil;
-import com.hkh.ai.chain.llm.capabilities.generation.ZhipuChatApis;
+import com.hkh.ai.chain.llm.capabilities.generation.KimiAiUtil;
+import com.hkh.ai.chain.llm.capabilities.generation.KimiApis;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.domain.Conversation;
 import com.hkh.ai.domain.CustomChatMessage;
@@ -17,26 +16,21 @@ import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
-
 @Service
 @Slf4j
-public class ZhipuTextChatService implements TextChatService {
+@AllArgsConstructor
+public class KimiTextChatService implements TextChatService {
 
-    @Autowired
-    private ZhipuAiUtil zhipuAiUtil;
-
-    @Autowired
-    private ConversationService conversationService;
-
-    @Autowired
-    private ZhipuCompletionWebClient zhipuCompletionWebClient;
+    private final KimiAiUtil kimiAiUtil;
+    private final ConversationService conversationService;
+    private final KimiCompletionWebClient kimiCompletionWebClient;
 
     @Override
     public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException {
@@ -76,11 +70,10 @@ public class ZhipuTextChatService implements TextChatService {
         JSONObject body = new JSONObject();
         body.put("messages",messages);
         body.put("stream",true);
-        body.put("model",zhipuAiUtil.getCompletionModel());
-        body.put("request_id", UUID.fastUUID().toString(true));
+        body.put("model",kimiAiUtil.getCompletionModel());
         body.put("temperature",0.95);
 
-        ZhipuCompletionBizProcessor bizProcessor = ZhipuCompletionBizProcessor.builder()
+        KimiCompletionBizProcessor bizProcessor = KimiCompletionBizProcessor.builder()
                 .conversationService(conversationService)
                 .sb(new StringBuilder())
                 .sseEmitter(sseEmitter)
@@ -90,7 +83,7 @@ public class ZhipuTextChatService implements TextChatService {
                 .promptTokens(promptTokens)
                 .build();
 
-        zhipuCompletionWebClient.createFlux(body, bizProcessor);
+        kimiCompletionWebClient.createFlux(body, bizProcessor);
     }
 
     @Override
@@ -99,7 +92,7 @@ public class ZhipuTextChatService implements TextChatService {
         Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
         List<Integer> promptTokens = enc.encode(content);
         System.out.println("promptTokens length == " + promptTokens.size());
-        String accessToken = zhipuAiUtil.getAccessToken();
+        String appKey = kimiAiUtil.getAppKey();
 
         // 构建 message
         JSONArray messages = new JSONArray();
@@ -111,14 +104,13 @@ public class ZhipuTextChatService implements TextChatService {
         // 构建请求体
         JSONObject body = new JSONObject();
         body.put("messages",messages);
-        body.put("model",zhipuAiUtil.getCompletionModel());
-        body.put("request_id", UUID.fastUUID().toString(true));
+        body.put("model",kimiAiUtil.getCompletionModel());
         body.put("stream",false);
         body.put("temperature",0.95);
 
-        HttpRequest httpRequest = new HttpRequest(UrlBuilder.of(ZhipuChatApis.COMPLETION_TEXT));
+        HttpRequest httpRequest = new HttpRequest(UrlBuilder.of(KimiApis.COMPLETION_TEXT));
         httpRequest.method(Method.POST);
-        httpRequest.header("Authorization",accessToken);
+        httpRequest.header("Authorization","Bearer " + appKey);
         httpRequest.header("content-type","application/json");
         httpRequest.body(body.toJSONString());
         String resultStr = httpRequest.execute().body();

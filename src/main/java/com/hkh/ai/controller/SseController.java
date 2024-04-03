@@ -5,6 +5,9 @@ import com.hkh.ai.chain.llm.capabilities.generation.audio.AudioChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.image.ImageChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.text.TextChatService;
 import com.hkh.ai.chain.llm.capabilities.generation.vision.VisionChatService;
+import com.hkh.ai.chain.loader.ResourceLoader;
+import com.hkh.ai.chain.loader.ResourceLoaderFactory;
+import com.hkh.ai.chain.plugin.search.engine.WebSearchEngine;
 import com.hkh.ai.chain.vectorizer.local.LocalAiVectorization;
 import com.hkh.ai.chain.vectorizer.Vectorization;
 import com.hkh.ai.chain.vectorstore.VectorStore;
@@ -25,14 +28,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,11 +66,13 @@ public class SseController {
     private final ConversationService conversationService;
     private final ChatRequestLogService chatRequestLogService;
     private final MediaFileService mediaFileService;
+    private final ResourceLoaderFactory resourceLoaderFactory;
+    private final WebSearchEngine webSearchEngine;
 
     @SneakyThrows
     @PostMapping(path = "send")
     @ResponseBody
-    public ResultData<List<String>> send(HttpServletRequest httpServletRequest, String sessionId, String content,String kid,String sid,Boolean useLk,Boolean useHistory) {
+    public ResultData<List<String>> send(HttpServletRequest httpServletRequest, String sessionId, String content,String kid,String sid,Boolean useLk,Boolean useHistory,Boolean useDocMode,String docId,Boolean useNetMode) {
         SseEmitter sseEmitter = sseCache.get(sessionId);
         List<String> nearestList = new ArrayList<>();
         if (sseEmitter != null) {
@@ -81,6 +89,7 @@ public class SseController {
                 history = conversationService.history(sid);
             }
             CustomChatMessage customChatMessage = new CustomChatMessage(content,sid);
+            // 本地知识库模式
             if (useLk){
                 if (vectorization instanceof LocalAiVectorization){
                     // 使用 weaviate向量数据库内置的嵌入向量模型
@@ -91,6 +100,23 @@ public class SseController {
                     nearestList = vectorStore.nearest(queryVector,kid);
                 }
                 log.info("知识库向量检索结果为{}",nearestList);
+            }
+            // 文档模式
+            if (useDocMode){
+                MediaFile mediaFile = mediaFileService.getByMfid(docId);
+                if (StringUtils.isNotBlank(docId)){
+                    ResourceLoader resourceLoader = resourceLoaderFactory.getLoaderByFileType(mediaFile.getFileSuffix());
+                    File file = new File(mediaFile.getFilePath());
+                    InputStream inputStream = new FileInputStream(file);
+                    String docContent = resourceLoader.getContent(inputStream);
+                    nearestList.add(docContent);
+                }
+            }
+            // 联网模式
+            if (useNetMode){
+                InputStream inputStream = webSearchEngine.search(content);
+                String searchContent = webSearchEngine.load(inputStream);
+                nearestList.add(searchContent);
             }
             textChatService.streamChat(customChatMessage,nearestList,history,sseEmitter,sysUser);
         }

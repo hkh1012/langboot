@@ -12,6 +12,7 @@
     <artifactId>langchain-springboot</artifactId>
     <version>1.0.0</version>
     <name>langchain-springboot</name>
+    <packaging>jar</packaging>
     <description>SpringBoot整合AI模型</description>
     <properties>
         <java.version>17</java.version>
@@ -210,6 +211,11 @@
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
             <version>2.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.15.3</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>me.zhyd.oauth</groupId>-->

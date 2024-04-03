@@ -204,12 +204,14 @@ public class MediaFileServiceImpl extends ServiceImpl<MediaFileMapper, MediaFile
     }
 
     private int getMediaTypeBySuffix(String suffix){
-        //默认mediaType = 1，视频
+        //视频1,音频2，图片3，文档4，默认mediaType = 1
         int mediaType = 1;
         if (StringUtils.equalsAnyIgnoreCase(suffix,"mp3","wav","acc")){
             mediaType = 2;
         }else if (StringUtils.equalsAnyIgnoreCase(suffix,"jpg","png","jpeg","gif","bmp","svg","tiff")){
             mediaType = 3;
+        }else if (StringUtils.equalsAnyIgnoreCase(suffix,"doc","docx","pdf","xls","xlsx","txt","ppt","pptx")){
+            mediaType = 4;
         }
         return mediaType;
     }
@@ -221,6 +223,8 @@ public class MediaFileServiceImpl extends ServiceImpl<MediaFileMapper, MediaFile
             mediaTypeStr = "audio";
         }else if (mediaType == 3){
             mediaTypeStr = "picture";
+        }else if (mediaType == 4){
+            mediaTypeStr = "doc";
         }
         return mediaTypeStr;
     }

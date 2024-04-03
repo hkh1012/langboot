@@ -37,7 +37,7 @@ public class MediaFile implements Serializable {
     private String mfid;
 
     /**
-     * 媒体类型：1视频，2音频，3图片
+     * 媒体类型：1视频，2音频，3图片,4文档
      */
     @TableField(value = "media_type")
     private Integer mediaType;
