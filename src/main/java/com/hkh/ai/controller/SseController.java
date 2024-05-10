@@ -8,6 +8,7 @@ import com.hkh.ai.chain.llm.capabilities.generation.vision.VisionChatService;
 import com.hkh.ai.chain.loader.ResourceLoader;
 import com.hkh.ai.chain.loader.ResourceLoaderFactory;
 import com.hkh.ai.chain.plugin.search.engine.WebSearchEngine;
+import com.hkh.ai.chain.vectorizer.VectorizationFactory;
 import com.hkh.ai.chain.vectorizer.local.LocalAiVectorization;
 import com.hkh.ai.chain.vectorizer.Vectorization;
 import com.hkh.ai.chain.vectorstore.VectorStore;
@@ -68,6 +69,7 @@ public class SseController {
     private final MediaFileService mediaFileService;
     private final ResourceLoaderFactory resourceLoaderFactory;
     private final WebSearchEngine webSearchEngine;
+    private final VectorizationFactory vectorizationFactory;
 
     @SneakyThrows
     @PostMapping(path = "send")
@@ -91,7 +93,7 @@ public class SseController {
             CustomChatMessage customChatMessage = new CustomChatMessage(content,sid);
             // 本地知识库模式
             if (useLk){
-                if (vectorization instanceof LocalAiVectorization){
+                if (vectorizationFactory.getEmbedding() instanceof LocalAiVectorization){
                     // 使用 weaviate向量数据库内置的嵌入向量模型
                     nearestList = vectorStore.nearest(content,kid);
                 }else {
@@ -135,7 +137,7 @@ public class SseController {
         }
         CustomChatMessage customChatMessage = new CustomChatMessage(request.getContent(), request.getSid());
         if (request.getUseLk()){
-            if (vectorization instanceof LocalAiVectorization){
+            if (vectorizationFactory.getEmbedding() instanceof LocalAiVectorization){
                 // 使用 weaviate向量数据库内置的嵌入向量模型
                 nearestList = vectorStore.nearest(request.getContent(),request.getKid());
             }else {
