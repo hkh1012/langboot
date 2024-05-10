@@ -22,7 +22,7 @@
 | vector store | weaviate、milvus                              |
 
 ## langchain 原理
-<img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>
+<img src="assets/langchain+chatglm.png" alt="原理图"/>
 
 ## 模型能力矩阵
 | 模型/能力     | 文本生成 | 流式输出 | 语音  | 函数调用 | 图片生成 | 多模态(VISION) | 嵌入EMBEDDING |
@@ -98,11 +98,11 @@ python .\openai_api.py
 
 ## 聊天Demo
 
-<img src="src/main/resources/assets/stream-chat.png" alt="聊天"/>
+<img src="assets/stream-chat.png" alt="聊天"/>
 本地知识库
-<img src="src/main/resources/assets/use_lk.png" alt="知识库"/>
-<img src="src/main/resources/assets/use_lk2.png" alt="知识库"/>
+<img src="assets/use_lk.png" alt="知识库"/>
+<img src="assets/use_lk2.png" alt="知识库"/>
 ## 项目交流群
-<img src="src/main/resources/assets/weixin_qun.png" alt="二维码" width="300" height="467" />
-<img src="src/main/resources/assets/weixin_02.png" alt="二维码" width="300" height="406" />
+<img src="assets/weixin_qun.png" alt="二维码" width="300" height="467" />
+<img src="assets/weixin_02.png" alt="二维码" width="300" height="406" />
 🎉 langchain-springboot 项目微信交流群，如果你也对本项目感兴趣，欢迎加入群聊参与讨论交流。如群二维码已过期请扫我的个人二维码拉入群
