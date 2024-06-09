@@ -1,4 +1,4 @@
-# langchain-springboot
+# LangBoot
 用langchain的思想，构建SpringBoot AI应用。
 
 🚩 本项目未涉及AI模型的微调、训练过程，仅使用相关大语言模型作为技术底座实现相关功能，模型的使用请参看相关官方文档。
@@ -21,7 +21,7 @@
 | embeddings   | openai、text2vec-transformers、文心一言            |
 | vector store | weaviate、milvus                              |
 
-## langchain 原理
+## langchain rag原理
 <img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>
 
 ## 模型能力矩阵
@@ -86,9 +86,9 @@ python .\openai_api.py
 
 ## 更多配置请查看
 
-[Wiki](https://github.com/hkh1012/langchain-springboot/wiki)
+[Wiki](https://github.com/hkh1012/langboot/wiki)
 
-[如何构建高质量知识库文档](https://github.com/hkh1012/langchain-springboot/wiki/How-to-build-a-high%E2%80%90quality-knowledge-base)
+[如何构建高质量知识库文档](https://github.com/hkh1012/langboot/wiki/How-to-build-a-high%E2%80%90quality-knowledge-base)
 
 ## 功能展示
 | <img src="src/main/resources/assets/login_app.png" alt="登录" with="200"/> |<img src="src/main/resources/assets/functions_1.png" alt="首页"/>|<img src="src/main/resources/assets/functions_2.png" alt="功能2"/>|<img src="src/main/resources/assets/functions_3.png" alt="功能3"/>|

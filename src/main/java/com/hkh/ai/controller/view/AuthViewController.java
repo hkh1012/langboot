@@ -1,4 +1,4 @@
-package com.hkh.ai.controller;
+package com.hkh.ai.controller.view;
 
 import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.net.URLEncodeUtil;
@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
  */
 @Controller
 @AllArgsConstructor
-public class AuthController {
+public class AuthViewController {
 
     private final SysUserService sysUserService;
 

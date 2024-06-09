@@ -1,17 +1,7 @@
 package com.hkh.ai.controller.view;
 
-import com.github.pagehelper.PageInfo;
-import com.hkh.ai.common.annotation.AdminRequired;
 import com.hkh.ai.common.constant.SysConstants;
 import com.hkh.ai.domain.*;
-import com.hkh.ai.request.KnowledgeAttachPageRequest;
-import com.hkh.ai.request.KnowledgeFragmentPageRequest;
-import com.hkh.ai.request.KnowledgePageRequest;
-import com.hkh.ai.request.SpecialNounPageRequest;
-import com.hkh.ai.service.KnowledgeAttachService;
-import com.hkh.ai.service.KnowledgeFragmentService;
-import com.hkh.ai.service.KnowledgeService;
-import com.hkh.ai.service.SpecialNounService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 @AllArgsConstructor
-public class IndexController {
+public class IndexViewController {
 
 
     @GetMapping(value = {"/"})
