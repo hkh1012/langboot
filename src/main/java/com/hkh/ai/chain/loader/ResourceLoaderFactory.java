@@ -1,6 +1,6 @@
 package com.hkh.ai.chain.loader;
 
-import com.hkh.ai.constant.FileType;
+import com.hkh.ai.common.constant.FileType;
 import com.hkh.ai.chain.split.CharacterTextSplitter;
 import com.hkh.ai.chain.split.CodeTextSplitter;
 import com.hkh.ai.chain.split.MarkdownTextSplitter;

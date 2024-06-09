@@ -1,4 +1,4 @@
-package com.hkh.ai.constant;
+package com.hkh.ai.common.constant;
 
 public class FileType {
     public static final String TXT = "txt";

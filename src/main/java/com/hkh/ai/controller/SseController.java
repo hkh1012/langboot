@@ -79,13 +79,13 @@ public class SseController {
         List<String> nearestList = new ArrayList<>();
         if (sseEmitter != null) {
             SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
-            ChatRequestLog chatRequestLog = new ChatRequestLog();
-            chatRequestLog.setUserId(sysUser.getId());
-            chatRequestLog.setKid(kid);
-            chatRequestLog.setRequestTime(LocalDateTime.now());
-            chatRequestLog.setContent(content);
-            chatRequestLog.setCreateTime(LocalDateTime.now());
-            chatRequestLogService.save(chatRequestLog);
+//            ChatRequestLog chatRequestLog = new ChatRequestLog();
+//            chatRequestLog.setUserId(sysUser.getId());
+//            chatRequestLog.setKid(kid);
+//            chatRequestLog.setRequestTime(LocalDateTime.now());
+//            chatRequestLog.setContent(content);
+//            chatRequestLog.setCreateTime(LocalDateTime.now());
+//            chatRequestLogService.save(chatRequestLog);
             List<Conversation> history = new ArrayList<>();
             if (useHistory){
                 history = conversationService.history(sid);
