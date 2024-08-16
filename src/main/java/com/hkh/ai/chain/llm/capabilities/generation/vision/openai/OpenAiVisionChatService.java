@@ -132,7 +132,7 @@ public class OpenAiVisionChatService implements VisionChatService {
         // 构建请求体
         JSONObject body = new JSONObject();
         body.put("messages",messages);
-        body.put("model","gpt-4-vision-preview");
+        body.put("model","gpt-4o");
 //        body.put("request_id", UUID.fastUUID().toString(true));
 
 

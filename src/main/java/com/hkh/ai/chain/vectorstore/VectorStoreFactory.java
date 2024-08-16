@@ -15,9 +15,12 @@ public class VectorStoreFactory {
 
     private final MilvusVectorStore milvusVectorStore;
 
-    public VectorStoreFactory(WeaviateVectorStore weaviateVectorStore, MilvusVectorStore milvusVectorStore) {
+    private final PgVectorStore pgVectorStore;
+
+    public VectorStoreFactory(WeaviateVectorStore weaviateVectorStore, MilvusVectorStore milvusVectorStore, PgVectorStore pgVectorStore) {
         this.weaviateVectorStore = weaviateVectorStore;
         this.milvusVectorStore = milvusVectorStore;
+        this.pgVectorStore = pgVectorStore;
     }
 
     public VectorStore getVectorStore(){
@@ -25,6 +28,8 @@ public class VectorStoreFactory {
             return weaviateVectorStore;
         }else if ("milvus".equals(type)){
             return milvusVectorStore;
+        }else if ("pg".equals(type)){
+            return pgVectorStore;
         }
         return null;
     }

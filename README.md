@@ -19,7 +19,7 @@
 | stream-chat  | SSE                                          | 
 | LLMs         | openai、chatglm2、文心一言 、智谱AI、Kimi              | 
 | embeddings   | openai、text2vec-transformers、文心一言            |
-| vector store | weaviate、milvus                              |
+| vector store | weaviate、milvus、pgvector                     |
 
 ## langchain rag原理
 <img src="src/main/resources/assets/langchain+chatglm.png" alt="原理图"/>

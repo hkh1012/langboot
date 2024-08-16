@@ -36,7 +36,7 @@ public class MilvusVectorStore implements VectorStore{
     @Value("${chain.vector.store.milvus.host}")
     private String milvusHost;
     @Value("${chain.vector.store.milvus.port}")
-    private Integer milvausPort;
+    private Integer milvusPort;
 
     @Value("${chain.vector.store.milvus.dimension}")
     private Integer dimension;
@@ -51,7 +51,7 @@ public class MilvusVectorStore implements VectorStore{
         milvusServiceClient = new MilvusServiceClient(
                 ConnectParam.newBuilder()
                         .withHost(milvusHost)
-                        .withPort(milvausPort)
+                        .withPort(milvusPort)
                         .withDatabaseName("default")
                         .build()
         );
