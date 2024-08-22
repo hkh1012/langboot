@@ -1,4 +1,4 @@
-package com.hkh.ai.controller;
+package com.hkh.ai.controller.view;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
