@@ -27,25 +27,25 @@ public class PgVectorStore implements VectorStore{
     @Value("${chain.vector.store.pgvector.collection}")
     private String collectionName;
 
+    @Value("${chain.vector.store.type}")
+    private String vectorType;
+
     private Connection connection;
-
-    private final PromptRetrieverProperties promptRetrieverProperties;
-
-    public PgVectorStore(PromptRetrieverProperties promptRetrieverProperties) {
-        this.promptRetrieverProperties = promptRetrieverProperties;
-    }
 
     @PostConstruct
     public void init(){
-        try {
-            Class.forName("org.postgresql.Driver");
-            // replace user and password with the configuration of your pg database
-            connection = DriverManager.getConnection("jdbc:postgresql://" + pgHost + ":"+ pgPort +"/pg","postgres","pg123456");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (vectorType.equals("pg")){
+            try {
+                Class.forName("org.postgresql.Driver");
+                // replace user and password with the configuration of your pg database
+                connection = DriverManager.getConnection("jdbc:postgresql://" + pgHost + ":"+ pgPort +"/pg","postgres","pg123456");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
+
 
     }
 
