@@ -1,0 +1,26 @@
+package com.hkh.user.controller.view;
+
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+/**
+ * 注册
+ */
+@Controller
+@AllArgsConstructor
+public class RegisterController {
+
+    @GetMapping("/register")
+    public String registerUi(Model model) {
+        return "register";
+    }
+
+
+    @PostMapping("/register")
+    public String register(){
+        return "chat";
+    }
+}

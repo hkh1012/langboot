@@ -1,0 +1,65 @@
+package com.hkh.domain.domain;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+/**
+ * 知识库
+ * @TableName knowledge
+ */
+@TableName(value ="knowledge")
+@Data
+public class Knowledge implements Serializable {
+    /**
+     * 
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    /**
+     * 知识库ID
+     */
+    @TableField(value = "kid")
+    private String kid;
+
+    /**
+     * 用户ID
+     */
+    @TableField(value = "uid")
+    private Integer uid;
+
+    /**
+     * 知识库名称
+     */
+    @TableField(value = "kname")
+    private String kname;
+
+    /**
+     * 描述
+     */
+    @TableField(value = "description")
+    private String description;
+
+    /**
+     * 
+     */
+    @TableField(value = "create_time")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
+
+    /**
+     * 
+     */
+    @TableField(value = "create_by")
+    private String createBy;
+
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
+}

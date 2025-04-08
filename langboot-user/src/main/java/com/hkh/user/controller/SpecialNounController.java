@@ -1,0 +1,54 @@
+package com.hkh.user.controller;
+
+import com.hkh.common.common.annotation.AdminRequired;
+import com.hkh.common.service.SpecialNounService;
+import com.hkh.domain.ResultData;
+import com.hkh.domain.constant.SysConstants;
+import com.hkh.domain.domain.SysUser;
+import com.hkh.domain.request.SpecialNounRemoveRequest;
+import com.hkh.domain.request.SpecialNounSaveRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 专有名称功能
+ * @author huangkh
+ */
+@RestController
+@AllArgsConstructor
+@RequestMapping("special")
+public class SpecialNounController {
+
+
+    private final SpecialNounService specialNounService;
+    /**
+     * 保存专有名词
+     * @param httpServletRequest
+     * @param requestBody
+     * @return
+     */
+    @PostMapping(value = "save")
+    @AdminRequired
+    public ResultData save(@RequestBody SpecialNounSaveRequest requestBody, HttpServletRequest httpServletRequest){
+        SysUser sysUser = (SysUser) httpServletRequest.getSession().getAttribute(SysConstants.SESSION_LOGIN_USER_KEY);
+        specialNounService.saveOne(requestBody,sysUser);
+        return ResultData.success("保存知识库成功");
+    }
+
+    /**
+     * 删除专业名词
+     * @param requestBody
+     * @return
+     */
+    @PostMapping("remove")
+    @AdminRequired
+    public ResultData remove(@RequestBody SpecialNounRemoveRequest requestBody){
+        specialNounService.removeById(requestBody.getId());
+        return ResultData.success("删除知识库成功");
+    }
+
+}
