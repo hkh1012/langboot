@@ -1,6 +1,6 @@
 package com.hkh.agent.input.demand;
 
-import com.hkh.ai.agent.input.UserInputMessage;
+import com.hkh.agent.input.UserInputMessage;
 import lombok.Data;
 
 /**

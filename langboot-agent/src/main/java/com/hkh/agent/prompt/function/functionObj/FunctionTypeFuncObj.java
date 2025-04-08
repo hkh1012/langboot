@@ -2,7 +2,7 @@ package com.hkh.agent.prompt.function.functionObj;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.hkh.ai.agent.core.function.FunctionType;
+import com.hkh.agent.core.function.FunctionType;
 import lombok.Data;
 
 @Data

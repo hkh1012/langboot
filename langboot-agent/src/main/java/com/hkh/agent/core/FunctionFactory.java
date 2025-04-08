@@ -2,15 +2,14 @@ package com.hkh.agent.core;
 
 
 import com.alibaba.fastjson2.JSONObject;
-import com.hkh.ai.agent.core.function.AiFunctionType;
-import com.hkh.ai.agent.core.function.FunctionType;
-import com.hkh.ai.agent.core.function.ToolFunctionType;
-import com.hkh.ai.agent.prompt.function.FunctionTypePrompt;
-import com.hkh.ai.agent.prompt.function.functionObj.FunctionTypeFuncObj;
-import com.hkh.ai.common.constant.SysConstants;
-import com.hkh.ai.domain.DemandStep;
-import com.hkh.ai.domain.SysUser;
-import com.hkh.ai.service.CompletionService;
+import com.hkh.agent.core.function.AiFunctionType;
+import com.hkh.agent.core.function.FunctionType;
+import com.hkh.agent.core.function.ToolFunctionType;
+import com.hkh.agent.prompt.function.FunctionTypePrompt;
+import com.hkh.agent.prompt.function.functionObj.FunctionTypeFuncObj;
+import com.hkh.domain.constant.SysConstants;
+import com.hkh.domain.domain.DemandStep;
+import com.hkh.domain.domain.SysUser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.concurrent.CompletionService;
 import java.util.function.Function;
 
 /**

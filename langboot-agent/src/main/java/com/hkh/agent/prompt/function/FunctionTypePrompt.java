@@ -1,6 +1,7 @@
 package com.hkh.agent.prompt.function;
 
-import com.hkh.ai.chain.prompt.PromptTemplate;
+
+import com.hkh.domain.prompt.PromptTemplate;
 
 public class FunctionTypePrompt extends PromptTemplate {
 

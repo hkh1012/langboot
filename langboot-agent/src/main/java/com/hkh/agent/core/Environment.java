@@ -1,7 +1,7 @@
 package com.hkh.agent.core;
 
-import com.hkh.ai.domain.DemandStep;
-import org.springframework.stereotype.Component;
+
+import com.hkh.domain.domain.DemandStep;
 
 import java.util.List;
 

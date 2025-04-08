@@ -1,6 +1,6 @@
 package com.hkh.agent.action.goal;
 
-import com.hkh.ai.agent.action.task.Task;
+import com.hkh.agent.action.task.Task;
 import lombok.Data;
 
 import java.time.LocalDateTime;

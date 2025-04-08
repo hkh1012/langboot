@@ -1,6 +1,7 @@
 package com.hkh.agent.action.task.notice.app;
 
-import com.hkh.ai.agent.action.task.TaskProcessor;
+
+import com.hkh.agent.action.task.TaskProcessor;
 
 /**
  * 社交APP通知处理器

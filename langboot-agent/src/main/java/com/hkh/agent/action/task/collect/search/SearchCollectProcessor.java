@@ -1,6 +1,7 @@
 package com.hkh.agent.action.task.collect.search;
 
-import com.hkh.ai.agent.action.task.TaskProcessor;
+
+import com.hkh.agent.action.task.TaskProcessor;
 
 /**
  * 搜索引擎收集处理器接口

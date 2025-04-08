@@ -1,6 +1,7 @@
 package com.hkh.agent.action.task.analysis;
 
-import com.hkh.ai.agent.action.task.TaskProcessor;
+
+import com.hkh.agent.action.task.TaskProcessor;
 
 /**
  * 数据分析处理器

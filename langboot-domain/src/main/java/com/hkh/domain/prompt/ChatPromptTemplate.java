@@ -1,4 +1,4 @@
-package com.hkh.core.prompt;
+package com.hkh.domain.prompt;
 
 public class ChatPromptTemplate extends PromptTemplate{
 
