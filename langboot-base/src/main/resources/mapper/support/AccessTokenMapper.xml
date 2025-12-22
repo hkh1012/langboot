@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.accesstoken.dao.AccessTokenDao">
+
+    <!-- 查询结果列 -->
+    <sql id="base_columns">
+        access_token.id,
+        access_token.app,
+        access_token.token,
+        access_token.create_time,
+        access_token.expired_time,
+        access_token.create_by
+    </sql>
+
+    <!-- 分页查询 -->
+    <select id="queryPage" resultType="com.hkh.domain.vo.accesstoken.AccessTokenVO">
+        SELECT
+        <include refid="base_columns"/>
+        FROM access_token
+        <where>
+            <!--应用名称-->
+            <if test="queryForm.app != null and queryForm.app != ''">
+                AND INSTR(access_token.app,#{queryForm.app})
+            </if>
+            <!--过期时间-->
+            <if test="queryForm.expiredTimeBegin != null">
+                AND access_token.expired_time &gt;= #{queryForm.expiredTimeBegin}
+            </if>
+            <if test="queryForm.expiredTimeEnd != null">
+                AND access_token.expired_time &lt;= #{queryForm.expiredTimeEnd}
+            </if>
+        </where>
+        order by access_token.id desc
+
+    </select>
+
+
+</mapper>

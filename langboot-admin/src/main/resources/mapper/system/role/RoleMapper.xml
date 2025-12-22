@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.admin.module.system.role.dao.RoleDao">
+
+    <resultMap id="RoleEntity"
+               type="com.hkh.domain.entity.role.RoleEntity"></resultMap>
+
+
+    <select id="getByRoleName" resultMap="RoleEntity">
+        SELECT *
+        FROM sys_role
+        WHERE role_name = #{roleName}
+    </select>
+
+
+    <select id="getByRoleCode" resultMap="RoleEntity">
+        SELECT *
+        FROM sys_role
+        WHERE role_code = #{roleCode}
+    </select>
+</mapper>

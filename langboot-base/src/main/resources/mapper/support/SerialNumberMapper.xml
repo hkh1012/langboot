@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.serialnumber.dao.SerialNumberDao">
+
+    <update id="updateLastNumberAndTime">
+        update serial_number
+        set
+        last_number = #{lastNumber},
+        last_time = #{lastTime}
+        where
+        serial_number_id = #{serialNumberId}
+
+    </update>
+
+    <!-- 查询最后生成记录 -->
+    <select id="selectForUpdate" resultType="com.hkh.domain.entity.serialnumber.SerialNumberEntity">
+       select * from serial_number where serial_number_id = #{serialNumberId} for update
+    </select>
+
+
+</mapper>

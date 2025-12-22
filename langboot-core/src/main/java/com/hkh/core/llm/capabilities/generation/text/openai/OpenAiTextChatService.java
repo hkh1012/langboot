@@ -1,11 +1,12 @@
 package com.hkh.core.llm.capabilities.generation.text.openai;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.hkh.core.llm.OpenAiServiceProxy;
 import com.hkh.core.llm.capabilities.generation.text.TextChatService;
-import com.hkh.domain.domain.Conversation;
-import com.hkh.domain.domain.CustomChatMessage;
-import com.hkh.domain.domain.SysUser;
+import com.hkh.domain.dto.FluxStreamBuilder;
+import com.hkh.domain.dto.FluxStreamDto;
+import com.hkh.domain.dto.HistoryMessageDto;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -18,11 +19,8 @@ import com.theokanning.openai.service.OpenAiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,66 +36,66 @@ public class OpenAiTextChatService implements TextChatService {
     @Value("${chain.llm.openai.model}")
     private String defaultModel;
 
-//    @Autowired
-//    private ConversationService conversationService;
 
     @Autowired
     private OpenAiServiceProxy openAiServiceProxy;
 
-    @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException {
-        OpenAiService service = openAiServiceProxy.service();
-        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
-        Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
-        List<Integer> promptTokens = enc.encode(request.getContent());
 
+    @Override
+    public FluxStreamDto stream(String content, String systemPrompt, List<String> nearestList, List<HistoryMessageDto> historyList) {
+        OpenAiService service = openAiServiceProxy.service();
         final List<ChatMessage> messages = new ArrayList<>();
-//        conversationService.saveConversation(sysUser.getId(),request.getSessionId(), request.getContent(), "Q");
-        for (String content : nearestList) {
-            final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), content);
+
+        // 系统提示词
+        StringBuilder nearestContext = new StringBuilder();
+        for (String nearest : nearestList){
+            nearestContext.append(nearest).append("\n");
+        }
+        if (!nearestContext.isEmpty()){
+            systemPrompt = systemPrompt + "\n\n可供参考的资料如下:\n" + nearestContext;
+        }
+        if (StrUtil.isNotEmpty(systemPrompt)){
+            ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), systemPrompt);
             messages.add(systemMessage);
         }
-        String ask = request.getContent();
-        String temp = "";
-        for (Conversation conversation : history){
-            temp = temp + conversation.getContent();
+
+        // 历史聊天记录
+        for (HistoryMessageDto historyMessageDto : historyList) {
+            ChatMessage chatMessage = new ChatMessage(historyMessageDto.getRole(), historyMessageDto.getContent());
+            messages.add(chatMessage);
         }
-        ask = temp + ask;
-        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), ask + (nearestList.size() > 0 ? "\n\n注意：回答问题时，须严格根据我给你的系统上下文内容原文进行回答，请不要自己发挥,回答时保持原来文本的段落层级，直接回答问题，无需重复问题的内容" : "" ));
+
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
         messages.add(userMessage);
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
                 .builder()
                 .model(defaultModel)
                 .messages(messages)
                 .temperature(0.1)
-                .user(request.getSessionId())
+                .topP(0.3)
+                .user(RandomUtil.randomString(32))
                 .n(1)
                 .logitBias(new HashMap<>())
                 .build();
-        StringBuilder sb = new StringBuilder();
+
+        FluxStreamDto fluxStreamDto = FluxStreamBuilder.build();
+
         service.streamChatCompletion(chatCompletionRequest)
                 .doOnError(Throwable::printStackTrace)
                 .blockingForEach(item -> {
                     if (StrUtil.isBlank(item.getChoices().get(0).getFinishReason())
                             && StrUtil.isBlank(item.getChoices().get(0).getMessage().getRole())){
-                        String content = item.getChoices().get(0).getMessage().getContent();
-                        if (content.endsWith("\n") || content.endsWith("\r")){
-                            content = content.replaceAll("\n","<br>");
-                            content = content.replaceAll("\r","<br>");
-                        }
-                        if (content.contains(" ")){
-                            content = content.replaceAll(" ","&nbsp;");
-                        }
-                        sb.append(content);
-                        sseEmitter.send(content);
+                        String messageContent = item.getChoices().get(0).getMessage().getContent();
+                        fluxStreamDto.getSb().append(messageContent);
+                        fluxStreamDto.getTextBlockingDeque().offer(messageContent);
+                        fluxStreamDto.getAudioBlockingDeque().offer(messageContent);
                     }else if (StrUtil.isNotBlank(item.getChoices().get(0).getFinishReason())){
-                        sseEmitter.send("[END]");
-                        String fullContent = sb.toString();
-                        List<Integer> completionToken = enc.encode(fullContent);
-//                        conversationService.saveConversation(sysUser.getId(),request.getSessionId(), sb.toString(), "A");
+                        fluxStreamDto.getTextBlockingDeque().offer("[END]");
+                        fluxStreamDto.getAudioBlockingDeque().offer("[END]");
                     }
                 });
         service.shutdownExecutor();
+        return fluxStreamDto;
     }
 
     @Override

@@ -1,13 +1,14 @@
 package com.hkh.core.llm.capabilities.generation.text.baidu;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.core.llm.capabilities.generation.BaiduQianFanUtil;
 import com.hkh.core.llm.capabilities.generation.text.TextChatService;
-import com.hkh.domain.domain.Conversation;
-import com.hkh.domain.domain.CustomChatMessage;
-import com.hkh.domain.domain.SysUser;
+import com.hkh.domain.dto.FluxStreamBuilder;
+import com.hkh.domain.dto.FluxStreamDto;
+import com.hkh.domain.dto.HistoryMessageDto;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -15,11 +16,8 @@ import com.knuddels.jtokkit.api.EncodingType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,64 +31,54 @@ public class BaiduQianFanTextChatService implements TextChatService {
     @Autowired
     private BaiduQianFanUtil baiduQianFanUtil;
 
-//    @Autowired
-//    private ConversationService conversationService;
-
     @Autowired
-    private BaiduQianFanCompletionWebClient baiduQianFanCompletionWebClient;
+    private BaiduCompletionWebClient baiduCompletionWebClient;
+
     @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> historyList, SseEmitter sseEmitter, SysUser sysUser) {
-        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
-        Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
-        List<Integer> promptTokens = enc.encode(request.getContent());
-        System.out.println("promptTokens length == " + promptTokens.size());
-
-        System.out.println("Streaming chat completion...");
-//        conversationService.saveConversation(sysUser.getId(),request.getSessionId(), request.getContent(), "Q");
-
+    public FluxStreamDto stream(String content, String systemPrompt, List<String> nearestList, List<HistoryMessageDto> historyList) {
         JSONArray messages = new JSONArray();
+        // 系统提示词
+        JSONObject promptJson = new JSONObject();
+        StringBuilder nearestContext = new StringBuilder();
+        for (String nearest : nearestList){
+            nearestContext.append(nearest).append("\n");
+        }
+        if (!nearestContext.isEmpty()){
+            systemPrompt = systemPrompt + "\n\n可供参考的资料如下:\n" + nearestContext;
+        }
+        if (StrUtil.isNotEmpty(systemPrompt)){
+            promptJson.put("role","system");
+            promptJson.put("content", systemPrompt);
+            messages.add(promptJson);
+        }
 
-        List<Conversation> newHistoryList = fixHistoryList(historyList);
-        // history context
-        for (Conversation conversation : newHistoryList) {
+        List<HistoryMessageDto> newHistoryList = fixHistoryListNew(historyList);
+        // 历史聊天记录
+        for (HistoryMessageDto historyMessageDto : newHistoryList) {
             JSONObject historyJson = new JSONObject();
-            historyJson.put("role",conversation.getType().equals("Q") ? "user" : "assistant");
-            historyJson.put("content",conversation.getContent());
+            historyJson.put("role",historyMessageDto.getRole());
+            historyJson.put("content",historyMessageDto.getContent());
             messages.add(historyJson);
         }
 
-        // nearest context
-        String nearestContext = "";
-        if (nearestList!=null && nearestList.size() >0){
-            nearestContext = "请根据下面的上下文信息:\n\n";
-            for (String nearest : nearestList){
-                nearestContext += nearest + ";";
-            }
-        }
-
-        // 添加问题
+        // 添加当前问题
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("role","user");
-        jsonObject.put("content",nearestContext + request.getContent());
+        jsonObject.put("content",content);
         messages.add(jsonObject);
 
         JSONObject body = new JSONObject();
         body.put("messages",messages);
         body.put("stream",true);
-        BaiduQianFanCompletionBizProcessor bizProcessor = BaiduQianFanCompletionBizProcessor.builder()
-//                .conversationService(conversationService)
-                .sb(new StringBuilder())
-                .sseEmitter(sseEmitter)
-                .sysUser(sysUser)
-                .request(request)
-                .enc(enc)
-                .promptTokens(promptTokens)
+
+        FluxStreamDto fluxStreamDto = FluxStreamBuilder.build();
+        BaiduStreamBizProcessor bizProcessor = BaiduStreamBizProcessor.builder()
+                .fluxStreamDto(fluxStreamDto)
                 .build();
 
-        baiduQianFanCompletionWebClient.createFlux(body, bizProcessor);
+        baiduCompletionWebClient.createFlux(body, bizProcessor);
+        return fluxStreamDto;
     }
-
-
 
     /**
      * 适配百度 API 文档 messages 规则
@@ -101,36 +89,37 @@ public class BaiduQianFanTextChatService implements TextChatService {
      * （4）最后一个message的content长度（即此轮对话的问题）不能超过3000 token；如果messages中content总长度大于3000 token，系统会依次遗忘最早的历史会话，直到content的总长度不超过3000 token
      * @param historyList
      */
-    private List<Conversation> fixHistoryList(List<Conversation> historyList) {
-        Collections.reverse(historyList);
-        LinkedList<Conversation> linkedList = new LinkedList<>();
-        if (historyList!=null && historyList.size() > 0){
-            for (int i = 0; i < historyList.size(); i++) {
-                Conversation conversation = historyList.get(i);
-                if (linkedList.size()==0){
-                    if (conversation.getType().equals("A")){
-                        linkedList.addFirst(conversation);
-                    }
-                }else {
-                    if (linkedList.size() % 2 == 0) {
-                        if (conversation.getType().equals("A")){
-                            linkedList.addFirst(conversation);
-                        }
-                    }else {
-                        if (conversation.getType().equals("Q")){
-                            linkedList.addFirst(conversation);
-                        }
-                    }
+    private List<HistoryMessageDto> fixHistoryListNew(List<HistoryMessageDto> historyList) {
+        List<HistoryMessageDto> newHistoryList = new ArrayList<>();
+        for (HistoryMessageDto historyMessageDto : historyList){
+            if (newHistoryList.isEmpty()){
+                newHistoryList.add(historyMessageDto);
+            }else {
+                if (!newHistoryList.get(newHistoryList.size()-1).getRole().equals(historyMessageDto.getRole())){
+                    newHistoryList.add(historyMessageDto);
                 }
             }
         }
-        if (linkedList.size() > 0 && linkedList.size() % 2 == 1){
-            linkedList.removeFirst();
+        if (!newHistoryList.isEmpty()){
+            if (newHistoryList.size() % 2 == 1){
+                if (newHistoryList.get(0).getRole().equals("user")){
+                    // user -> assistant -> user -> assistant -> user
+                    newHistoryList.remove(newHistoryList.size()-1);
+                }else {
+                    // assistant -> user -> assistant -> user -> assistant
+                    newHistoryList.remove(0);
+                }
+            }else {
+                if (newHistoryList.get(0).getRole().equals("assistant")){
+                    // assistant -> user -> assistant -> user
+                    newHistoryList.remove(newHistoryList.size()-1);
+                    newHistoryList.remove(0);
+                }
+            }
         }
-        List<Conversation> newHistoryList = new ArrayList<>();
-        newHistoryList.addAll(linkedList);
         return newHistoryList;
     }
+
 
     @Override
     public String blockCompletion(String content) {

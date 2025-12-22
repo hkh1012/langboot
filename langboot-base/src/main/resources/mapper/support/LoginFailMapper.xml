@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.securityprotect.dao.LoginFailDao">
+
+    <!-- 分页查询 -->
+    <select id="queryPage" resultType="com.hkh.domain.vo.login.LoginFailVO">
+        SELECT
+        *
+        FROM login_fail
+        <where>
+            <!--登录名-->
+            <if test="queryForm.loginName != null and queryForm.loginName != ''">
+                AND INSTR(login_fail.login_name,#{queryForm.loginName})
+            </if>
+            <!--锁定状态-->
+            <if test="queryForm.lockFlag != null ">
+                AND login_fail.lock_flag = #{queryForm.lockFlag}
+            </if>
+            <!--登录失败锁定时间-->
+            <if test="queryForm.loginLockBeginTimeBegin != null">
+                AND DATE_FORMAT(login_fail.login_lock_begin_time, '%Y-%m-%d') &gt;= #{queryForm.loginLockBeginTimeBegin}
+            </if>
+            <if test="queryForm.loginLockBeginTimeEnd != null">
+                AND DATE_FORMAT(login_fail.login_lock_begin_time, '%Y-%m-%d') &lt;= #{queryForm.loginLockBeginTimeEnd}
+            </if>
+        </where>
+        order by login_fail.update_time desc
+    </select>
+
+
+    <select id="selectByUserIdAndUserType"
+            resultType="com.hkh.domain.entity.login.LoginFailEntity">
+        select *
+        from login_fail
+        where user_id = #{userId}
+          and user_type = #{userType}
+    </select>
+
+    <delete id="deleteByUserIdAndUserType">
+        delete
+        from login_fail
+        where user_id = #{userId}
+          and user_type = #{userType}
+    </delete>
+
+
+</mapper>

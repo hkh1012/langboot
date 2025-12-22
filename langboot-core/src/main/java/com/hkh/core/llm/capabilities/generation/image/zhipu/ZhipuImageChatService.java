@@ -1,7 +1,6 @@
 package com.hkh.core.llm.capabilities.generation.image.zhipu;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -11,6 +10,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.hkh.core.llm.capabilities.generation.ZhipuAiUtil;
 import com.hkh.core.llm.capabilities.generation.ZhipuChatApis;
 import com.hkh.core.llm.capabilities.generation.image.ImageChatService;
+import com.hkh.domain.common.SysConfig;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;

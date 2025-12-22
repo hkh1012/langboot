@@ -6,7 +6,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.hkh.core.llm.OpenAiServiceProxy;
 import com.hkh.core.llm.capabilities.generation.vision.VisionChatService;
-import com.hkh.domain.SysConfig;
+import com.hkh.domain.common.SysConfig;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -25,10 +25,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.transport.ProxyProvider;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +49,9 @@ public class OpenAiVisionChatService implements VisionChatService {
     @Value("${proxy.socket.port}")
     private String port;
 
+    @Value("${proxy.http.baseurl}")
+    private String baseUrl;
+
     @Autowired
     private SysConfig sysConfig;
 
@@ -63,12 +64,7 @@ public class OpenAiVisionChatService implements VisionChatService {
     public void init(){
         log.info("openai api web client init...");
         // 备注：openai-java 库最新版本仍未集成vision api,待新版本集成后需要统一成 OpenAiServiceProxy 的方式
-        HttpClient httpClient = HttpClient.create()
-                .proxy(typeSpec -> {
-                    typeSpec.type(ProxyProvider.Proxy.HTTP)
-                            .address(new InetSocketAddress(host,Integer.parseInt(port)))
-                    ;
-                });
+        HttpClient httpClient = HttpClient.create();
 
         ClientHttpConnector clientHttpConnector = new ReactorClientHttpConnector(httpClient);
 
@@ -129,7 +125,7 @@ public class OpenAiVisionChatService implements VisionChatService {
 
 
         Mono<String> response = webClient.post()
-                .uri("https://api.openai.com/v1/chat/completions")
+                .uri(baseUrl +"v1/chat/completions")
                 .header("Authorization", "Bearer " + apiToken)
                 .header("content-type", "application/json")
                 .bodyValue(body.toJSONString())

@@ -1,15 +1,12 @@
 package com.hkh.core.llm.capabilities.generation.text;
 
-import com.hkh.domain.domain.Conversation;
-import com.hkh.domain.domain.CustomChatMessage;
-import com.hkh.domain.domain.SysUser;
+import com.hkh.domain.dto.FluxStreamDto;
+import com.hkh.domain.dto.HistoryMessageDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -21,14 +18,14 @@ public class TextChatServiceWrapper implements TextChatService{
     private final TextChatServiceFactory textChatServiceFactory;
 
     @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException {
-        TextChatService textChatService = textChatServiceFactory.getTextChatService();
-        textChatService.streamChat(request, nearestList, history,sseEmitter,sysUser);
-    }
-
-    @Override
     public String blockCompletion(String content) {
         TextChatService textChatService = textChatServiceFactory.getTextChatService();
         return textChatService.blockCompletion(content);
+    }
+
+    @Override
+    public FluxStreamDto stream(String content, String systemPrompt, List<String> nearestList, List<HistoryMessageDto> historyList) {
+        TextChatService textChatService = textChatServiceFactory.getTextChatService();
+        return textChatService.stream(content, systemPrompt,nearestList, historyList);
     }
 }

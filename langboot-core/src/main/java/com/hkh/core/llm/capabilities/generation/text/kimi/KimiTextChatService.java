@@ -1,6 +1,7 @@
 package com.hkh.core.llm.capabilities.generation.text.kimi;
 
 import cn.hutool.core.net.url.UrlBuilder;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSONArray;
@@ -8,9 +9,9 @@ import com.alibaba.fastjson2.JSONObject;
 import com.hkh.core.llm.capabilities.generation.KimiAiUtil;
 import com.hkh.core.llm.capabilities.generation.KimiApis;
 import com.hkh.core.llm.capabilities.generation.text.TextChatService;
-import com.hkh.domain.domain.Conversation;
-import com.hkh.domain.domain.CustomChatMessage;
-import com.hkh.domain.domain.SysUser;
+import com.hkh.domain.dto.FluxStreamBuilder;
+import com.hkh.domain.dto.FluxStreamDto;
+import com.hkh.domain.dto.HistoryMessageDto;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -18,52 +19,50 @@ import com.knuddels.jtokkit.api.EncodingType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
+
 @Service
 @Slf4j
 @AllArgsConstructor
 public class KimiTextChatService implements TextChatService {
 
     private final KimiAiUtil kimiAiUtil;
-//    private final ConversationService conversationService;
     private final KimiCompletionWebClient kimiCompletionWebClient;
 
+
+
     @Override
-    public void streamChat(CustomChatMessage request, List<String> nearestList, List<Conversation> history, SseEmitter sseEmitter, SysUser sysUser) throws IOException {
-        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
-        Encoding enc = registry.getEncoding(EncodingType.CL100K_BASE);
-        List<Integer> promptTokens = enc.encode(request.getContent());
-        System.out.println("promptTokens length == " + promptTokens.size());
-
-        System.out.println("Streaming chat completion...");
-//        conversationService.saveConversation(sysUser.getId(),request.getSessionId(), request.getContent(), "Q");
-
+    public FluxStreamDto stream(String content, String systemPrompt, List<String> nearestList, List<HistoryMessageDto> historyList) {
         JSONArray messages = new JSONArray();
 
-        // history context
-        for (Conversation conversation : history) {
-            JSONObject historyJson = new JSONObject();
-            historyJson.put("role",conversation.getType().equals("Q") ? "user" : "assistant");
-            historyJson.put("content",conversation.getContent());
-            messages.add(historyJson);
+        // 系统提示词
+        JSONObject promptJson = new JSONObject();
+        StringBuilder nearestContext = new StringBuilder();
+        for (String nearest : nearestList){
+            nearestContext.append(nearest).append("\n");
+        }
+        if (!nearestContext.isEmpty()){
+            systemPrompt = systemPrompt + "\n\n可供参考的资料如下:\n" + nearestContext;
+        }
+        if (StrUtil.isNotEmpty(systemPrompt)){
+            promptJson.put("role","system");
+            promptJson.put("content", systemPrompt);
+            messages.add(promptJson);
         }
 
-        // nearest context
-        String nearestContext = "";
-        if (nearestList!=null && nearestList.size() >0){
-            nearestContext = "请根据下面的上下文信息:\n\n";
-            for (String nearest : nearestList){
-                nearestContext += nearest + ";";
-            }
+        // 历史聊天记录
+        for (HistoryMessageDto historyMessageDto : historyList) {
+            JSONObject historyJson = new JSONObject();
+            historyJson.put("role",historyMessageDto.getRole());
+            historyJson.put("content",historyMessageDto.getContent());
+            messages.add(historyJson);
         }
 
         // 添加问题
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("role","user");
-        jsonObject.put("content",nearestContext + request.getContent());
+        jsonObject.put("content", content);
         messages.add(jsonObject);
 
         JSONObject body = new JSONObject();
@@ -72,17 +71,13 @@ public class KimiTextChatService implements TextChatService {
         body.put("model",kimiAiUtil.getCompletionModel());
         body.put("temperature",0.95);
 
-        KimiCompletionBizProcessor bizProcessor = KimiCompletionBizProcessor.builder()
-//                .conversationService(conversationService)
-                .sb(new StringBuilder())
-                .sseEmitter(sseEmitter)
-                .sysUser(sysUser)
-                .request(request)
-                .enc(enc)
-                .promptTokens(promptTokens)
+        FluxStreamDto fluxStreamDto = FluxStreamBuilder.build();
+        KimiStreamBizProcessor bizProcessor = KimiStreamBizProcessor.builder()
+                .fluxStreamDto(fluxStreamDto)
                 .build();
 
         kimiCompletionWebClient.createFlux(body, bizProcessor);
+        return fluxStreamDto;
     }
 
     @Override

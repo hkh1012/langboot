@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.admin.module.system.employee.dao.EmployeeDao">
+
+    <select id="queryEmployee" resultType="com.hkh.domain.vo.employee.EmployeeVO">
+        SELECT
+        employee.*,
+        department.department_name
+        FROM employee
+        LEFT JOIN department ON department.department_id = employee.department_id
+        <where>
+            <if test="queryForm.keyword != null and queryForm.keyword != ''">
+                AND (
+                INSTR(employee.actual_name,#{queryForm.keyword})
+                OR INSTR(employee.phone,#{queryForm.keyword})
+                OR INSTR(employee.login_name,#{queryForm.keyword})
+                )
+            </if>
+            <if test="departmentIdList != null and departmentIdList.size > 0">
+                and
+                employee.department_id
+                in
+                <foreach collection="departmentIdList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="queryForm.disabledFlag != null">
+                AND employee.disabled_flag = #{queryForm.disabledFlag}
+            </if>
+            <if test="queryForm.deletedFlag != null">
+                AND employee.deleted_flag = #{queryForm.deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateDisableFlag">
+        UPDATE employee
+        SET disabled_flag = #{disabledFlag}
+        WHERE employee_id = #{employeeId}
+    </update>
+
+    <select id="getByLoginName" resultType="com.hkh.domain.entity.EmployeeEntity">
+        SELECT *
+        FROM employee
+        <where>
+            login_name = #{loginName}
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByActualName" resultType="com.hkh.domain.entity.EmployeeEntity">
+        SELECT *
+        FROM employee
+        <where>
+            actual_name = #{actualName}
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByPhone" resultType="com.hkh.domain.entity.EmployeeEntity">
+        SELECT *
+        FROM employee
+        <where>
+            phone = #{phone}
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByEmail" resultType="com.hkh.domain.entity.EmployeeEntity">
+        SELECT *
+        FROM employee
+        <where>
+            email = #{email}
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="listAll" resultType="com.hkh.domain.vo.employee.EmployeeVO">
+        SELECT *
+        FROM employee
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="countByDepartmentId" resultType="integer">
+        SELECT count(1) FROM employee
+        WHERE
+        department_id = #{departmentId} AND deleted_flag = #{deletedFlag}
+    </select>
+
+    <select id="selectByDepartmentId" resultType="com.hkh.domain.entity.EmployeeEntity">
+        SELECT *
+        FROM employee
+        <where>
+            department_id = #{departmentId}
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByActualName" resultType="com.hkh.domain.entity.EmployeeEntity">
+        SELECT * FROM employee
+        <where>
+            actual_name = #{actualName}
+            AND department_id in
+            <foreach collection="departmentIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getEmployeeIdByDepartmentIdList" resultType="java.lang.Long">
+        SELECT employee_id
+        FROM employee
+        <where>
+            department_id IN
+            <foreach collection="departmentIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getEmployeeId" resultType="java.lang.Long">
+        SELECT employee_id
+        FROM employee
+        <where>
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getEmployeeIdByDepartmentId" resultType="java.lang.Long">
+        SELECT employee_id
+        FROM employee
+        <where>
+            department_id = #{departmentId}
+            <if test="deletedFlag != null">
+                AND deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getEmployeeByIds" resultType="com.hkh.domain.vo.employee.EmployeeVO">
+        SELECT * FROM employee
+        where employee_id IN
+        <foreach collection="employeeIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getEmployeeById" resultType="com.hkh.domain.vo.employee.EmployeeVO">
+        SELECT employee.*,
+               department.department_name
+        FROM employee
+                 LEFT JOIN department ON department.department_id = employee.department_id
+        where employee.employee_id = #{employeeId}
+    </select>
+
+    <select id="selectEmployeeByDisabledAndDeleted" resultType="com.hkh.domain.vo.employee.EmployeeVO">
+        SELECT
+        employee.*,
+        department.department_name
+        FROM employee
+        LEFT JOIN department ON department.department_id = employee.department_id
+        <where>
+            <if test="disabledFlag != null">
+                AND employee.disabled_flag = #{disabledFlag}
+            </if>
+            <if test="deletedFlag != null">
+                AND employee.deleted_flag = #{deletedFlag}
+            </if>
+        </where>
+    </select>
+
+    <update id="updatePassword">
+        UPDATE employee
+        SET login_pwd = #{password}
+        WHERE employee_id = #{employeeId}
+    </update>
+
+</mapper>

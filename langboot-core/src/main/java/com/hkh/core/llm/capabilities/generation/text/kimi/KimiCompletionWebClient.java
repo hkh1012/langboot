@@ -51,7 +51,7 @@ public class KimiCompletionWebClient {
 
     }
 
-    public Flux<JSONObject> createFlux(JSONObject requestBody, KimiCompletionBizProcessor kimiCompletionBizProcessor){
+    public Flux<JSONObject> createFlux(JSONObject requestBody, KimiBizProcessor kimiBizProcessor){
         log.info("createFlux 参数：{}",requestBody);
         Flux<JSONObject> flux = Flux.create(emitter -> {
             emitter.next(requestBody);
@@ -61,7 +61,7 @@ public class KimiCompletionWebClient {
         flux.subscribe(
                 jsonObject -> {
                     Flux<String> stringFlux = streamChatCompletion(requestBody);
-                    stringFlux.subscribe(kimiCompletionBizProcessor::bizProcess);
+                    stringFlux.subscribe(kimiBizProcessor::bizProcess);
                 },
                 System.err::println,
                 () -> System.out.println("emitter completed")

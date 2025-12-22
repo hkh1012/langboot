@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.changelog.dao.ChangeLogDao">
+
+    <!-- 分页查询 -->
+    <select id="queryPage" resultType="com.hkh.domain.vo.changelog.ChangeLogVO">
+        SELECT
+        *
+        FROM change_log
+        <where>
+            <!--更新类型:[1:特大版本功能更新;2:功能更新;3:bug修复]-->
+            <if test="queryForm.type != null">
+                AND change_log.type = #{queryForm.type}
+            </if>
+            <!--关键字-->
+            <if test="queryForm.keyword != null and queryForm.keyword != ''">
+                AND ( INSTR(change_log.update_version,#{queryForm.keyword})
+                OR INSTR(change_log.publish_author,#{queryForm.keyword})
+                OR INSTR(change_log.content,#{queryForm.keyword})
+                )
+            </if>
+            <!--发布日期-->
+            <if test="queryForm.publicDateBegin != null">
+                AND DATE_FORMAT(change_log.public_date, '%Y-%m-%d') &gt;= #{queryForm.publicDateBegin}
+            </if>
+            <if test="queryForm.publicDateEnd != null">
+                AND DATE_FORMAT(change_log.public_date, '%Y-%m-%d') &lt;= #{queryForm.publicDateEnd}
+            </if>
+            <!--创建时间-->
+            <if test="queryForm.createTime != null">
+                AND DATE_FORMAT(change_log.create_time, '%Y-%m-%d') = #{queryForm.createTime}
+            </if>
+            <!--跳转链接-->
+            <if test="queryForm.link != null">
+                AND change_log.link = #{queryForm.link}
+            </if>
+        </where>
+        order by change_log.update_version desc
+    </select>
+
+    <select id="selectByVersion"
+            resultType="com.hkh.domain.entity.ChangeLogEntity">
+        select * from change_log where update_version = #{version}
+    </select>
+
+
+</mapper>

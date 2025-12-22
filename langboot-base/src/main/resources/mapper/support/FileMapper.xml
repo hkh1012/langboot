@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.file.dao.FileDao">
+
+
+    <!-- 分页查询 -->
+    <select id="queryPage" resultType="com.hkh.domain.vo.file.FileVO">
+        SELECT
+        *
+        FROM file
+        <where>
+            <!--文件夹类型-->
+            <if test="queryForm.folderType != null">
+                AND file.folder_type = #{queryForm.folderType}
+            </if>
+            <!--文件名词-->
+            <if test="queryForm.fileName != null and queryForm.fileName != ''">
+                AND INSTR(file.file_name,#{queryForm.fileName})
+            </if>
+            <!--文件Key-->
+            <if test="queryForm.fileKey != null and queryForm.fileKey != ''">
+                AND INSTR(file.file_key,#{queryForm.fileKey})
+            </if>
+            <!--文件类型-->
+            <if test="queryForm.fileType != null">
+                AND file.file_type = #{queryForm.fileType}
+            </if>
+            <!--创建人-->
+            <if test="queryForm.creatorName != null and queryForm.creatorName != ''">
+                AND INSTR(file.creator_name,#{queryForm.creatorName})
+            </if>
+            <!--创建时间-->
+            <if test="queryForm.createTimeBegin != null">
+                AND DATE_FORMAT(file.create_time, '%Y-%m-%d') &gt;= #{queryForm.createTimeBegin}
+            </if>
+            <if test="queryForm.createTimeEnd != null">
+                AND DATE_FORMAT(file.create_time, '%Y-%m-%d') &lt;= #{queryForm.createTimeEnd}
+            </if>
+        </where>
+        <if test="queryForm.sortItemList == null or queryForm.sortItemList.size == 0">
+            ORDER BY file.create_time DESC
+        </if>
+    </select>
+
+    <select id="getByFileKey" resultType="com.hkh.domain.vo.file.FileVO">
+        SELECT * FROM file where file_key = #{fileKey}
+    </select>
+
+
+    <select id="selectByFileKeyList" resultType="com.hkh.domain.vo.file.FileVO">
+        select * from file where file_key in
+        <foreach collection="fileKeyList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

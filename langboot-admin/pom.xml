@@ -1,71 +1,117 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.hkh</groupId>
-        <artifactId>langboot-dependencies</artifactId>
+        <artifactId>langboot</artifactId>
         <version>1.0.0</version>
-        <relativePath>../langboot-dependencies</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>langboot-admin</artifactId>
-    <description>管理端服务</description>
+    <version>3.0.0</version>
+    <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <springboot.profileName>dev</springboot.profileName>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <springboot.profileName>test</springboot.profileName>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <springboot.profileName>prod</springboot.profileName>
-            </properties>
-        </profile>
-    </profiles>
+
+    <name>langboot-admin</name>
+    <description>admin project</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hkh</groupId>
+            <artifactId>langboot-base</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hkh</groupId>
+            <artifactId>langboot-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hkh</groupId>
+            <artifactId>langboot-domain</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hkh</groupId>
+            <artifactId>langboot-agent</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- SLF4J API -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Logback实现 -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
+        <finalName>${project.name}-${profiles.active}-${project.version}</finalName>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>dev/*</exclude>
+                    <exclude>test/*</exclude>
+                    <exclude>pre/*</exclude>
+                    <exclude>prod/*</exclude>
+                </excludes>
+            </resource>
+
+            <resource>
+                <directory>src/main/resources/${profiles.active}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>*.yaml</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <directory>src/main/resources/${profiles.active}</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.hkh.sa.admin.AdminApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+<!--                    <parameters>true</parameters>-->
+                    <compilerArgument>-parameters</compilerArgument>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <!--先排除掉所有的application*.properties-->
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>application*.properties</exclude>
-                </excludes>
-            </resource>
-            <!--再将对应配置的properties包含在内-->
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>application.properties</include>
-                    <include>application-${springboot.profileName}.properties</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 
 </project>

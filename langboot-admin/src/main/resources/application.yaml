@@ -1,0 +1,143 @@
+#############################################################################################################
+#                                                                                                           #
+# 为了减少重复配置，本配置文件为此sa-admin的独有配置，更多配置请查看 sa-base 项目中的 sa-base.yaml 通用配置文件。      #
+# 其中此文件中配置可以覆盖 sa-base.yaml 中的通用配置，具体实现类请看类：YamlProcessor.java                          #
+#                                                                                                           #
+#############################################################################################################
+
+# 项目配置: 名称、日志目录
+project:
+  name: langboot-admin
+  log-directory: /home/logs/smart_admin_v3/${project.name}/${spring.profiles.active}
+
+# 项目端口和url根路径
+server:
+  port: 1024
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+
+
+# 环境
+spring:
+  profiles:
+    active: '@profiles.active@'
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+
+baidu:
+  appKey: xxxxxxxxxxxxxxxxx
+  secretKey: xxxxxxxxxxxxxxxxxxxxxxxxx
+google:
+  search:
+    token: xxxxxxxxxxxxxxxxxxxxxx
+    cx: xxxxxxxxxxxxxxxxxxxxxx
+  ai:
+    token: xxxxxxxxxxxxxxxxxxxxxx
+request:
+  staticurls: webjars,.js,.css,.html,.jpg,.png,.map,.woff,.woff2,.mp3,.wav,.acc,.mp4
+  whiteurls: /,/login,/role/page
+proxy:
+  http:
+    baseurl: http://192.168.1.100:8080/
+  socket:
+    host: 127.0.0.1
+    port: '7890'
+  enable: 'true'
+  mode: http
+chain:
+  llm:
+    vision:
+      type: openai
+    text:
+      type: openai
+    function:
+      type: openai
+    audio:
+      type: openai
+    image:
+      type: openai
+    kimi:
+      model: moonshot-v1-32k
+    baidu:
+      appKey: ${baidu.appKey}
+      model: ernie_bot
+      secretKey: ${baidu.secretKey}
+    chatglm:
+      model: chatglm2-6b
+      baseurl: http://127.0.0.1:8000/
+    openai:
+      token: ${openai.token}
+      model: gpt-4o
+    zhipu:
+      model: glm-4
+    qwen:
+      model: qwen-max
+
+  split:
+    chunk:
+      endspliter: <STOP>
+      overlay: '0'
+      qaspliter: '######'
+      size: '200'
+  vector:
+    store:
+      milvus:
+        port: '19530'
+        dimension: '1536'
+        collection: LocalKnowledge
+        host: 192.168.40.229
+      weaviate:
+        host: 192.168.40.229:8080
+        protocol: http
+        classname: LocalKnowledge
+      pgvector:
+        host: 192.168.40.229
+        dimension: '1536'
+        collection: LocalKnowledge
+        port: '5433'
+      type: weaviate
+  vectorization:
+    type: openai
+    openai:
+      model: text-embedding-ada-002
+      token: ${openai.token}
+    zhipu:
+      model: embedding-2
+    baidu:
+      model: bge-large-zh
+  plugin:
+    search:
+      type: google
+  prompt:
+    retriever:
+      limits: '5'
+agent:
+  output:
+    basepath: /data/agent/output
+zhipu:
+  ai:
+    token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+openai:
+  token: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+claude:
+  ai:
+    token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ali:
+  tts:
+    appKey: ''
+
+upload:
+  path: /data/upload
+
+resource:
+  domain: http://192.168.40.229:${server.port}/resources
+kimi:
+  ai:
+    token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+doubao:
+  ai:
+    token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

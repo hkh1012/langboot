@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.dict.dao.DictDataDao">
+
+
+    <select id="queryByDictId" resultType="com.hkh.domain.vo.dict.DictDataVO">
+        select *
+        from sys_dict_data
+        where dict_id = #{dictId}
+        order by sort_order desc
+    </select>
+
+    <select id="getAll" resultType="com.hkh.domain.vo.dict.DictDataVO">
+        select sys_dict_data.*,
+               sys_dict.dict_code
+        from sys_dict_data
+                 left join sys_dict on sys_dict_data.dict_id = sys_dict.dict_id
+        order by sys_dict_data.sort_order desc
+    </select>
+
+
+    <select id="selectByDictIdAndValue"
+            resultType="com.hkh.domain.entity.dict.DictDataEntity">
+        select *
+        from sys_dict_data
+        where dict_id = #{dictId}
+          and data_value = #{dataValue}
+    </select>
+
+    <select id="selectByDictDataIds" resultType="com.hkh.domain.vo.dict.DictDataVO">
+        select
+        sys_dict_data.*,
+        sys_dict.dict_code
+        from sys_dict_data
+        left join sys_dict on sys_dict_data.dict_id = sys_dict.dict_id
+        <where>
+            <if test="dictDataIdList != null and dictDataIdList.size > 0">
+                and sys_dict_data.dict_data_id in
+                <foreach collection="dictDataIdList" open="(" close=")" item="item" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

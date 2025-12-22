@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.admin.module.business.oa.bank.dao.BankDao">
+    <update id="deleteBank">
+        UPDATE oa_bank
+        SET deleted_flag = #{deletedFlag}
+        WHERE bank_id = #{bankId}
+    </update>
+    <select id="queryByAccountNumber"
+            resultType="com.hkh.domain.entity.BankEntity">
+        SELECT *
+        FROM oa_bank
+        WHERE enterprise_id = #{enterpriseId}
+        AND account_number = #{accountNumber}
+        AND deleted_flag = #{deletedFlag}
+        <if test="excludeBankId != null">
+            AND bank_id != #{excludeBankId}
+        </if>
+    </select>
+    <select id="queryPage" resultType="com.hkh.domain.vo.bank.BankVO">
+        SELECT oa_bank.*,
+        oa_enterprise.enterprise_name
+        FROM oa_bank
+        LEFT JOIN oa_enterprise ON oa_bank.enterprise_id = oa_enterprise.enterprise_id
+        <where>
+            oa_bank.deleted_flag = #{queryForm.deletedFlag}
+            <if test="queryForm.keywords != null and queryForm.keywords != ''">
+                AND (INSTR(oa_bank.bank_name,#{queryForm.keywords}) OR
+                INSTR(oa_bank.account_name,#{queryForm.keywords}) OR
+                INSTR(oa_bank.account_number,#{queryForm.keywords}) OR
+                INSTR(oa_bank.create_user_name,#{queryForm.keywords}))
+            </if>
+            <if test="queryForm.startTime != null">
+                AND DATE_FORMAT(oa_bank.create_time, '%Y-%m-%d') &gt;= #{queryForm.startTime}
+            </if>
+            <if test="queryForm.endTime != null">
+                AND DATE_FORMAT(oa_bank.create_time, '%Y-%m-%d') &lt;= #{queryForm.endTime}
+            </if>
+            <if test="queryForm.disabledFlag != null">
+                AND oa_bank.disabled_flag = #{queryForm.disabledFlag}
+            </if>
+            <if test="queryForm.enterpriseId != null">
+                AND oa_bank.enterprise_id = #{queryForm.enterpriseId}
+            </if>
+        </where>
+        <if test="queryForm.sortItemList == null or queryForm.sortItemList.size == 0">
+            ORDER BY oa_bank.create_time DESC
+        </if>
+    </select>
+    <select id="getDetail" resultType="com.hkh.domain.vo.bank.BankVO">
+        SELECT oa_bank.*,
+               oa_enterprise.enterprise_name
+        FROM oa_bank
+                 LEFT JOIN oa_enterprise ON oa_bank.enterprise_id = oa_enterprise.enterprise_id
+        WHERE oa_bank.bank_id = #{bankId}
+          AND oa_bank.deleted_flag = #{deletedFlag}
+    </select>
+</mapper>

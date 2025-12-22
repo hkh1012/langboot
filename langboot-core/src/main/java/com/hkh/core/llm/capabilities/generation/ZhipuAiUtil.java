@@ -3,8 +3,8 @@ package com.hkh.core.llm.capabilities.generation;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.signers.JWTSignerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hkh.core.service.AccessTokenService;
-import com.hkh.domain.domain.AccessToken;
+import com.hkh.domain.entity.accesstoken.AccessTokenEntity;
+import com.hkh.sa.base.module.support.accesstoken.service.AccessTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,11 +49,11 @@ public class ZhipuAiUtil {
     }
 
     public String getAccessToken(){
-        QueryWrapper<AccessToken> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<AccessTokenEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("app","zhipu");
         // 提前 1分钟 失效
         queryWrapper.ge("expired_time",LocalDateTime.now().plusSeconds(60L));
-        AccessToken accessToken = accessTokenService.getOne(queryWrapper,false);
+        AccessTokenEntity accessToken = accessTokenService.getOne(queryWrapper,false);
         if (accessToken == null){
             String[] keys = appKey.split("\\.");
             LocalDateTime now = LocalDateTime.now();
@@ -74,7 +74,7 @@ public class ZhipuAiUtil {
                     .setSigner(JWTSignerUtil.createSigner("HS256", keys[1].getBytes()));
             String jwtToken = jwt.sign();
 
-            AccessToken newAccessToken = new AccessToken();
+            AccessTokenEntity newAccessToken = new AccessTokenEntity();
             newAccessToken.setApp("zhipu");
             newAccessToken.setToken(jwtToken);
             newAccessToken.setExpiredTime(expiredTime);

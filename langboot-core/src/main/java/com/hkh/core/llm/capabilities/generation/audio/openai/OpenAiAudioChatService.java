@@ -32,9 +32,6 @@ public class OpenAiAudioChatService implements AudioChatService {
     @Autowired
     private OpenAiServiceProxy openAiServiceProxy;
 
-//    @Autowired
-//    private MediaFileService mediaFileService;
-
     @Override
     public String audioToText(File audio,String prompt) {
         OpenAiService service = openAiServiceProxy.service();
@@ -51,12 +48,12 @@ public class OpenAiAudioChatService implements AudioChatService {
     }
 
     @Override
-    public InputStream createSpeech(String content) {
+    public InputStream createSpeech(String content, String voiceType) {
         OpenAiService service = openAiServiceProxy.service();
         CreateSpeechRequest createSpeechRequest = CreateSpeechRequest.builder()
                 .model("tts-1")
                 .input(content)
-                .voice("onyx")
+                .voice(voiceType)
                 .build();
         final ResponseBody speech = service.createSpeech(createSpeechRequest);
         InputStream inputStream = speech.byteStream();

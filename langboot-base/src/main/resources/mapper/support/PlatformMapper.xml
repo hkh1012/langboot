@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.platform.dao.PlatformDao">
+
+    <!-- 查询结果列 -->
+    <sql id="base_columns">
+        platform.id,
+        platform.code,
+        platform.name,
+        platform.keys,
+        platform.create_time,
+        platform.create_by
+    </sql>
+
+    <!-- 分页查询 -->
+    <select id="queryPage" resultType="com.hkh.domain.vo.platform.PlatformVO">
+        SELECT
+        <include refid="base_columns"/>
+        FROM platform
+        <where>
+            <!--平台名称-->
+            <if test="queryForm.platform != null and queryForm.platform != ''">
+                AND (
+                  INSTR(platform.code,#{queryForm.platform})
+                  OR INSTR(platform.name,#{queryForm.platform})
+                )
+            </if>
+        </where>
+        order by platform.id asc
+    </select>
+
+
+</mapper>

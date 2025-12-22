@@ -1,0 +1,22 @@
+package com.hkh.domain.form.config;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+/**
+ * 配置更新表单
+ *
+ * @Author 1024创新实验室-主任: 卓大
+ * @Date 2022-03-14 20:46:27
+ * @Wechat zhuoda1024
+ * @Email lab1024@163.com
+ * @Copyright  <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@Data
+public class ConfigUpdateForm extends ConfigAddForm {
+
+    @Schema(description = "configId")
+    @NotNull(message = "configId不能为空")
+    private Long configId;
+}

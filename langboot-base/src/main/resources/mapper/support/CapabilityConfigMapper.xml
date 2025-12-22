@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.capabilityconfig.dao.CapabilityConfigDao">
+
+    <resultMap id="BaseResultMap" type="com.hkh.domain.entity.capabilityconfig.CapabilityConfigEntity">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="textModel" column="text_model" jdbcType="VARCHAR"/>
+            <result property="imageModel" column="image_model" jdbcType="VARCHAR"/>
+            <result property="visionModel" column="vision_model" jdbcType="VARCHAR"/>
+            <result property="funcModel" column="func_model" jdbcType="VARCHAR"/>
+            <result property="jsonModel" column="json_model" jdbcType="VARCHAR"/>
+            <result property="speechModel" column="speech_model" jdbcType="VARCHAR"/>
+            <result property="omniModel" column="omni_model" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,text_model,image_model,
+        vision_model,func_model,json_model,
+        speech_model,omni_model,create_time,
+        create_by
+    </sql>
+</mapper>

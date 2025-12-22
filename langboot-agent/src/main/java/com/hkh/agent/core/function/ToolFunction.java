@@ -1,6 +1,7 @@
 package com.hkh.agent.core.function;
 
-import org.jetbrains.annotations.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import java.util.function.Function;
 

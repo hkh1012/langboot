@@ -51,7 +51,7 @@ public class ZhipuCompletionWebClient {
 
     }
 
-    public Flux<JSONObject> createFlux(JSONObject requestBody, ZhipuCompletionBizProcessor zhipuCompletionBizProcessor){
+    public Flux<JSONObject> createFlux(JSONObject requestBody, ZhipuBizProcessor zhipuBizProcessor){
         log.info("createFlux 参数：{}",requestBody);
         Flux<JSONObject> flux = Flux.create(emitter -> {
             emitter.next(requestBody);
@@ -61,7 +61,7 @@ public class ZhipuCompletionWebClient {
         flux.subscribe(
                 jsonObject -> {
                     Flux<String> stringFlux = streamChatCompletion(requestBody);
-                    stringFlux.subscribe(zhipuCompletionBizProcessor::bizProcess);
+                    stringFlux.subscribe(zhipuBizProcessor::bizProcess);
                 },
                 System.err::println,
                 () -> System.out.println("emitter completed")

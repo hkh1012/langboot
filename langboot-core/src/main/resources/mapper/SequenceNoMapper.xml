@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.core.mapper.SequenceNoMapper">
+
+    <!-- 定义存储过程的调用 -->
+    <select id="getSequenceNo" parameterType="java.util.Map" statementType="CALLABLE">
+        {call getMaxNoByKey(#{p_no_key, mode=IN, jdbcType=VARCHAR}, #{result, mode=OUT, jdbcType=VARCHAR})}
+    </select>
+
+    <select id="getMaxNo" resultType="com.hkh.domain.vo.serialnumber.MaxNoEntity">
+        select reservedWord, noMax from t_maxno where noKey = #{prefixKey} for update
+    </select>
+
+    <update id="updateMaxNo">
+        update t_maxno set noMax = #{noMax} where noKey = #{noKey}
+    </update>
+
+</mapper>

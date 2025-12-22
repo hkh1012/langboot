@@ -8,11 +8,8 @@
 |-----------------------|---------|
 | langboot-admin        | 管理端接口   |
 | langboot-agent        | 智能体模块   |
-| langboot-common       | 通用模块    |
 | langboot-core         | LLM核心模块 |
-| langboot-dependencies | 依赖定义模块  |
 | langboot-domain       | 领域对象模块  |
-| langboot-user         | 用户端     |
 
 ## 涉及技术栈
 | 组件           | 版本                                           | 

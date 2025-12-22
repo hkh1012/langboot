@@ -23,4 +23,10 @@ public interface BaiduChatApis {
 
     String IMAGE_VISION = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/{yourServiceId}";
 
+    String AUDI_TO_TEXT = "https://vop.baidu.com/server_api";
+
+    String TEXT_TO_AUDIO = "https://aip.baidubce.com/rpc/2.0/tts/v1/create";
+
+    String AUDIO_TASK_QUERY = "https://aip.baidubce.com/rpc/2.0/tts/v1/query";
+
 }

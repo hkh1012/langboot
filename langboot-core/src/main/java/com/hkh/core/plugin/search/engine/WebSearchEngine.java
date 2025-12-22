@@ -1,8 +1,6 @@
 package com.hkh.core.plugin.search.engine;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 
 /**
  * 搜索引擎结果

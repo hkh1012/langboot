@@ -24,8 +24,8 @@ public class AudioChatServiceWrapper implements AudioChatService{
 
 
     @Override
-    public InputStream createSpeech(String content) {
+    public InputStream createSpeech(String content, String voiceType) {
         AudioChatService audioChatService = audioChatServiceFactory.getAudioChatService();
-        return audioChatService.createSpeech(content);
+        return audioChatService.createSpeech(content, voiceType);
     }
 }

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.admin.module.business.oa.notice.dao.NoticeDao">
+
+    <!-- 查询结果列 -->
+    <sql id="base_columns">
+        notice.notice_id,
+        notice.notice_type_id,
+        notice.title,
+        notice.all_visible_flag,
+        notice.scheduled_publish_flag,
+        notice.publish_time,
+        notice.content_text,
+        notice.content_html,
+        notice.attachment,
+        notice.page_view_count,
+        notice.user_view_count,
+        notice.source,
+        notice.author,
+        notice.document_number,
+        notice.deleted_flag,
+        notice.create_user_id,
+        notice.update_time,
+        notice.create_time
+    </sql>
+
+    <!-- ================================== 可见范围相关 ================================== -->
+
+    <insert id="insertVisibleRange">
+        insert into notice_visible_range
+        (notice_id, data_type, data_id)
+        values
+        <foreach collection="visibleRangeFormList" separator="," item="item">
+            ( #{noticeId} , #{item.dataType}, #{item.dataId} )
+        </foreach>
+    </insert>
+    <delete id="deleteVisibleRange">
+        delete
+        from notice_visible_range
+        where notice_id = #{noticeId}
+    </delete>
+
+    <select id="queryVisibleRange"
+            resultType="com.hkh.domain.vo.notice.NoticeVisibleRangeVO">
+        select *
+        from notice_visible_range
+        where notice_id = #{noticeId}
+    </select>
+
+    <!-- ================================== 通知公告【主表】相关 ================================== -->
+    <update id="updateDeletedFlag">
+        update notice
+        set deleted_flag = true
+        where notice_id = #{noticeId}
+    </update>
+
+    <!-- 后管分页查询资讯 -->
+    <select id="query" resultType="com.hkh.domain.vo.notice.NoticeVO">
+        SELECT
+        <include refid="base_columns"/>,
+        notice_type.notice_type_name as noticeTypeName,
+        employee.actual_name as createUserName
+        FROM notice
+        LEFT JOIN notice_type on notice.notice_type_id = notice_type.notice_type_id
+        LEFT JOIN employee on notice.create_user_id = employee.employee_id
+        <where>
+            <if test="query.noticeTypeId != null">
+                AND notice_type.notice_type_id = #{query.noticeTypeId}
+            </if>
+            <if test="query.keywords != null and query.keywords != ''">
+                AND ( INSTR(notice.title,#{query.keywords})
+                OR INSTR(notice.author,#{query.keywords})
+                OR INSTR(notice.source,#{query.keywords})
+                )
+            </if>
+            <if test="query.documentNumber != null and query.documentNumber != ''">
+                AND INSTR(notice.document_number, #{query.documentNumber})
+            </if>
+            <if test="query.createUserName != null and query.createUserName != ''">
+                AND employee.actual_name = #{query.createUserName}
+            </if>
+            <if test="query.deletedFlag != null">
+                AND notice.deleted_flag = #{query.deletedFlag}
+            </if>
+            <if test="query.createTimeBegin != null">
+                AND DATE_FORMAT(notice.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.createTimeBegin},
+                '%Y-%m-%d')
+            </if>
+            <if test="query.createTimeEnd != null">
+                AND DATE_FORMAT(notice.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.createTimeEnd}, '%Y-%m-%d')
+            </if>
+            <if test="query.publishTimeBegin != null">
+                AND DATE_FORMAT(notice.publish_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.publishTimeBegin},
+                '%Y-%m-%d')
+            </if>
+            <if test="query.publishTimeEnd != null">
+                AND DATE_FORMAT(notice.publish_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.publishTimeEnd},
+                '%Y-%m-%d')
+            </if>
+        </where>
+        <if test="query.sortItemList == null or query.sortItemList.size == 0">
+            ORDER BY notice.publish_time DESC, notice.notice_id DESC
+        </if>
+    </select>
+
+    <!-- ================================== 通知公告【员工查看】相关 ================================== -->
+    <select id="queryEmployeeNotice" resultType="com.hkh.domain.vo.notice.NoticeEmployeeVO">
+        select
+        <include refid="base_columns"/>,
+        notice_type.notice_type_name,
+        (select count(*) from notice_view_record where notice_view_record.employee_id = #{requestEmployeeId} and
+        notice_view_record.notice_id = notice.notice_id) as viewFlag
+        from notice
+        left join notice_type on notice.notice_type_id = notice_type.notice_type_id
+        <where>
+            <if test="!administratorFlag">
+            (
+                notice.notice_id in
+                (select notice_visible_range.notice_id
+                from notice_visible_range
+                where
+                ( notice_visible_range.data_type = #{departmentDataType}
+                    <if test="requestEmployeeDepartmentIdList != null and requestEmployeeDepartmentIdList.size > 0">
+                        and
+                        notice_visible_range.data_id
+                        in
+                        <foreach collection="requestEmployeeDepartmentIdList" open="(" close=")" separator="," item="item">
+                            #{item}
+                        </foreach>
+                    </if>
+                    )
+                    or ( notice_visible_range.data_type = #{employeeDataType} and notice_visible_range.data_id = #{requestEmployeeId} )
+                )
+                or notice.all_visible_flag = true
+            )
+            </if>
+
+            and notice.deleted_flag = #{deletedFlag}
+            and notice.publish_time &lt; now()
+            <if test="query.noticeTypeId != null">
+                AND notice_type.notice_type_id = #{query.noticeTypeId}
+            </if>
+            <if test="query.keywords != null and query.keywords !=''">
+                AND ( INSTR(notice.title,#{query.keywords})
+                OR INSTR(notice.author,#{query.keywords})
+                OR INSTR(notice.document_number,#{query.keywords})
+                OR INSTR(notice.source,#{query.keywords})
+                )
+            </if>
+            <if test="query.publishTimeBegin != null">
+                AND DATE_FORMAT(notice.publish_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.publishTimeBegin},
+                '%Y-%m-%d')
+            </if>
+            <if test="query.publishTimeEnd != null">
+                AND DATE_FORMAT(notice.publish_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.publishTimeEnd},
+                '%Y-%m-%d')
+            </if>
+            <if test="query.notViewFlag">
+                AND viewFlag = 0
+            </if>
+        </where>
+        order by notice.publish_time desc
+    </select>
+    <select id="queryEmployeeNotViewNotice" resultType="com.hkh.domain.vo.notice.NoticeEmployeeVO">
+        select * from
+        (
+        select
+        <include refid="base_columns"/>,
+        notice_type.notice_type_name,
+        (select count(*) from notice_view_record where notice_view_record.employee_id = #{requestEmployeeId} and
+        notice_view_record.notice_id = notice.notice_id) as viewFlag
+        from notice
+        left join notice_type on notice.notice_type_id = notice_type.notice_type_id
+        <where>
+            <if test="!administratorFlag">
+                notice.notice_id in
+                (select notice_visible_range.notice_id
+                from notice_visible_range
+                where
+                (notice_visible_range.data_type = #{departmentDataType}
+                <if test="requestEmployeeDepartmentIdList != null and requestEmployeeDepartmentIdList.size > 0">
+                    and
+                    notice_visible_range.data_id
+                    in
+                    <foreach collection="requestEmployeeDepartmentIdList" open="(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                )
+                or ( notice_visible_range.data_type = #{employeeDataType} and notice_visible_range.data_id =
+                #{requestEmployeeId} )
+                )
+            </if>
+            and notice.all_visible_flag = true
+            and notice.deleted_flag = #{deletedFlag}
+            and notice.publish_time &lt; now()
+            <if test="query.noticeTypeId != null">
+                AND notice_type.notice_type_id = #{query.noticeTypeId}
+            </if>
+            <if test="query.keywords != null and query.keywords !=''">
+                AND ( INSTR(notice.title,#{query.keywords})
+                OR INSTR(notice.author,#{query.keywords})
+                OR INSTR(notice.documentNumber,#{query.keywords})
+                OR INSTR(notice.source,#{query.keywords})
+                )
+            </if>
+            <if test="query.publishTimeBegin != null">
+                AND DATE_FORMAT(notice.publish_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.publishTimeBegin},
+                '%Y-%m-%d')
+            </if>
+            <if test="query.publishTimeEnd != null">
+                AND DATE_FORMAT(notice.publish_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.publishTimeEnd},
+                '%Y-%m-%d')
+            </if>
+        </where>
+        ) t where viewFlag = 0
+        order by t.publish_time desc
+    </select>
+    <select id="queryNoticeViewRecordList" resultType="com.hkh.domain.vo.notice.NoticeViewRecordVO">
+        select notice_view_record.*,
+        employee.actual_name as employeeName,
+        department.department_name
+        from notice_view_record
+        left join employee on employee.employee_id = notice_view_record.employee_id
+        left join department on department.department_id = employee.department_id
+        where
+        notice_id = #{queryForm.noticeId}
+        <if test="queryForm.keywords != null and queryForm.keywords !=''">
+            AND (
+            INSTR(employee.actual_name,#{queryForm.keywords})
+            OR INSTR(notice_view_record.first_ip,#{queryForm.keywords})
+            OR INSTR(notice_view_record.first_user_agent,#{queryForm.keywords})
+            OR INSTR(notice_view_record.last_ip,#{queryForm.keywords})
+            OR INSTR(notice_view_record.last_user_agent,#{queryForm.keywords})
+            )
+        </if>
+        <if test="queryForm.departmentId != null ">
+            and department.department_id = #{queryForm.departmentId}
+        </if>
+        order by notice_view_record.update_time desc,notice_view_record.create_time desc
+    </select>
+
+    <!-- ================================== 通知公告【员工查看记录】相关 ================================== -->
+    <select id="viewRecordCount" resultType="java.lang.Long">
+        select count(*)
+        from notice_view_record
+        where notice_id = #{noticeId}
+          and employee_id = #{employeeId}
+    </select>
+    <insert id="insertViewRecord">
+        insert into notice_view_record (notice_id, employee_id, first_ip, first_user_agent, page_view_count)
+        values (#{noticeId}, #{employeeId}, #{ip}, #{userAgent}, #{pageViewCount})
+    </insert>
+    <update id="updateViewRecord">
+        update notice_view_record
+        set page_view_count = page_view_count + 1,
+            last_ip         = #{ip},
+            last_user_agent = #{userAgent}
+        where notice_id = #{noticeId}
+          and employee_id = #{employeeId}
+    </update>
+    <update id="updateViewCount">
+        update notice
+        set page_view_count = page_view_count + #{pageViewCountIncrement},
+            user_view_count = user_view_count + #{userViewCountIncrement}
+        where notice_id = #{noticeId}
+    </update>
+
+</mapper>

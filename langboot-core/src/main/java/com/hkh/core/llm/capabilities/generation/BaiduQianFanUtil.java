@@ -4,10 +4,11 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hkh.core.service.AccessTokenService;
-import com.hkh.domain.domain.AccessToken;
+import com.hkh.domain.entity.PlatformEntity;
+import com.hkh.domain.entity.accesstoken.AccessTokenEntity;
+import com.hkh.sa.base.module.support.accesstoken.service.AccessTokenService;
+import com.hkh.sa.base.module.support.platform.service.PlatformService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +38,15 @@ public class BaiduQianFanUtil {
     @Value("${chain.llm.baidu.secretKey}")
     private String secretKey;
 
-    @Autowired
-    private AccessTokenService accessTokenService;
+
+    private final AccessTokenService accessTokenService;
+
+    private final PlatformService platformService;
+
+    public BaiduQianFanUtil(AccessTokenService accessTokenService, PlatformService platformService) {
+        this.accessTokenService = accessTokenService;
+        this.platformService = platformService;
+    }
 
 
     public String getUrl(){
@@ -66,18 +74,62 @@ public class BaiduQianFanUtil {
     }
 
     public String getAccessToken(){
-        QueryWrapper<AccessToken> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("app","baidu");
+        QueryWrapper<AccessTokenEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app","baidu_big_model");
         // 提前 1分钟 失效
         queryWrapper.ge("expired_time",LocalDateTime.now().plusSeconds(60L));
-        AccessToken accessToken = accessTokenService.getOne(queryWrapper,false);
+        AccessTokenEntity accessToken = accessTokenService.getOne(queryWrapper,false);
         if (accessToken == null){
+            PlatformEntity platform = platformService.getByCode("wenxinyiyan");
+            String dbToken = "";
+            String appKey = "";
+            String secretKey = "";
+            if (platform != null){
+                dbToken = platform.getKeys();
+                String[] keyAndSecret = dbToken.split("__");
+                appKey = keyAndSecret[0];
+                secretKey = keyAndSecret[1];
+            }
+
             String result = HttpUtil.get(BaiduChatApis.GET_TOKEN + "?grant_type=client_credentials&client_id=" + appKey + "&client_secret=" + secretKey);
             JSONObject jsonObject = JSON.parseObject(result);
             String token = jsonObject.getString("access_token");
             int expires_in_seconds = jsonObject.getIntValue("expires_in");
-            AccessToken newAccessToken = new AccessToken();
-            newAccessToken.setApp("baidu");
+            AccessTokenEntity newAccessToken = new AccessTokenEntity();
+            newAccessToken.setApp("baidu_big_model");
+            newAccessToken.setToken(token);
+            newAccessToken.setExpiredTime(LocalDateTime.now().plusSeconds(expires_in_seconds));
+            newAccessToken.setCreateTime(LocalDateTime.now());
+            accessTokenService.save(newAccessToken);
+            return token;
+        }
+        return accessToken.getToken();
+    }
+
+    public String getAccessTokenOfAudio(){
+        QueryWrapper<AccessTokenEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app","baidu_audio");
+        // 提前 1分钟 失效
+        queryWrapper.ge("expired_time",LocalDateTime.now().plusSeconds(60L));
+        AccessTokenEntity accessToken = accessTokenService.getOne(queryWrapper,false);
+        if (accessToken == null){
+            PlatformEntity platform = platformService.getByCode("wenxinyiyan");
+            String dbToken = "";
+            String appKey = "";
+            String secretKey = "";
+            if (platform != null){
+                dbToken = platform.getKeys();
+                String[] keyAndSecret = dbToken.split("__");
+                appKey = keyAndSecret[2];
+                secretKey = keyAndSecret[3];
+            }
+
+            String result = HttpUtil.get(BaiduChatApis.GET_TOKEN + "?grant_type=client_credentials&client_id=" + appKey + "&client_secret=" + secretKey);
+            JSONObject jsonObject = JSON.parseObject(result);
+            String token = jsonObject.getString("access_token");
+            int expires_in_seconds = jsonObject.getIntValue("expires_in");
+            AccessTokenEntity newAccessToken = new AccessTokenEntity();
+            newAccessToken.setApp("baidu_audio");
             newAccessToken.setToken(token);
             newAccessToken.setExpiredTime(LocalDateTime.now().plusSeconds(expires_in_seconds));
             newAccessToken.setCreateTime(LocalDateTime.now());

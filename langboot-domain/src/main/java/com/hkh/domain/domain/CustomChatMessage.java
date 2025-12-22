@@ -11,4 +11,6 @@ public class CustomChatMessage {
 
     private String sessionId;
 
+    private String sid;
+
 }

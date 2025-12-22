@@ -3,6 +3,7 @@ package com.hkh.core.llm.capabilities.generation.image.openai;
 import cn.hutool.http.HttpUtil;
 import com.hkh.core.llm.OpenAiServiceProxy;
 import com.hkh.core.llm.capabilities.generation.image.ImageChatService;
+import com.hkh.domain.common.SysConfig;
 import com.theokanning.openai.image.CreateImageEditRequest;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.Image;

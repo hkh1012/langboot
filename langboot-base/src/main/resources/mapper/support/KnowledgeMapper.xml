@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.knowledge.dao.KnowledgeDao">
+
+    <!-- 查询结果列 -->
+    <sql id="base_columns">
+        knowledge.id,
+        knowledge.knowledge_no,
+        knowledge.knowledge_name,
+        knowledge.pic_url,
+        knowledge.description,
+        knowledge.status,
+        knowledge.create_time,
+        knowledge.create_by,
+        knowledge.create_by_name,
+        knowledge.update_time,
+        knowledge.update_by,
+        knowledge.update_by_name
+    </sql>
+
+    <!-- 分页查询 -->
+    <select id="queryPage" resultType="com.hkh.domain.vo.knowledge.KnowledgeVO">
+        SELECT
+        <include refid="base_columns"/>
+        FROM knowledge
+        <where>
+            <!--关键词搜索-->
+            <if test="queryForm.query != null and queryForm.query != ''">
+                AND (
+                  INSTR(knowledge.knowledge_no,#{queryForm.query})
+                  OR INSTR(knowledge.knowledge_name,#{queryForm.query})
+                  OR INSTR(knowledge.description,#{queryForm.query})
+                )
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

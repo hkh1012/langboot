@@ -42,17 +42,30 @@ public class SpecialNoun implements Serializable {
     private Integer sort;
 
     /**
-     * 
+     * 创建时间
      */
     @TableField(value = "create_time")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     /**
-     * 
+     * 创建人
      */
     @TableField(value = "create_by")
     private String createBy;
+
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_time")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;
+
+    /**
+     * 更新人
+     */
+    @TableField(value = "update_by")
+    private String updateBy;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

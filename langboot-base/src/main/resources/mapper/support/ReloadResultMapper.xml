@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.base.module.support.reload.dao.ReloadResultDao">
+
+    <!-- 查询reload列表 -->
+    <select id="query" resultType="com.hkh.domain.vo.reload.ReloadResultVO">
+        SELECT	tag, identification, args, result, exception, create_time FROM	reload_result where tag = #{tag} order by create_time desc
+    </select>
+
+</mapper>

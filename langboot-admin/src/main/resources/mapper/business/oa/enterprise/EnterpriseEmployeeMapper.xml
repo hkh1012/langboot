@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkh.sa.admin.module.business.oa.enterprise.dao.EnterpriseEmployeeDao">
+
+    <delete id="deleteByEnterpriseAndEmployeeIdList">
+        delete from oa_enterprise_employee where enterprise_id = #{enterpriseId} and employee_id in
+        <foreach collection="employeeIdList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByEmployeeId">
+        delete from oa_enterprise_employee where employee_id = #{employeeId}
+    </delete>
+
+    <select id="selectByEnterpriseId"
+            resultType="com.hkh.domain.entity.enterprise.EnterpriseEmployeeEntity">
+        select * from oa_enterprise_employee where enterprise_id = #{enterpriseId}
+    </select>
+
+    <select id="selectByEnterpriseAndEmployeeIdList"
+            resultType="com.hkh.domain.entity.enterprise.EnterpriseEmployeeEntity">
+        select * from oa_enterprise_employee where enterprise_id = #{enterpriseId} and employee_id in
+        <foreach collection="employeeIdList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectByEmployeeIdList"
+            resultType="com.hkh.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseEmployeeVO">
+        select
+        oa_enterprise_employee.*,
+        oa_enterprise.enterprise_name,
+        employee.actual_name as employeeName
+        from oa_enterprise_employee
+        left join oa_enterprise  on oa_enterprise_employee.enterprise_id = oa_enterprise.enterprise_id
+        left join employee  on oa_enterprise_employee.employee_id = employee.employee_id
+        where oa_enterprise_employee.employee_id in
+        <foreach collection="employeeIdList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectByEnterpriseIdList"
+            resultType="com.hkh.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseEmployeeVO">
+        select
+        oa_enterprise_employee.*,
+        oa_enterprise.enterprise_name,
+        employee.*,
+        employee.actual_name as employeeName
+        from oa_enterprise_employee
+        left join oa_enterprise  on oa_enterprise_employee.enterprise_id = oa_enterprise.enterprise_id
+        left join employee on oa_enterprise_employee.employee_id = employee.employee_id
+        where oa_enterprise_employee.enterprise_id in
+        <foreach collection="enterpriseIdList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectEnterpriseIdByEmployeeId" resultType="java.lang.Long">
+        select enterprise_id from oa_enterprise_employee where employee_id = #{employeeId}
+    </select>
+
+    <select id="selectEmployeeIdByEnterpriseIdList" resultType="java.lang.Long">
+        select employee_id from oa_enterprise_employee where enterprise_id in
+        <foreach collection="enterpriseIdList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="queryPageEmployeeList"
+            resultType="com.hkh.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseEmployeeVO">
+        select
+        oa_enterprise_employee.enterprise_id,
+        oa_enterprise.enterprise_name,
+        employee.*,
+        employee.actual_name as employeeName
+        from oa_enterprise_employee
+        left join oa_enterprise  on oa_enterprise_employee.enterprise_id = oa_enterprise.enterprise_id
+        left join employee on oa_enterprise_employee.employee_id = employee.employee_id
+        where oa_enterprise_employee.enterprise_id = #{queryForm.enterpriseId}
+        <if test="queryForm.keyword != null and queryForm.keyword != ''">
+            AND (
+            INSTR(employee.actual_name,#{queryForm.keyword})
+            OR INSTR(employee.phone,#{queryForm.keyword})
+            OR INSTR(employee.login_name,#{queryForm.keyword})
+            )
+        </if>
+        <if test="queryForm.deletedFlag != null">
+            AND employee.deleted_flag = #{queryForm.deletedFlag}
+        </if>
+    </select>
+
+
+</mapper>

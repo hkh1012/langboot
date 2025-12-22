@@ -35,7 +35,6 @@ public class BaiduImageChatService implements ImageChatService {
         body.put("n",1);
 
         String jsonStrResult = HttpUtil.post(BaiduChatApis.IMAGE_CREATE + "?access_token=" + accessToken,body.toJSONString());
-//        log.info("baidu ai image create result ===> {}",jsonStrResult);
         JSONObject jsonObject = JSONObject.parseObject(jsonStrResult);
         JSONArray dataArr = jsonObject.getJSONArray("data");
         List<String> result = new ArrayList<>();

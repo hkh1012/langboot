@@ -10,5 +10,5 @@ import java.io.InputStream;
 public interface AudioChatService {
     String audioToText(File audio, String prompt);
 
-    InputStream createSpeech(String content);
+    InputStream createSpeech(String content,String voiceType);
 }

@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.hkh</groupId>
-        <artifactId>langboot-dependencies</artifactId>
+        <artifactId>langboot</artifactId>
         <version>1.0.0</version>
-        <relativePath>../langboot-dependencies</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>langboot-agent</artifactId>
@@ -24,6 +24,16 @@
             <artifactId>langboot-domain</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+        </dependency>
     </dependencies>
+
 
 </project>
