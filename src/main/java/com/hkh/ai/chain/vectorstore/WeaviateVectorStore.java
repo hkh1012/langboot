@@ -37,6 +37,12 @@ import java.util.Map;
 @Slf4j
 public class WeaviateVectorStore implements VectorStore{
 
+    /**
+     * Weaviate (>= 1.38) reads this header to attribute requests to the integration that sent them.
+     */
+    private static final String INTEGRATION_HEADER = "X-Weaviate-Client-Integration";
+    private static final String INTEGRATION_HEADER_VALUE = "langboot/" + resolveVersion();
+
     @Value("${chain.vector.store.weaviate.protocol}")
     private String protocol;
     @Value("${chain.vector.store.weaviate.host}")
@@ -52,9 +58,23 @@ public class WeaviateVectorStore implements VectorStore{
     }
 
     public WeaviateClient getClient(){
-        Config config = new Config(protocol, host);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(INTEGRATION_HEADER, INTEGRATION_HEADER_VALUE);
+        Config config = new Config(protocol, host, headers);
         WeaviateClient client = new WeaviateClient(config);
         return client;
+    }
+
+    /**
+     * LangBoot version from the jar manifest (Implementation-Version), or "unknown" when not packaged.
+     */
+    static String resolveVersion() {
+        try {
+            String version = WeaviateVectorStore.class.getPackage().getImplementationVersion();
+            return StringUtils.isNotBlank(version) ? version : "unknown";
+        } catch (RuntimeException e) {
+            return "unknown";
+        }
     }
 
     public Result<Meta> getMeta(){
